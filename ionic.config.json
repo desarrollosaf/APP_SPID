@@ -1,0 +1,7 @@
+{
+  "name": "APP_SPID",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "angular"
+}
