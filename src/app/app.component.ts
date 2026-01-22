@@ -7,12 +7,12 @@ import { Component } from '@angular/core';
 })
 export class AppComponent {
   public appPages = [
-    { title: 'Inicio', url: '/folder/inbox', icon: 'mail' },
+    { title: 'Inicio', url: '/folder/inbox', icon: 'home' },
     { title: 'Sesion', url: '/sesiones', icon: 'paper-plane' },
-    { title: 'Asuntos orden del dia', url: '/folder/favorites', icon: 'heart' },
-    { title: 'Orden del dia', url: '/folder/archived', icon: 'archive' },
-    { title: 'Marco Juridico', url: '/folder/trash', icon: 'trash' },
-    { title: 'Sesion', url: '/folder/spam', icon: 'warning' },
+    // { title: 'Asuntos orden del dia', url: '/folder/favorites', icon: 'heart' },
+    // { title: 'Orden del dia', url: '/folder/archived', icon: 'archive' },
+    // { title: 'Marco Juridico', url: '/folder/trash', icon: 'trash' },
+    // { title: 'Sesion', url: '/folder/spam', icon: 'warning' },
   ];
   public labels = ['Family', 'Friends', 'Notes', 'Work', 'Travel', 'Reminders'];
   constructor() {}
