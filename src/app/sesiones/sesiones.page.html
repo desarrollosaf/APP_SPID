@@ -9,26 +9,67 @@
 
 <ion-content class="ion-padding">
 
-  <!-- Toolbar colapsable, NO envuelto en ion-header -->
   <ion-toolbar collapse="condense">
     <ion-title size="large">Sesiones</ion-title>
   </ion-toolbar>
 
-  <ion-button expand="block" (click)="setOpen(true)">Open</ion-button>
+  <ion-grid>
+    <ion-row>
+      <ion-col size="6">
+        <ion-card button (click)="setOpen(true)">
+          <ion-card-content class="doc-card">
+            <ion-icon name="document-text-outline"></ion-icon>
+            <h2>Acta</h2>
+          </ion-card-content>
+        </ion-card>
+      </ion-col>
 
+      <ion-col size="6">
+        <ion-card button (click)="setOpen(true)">
+          <ion-card-content class="doc-card">
+            <ion-icon name="list-outline"></ion-icon>
+            <h2>Asuntos del Orden</h2>
+          </ion-card-content>
+        </ion-card>
+      </ion-col>
+
+      <ion-col size="6">
+        <ion-card button (click)="setOpen(true)">
+          <ion-card-content class="doc-card">
+            <ion-icon name="calendar-outline"></ion-icon>
+            <h2>Orden del Día</h2>
+          </ion-card-content>
+        </ion-card>
+      </ion-col>
+
+      <ion-col size="6">
+        <ion-card button (click)="setOpen(true)">
+          <ion-card-content class="doc-card">
+            <ion-icon name="scale-outline"></ion-icon>
+            <h2>Marco Jurídico</h2>
+          </ion-card-content>
+        </ion-card>
+      </ion-col>
+    </ion-row>
+  </ion-grid>
+
+  <!-- MODAL -->
   <ion-modal [isOpen]="isModalOpen">
     <ng-template>
       <ion-header>
         <ion-toolbar>
-          <ion-title>Modal</ion-title>
+          <ion-title>Documento</ion-title>
           <ion-buttons slot="end">
-            <ion-button (click)="setOpen(false)">Close</ion-button>
+            <ion-button (click)="setOpen(false)">Cerrar</ion-button>
           </ion-buttons>
         </ion-toolbar>
       </ion-header>
 
-      <ion-content class="ion-padding">
-        <p>Contenido del modal</p>
+      <ion-content>
+        <iframe
+          [src]="pdfUrl"
+          style="width: 100%; height: 100%; border: none;">
+        </iframe>
       </ion-content>
     </ng-template>
   </ion-modal>
