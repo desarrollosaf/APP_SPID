@@ -13,7 +13,9 @@
     <ion-title size="large"></ion-title>
   </ion-toolbar>
 
-  <ion-grid>
+  @if (evento  == 1) {
+
+    <ion-grid>
     <ion-row>
       <ion-col size="6">
         <ion-card button (click)="setOpen(true)">
@@ -52,6 +54,60 @@
       </ion-col>
     </ion-row>
   </ion-grid>
+    
+  } @else if (evento == 2) {
+   
+    <div class="ion-text-center ion-padding">
+      <ion-card>
+        <ion-card-header>
+          <ion-card-title>Registro de Asistencia</ion-card-title>
+        </ion-card-header>
+
+        <ion-card-content>
+          <ion-button expand="block" color="success" (click)="registrarAsistencia()">
+            Asistencia
+          </ion-button>
+        </ion-card-content>
+      </ion-card>
+  </div>
+
+  } @else if (evento == 3){
+   
+    <div *ngIf="evento === 3" class="ion-text-center ion-padding">
+      <ion-card>
+        <ion-card-header>
+          <ion-card-title>Votación</ion-card-title>
+        </ion-card-header>
+
+        <ion-card-content>
+          <ion-button expand="block" color="success" (click)="votar(1)">
+            A Favor
+          </ion-button>
+
+          <ion-button expand="block" color="danger" (click)="votar(2)">
+            En Contra
+          </ion-button>
+
+          <ion-button expand="block" color="warning" (click)="votar(3)">
+            Abstención
+          </ion-button>
+
+           <ion-button expand="block" color="medium" (click)="votar(4)">
+            S/R
+          </ion-button>
+        </ion-card-content>
+      </ion-card>
+    </div>
+
+  } @else {
+
+    <div  class="ion-text-center ion-padding">
+      <ion-text color="medium">
+        No hay evento activo en este momento
+      </ion-text>
+    </div>
+  }
+  
 
   <!-- MODAL -->
   <ion-modal [isOpen]="isModalOpen">
