@@ -45,7 +45,7 @@ export class SesionesPage implements OnInit {
  
   setOpen(isOpen: boolean) {
     
-     this.pdfUrl = this.sanitizer.bypassSecurityTrustResourceUrl('assets/OD-DELIBERANTE-DIP.PER-22ENERO2026.pdf');
+    this.pdfUrl = this.sanitizer.bypassSecurityTrustResourceUrl('assets/OD-DELIBERANTE-DIP.PER-22ENERO2026.pdf');
     this.isModalOpen = isOpen;
   }
 
