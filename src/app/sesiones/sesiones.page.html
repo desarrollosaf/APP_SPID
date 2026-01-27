@@ -80,19 +80,19 @@
         </ion-card-header>
 
         <ion-card-content>
-          <ion-button expand="block" color="success" (click)="votar(1)">
+          <ion-button expand="block" color="success" (click)="votar('FAVOR')">
             A Favor
           </ion-button>
 
-          <ion-button expand="block" color="danger" (click)="votar(2)">
+          <ion-button expand="block" color="danger" (click)="votar('CONTRA')">
             En Contra
           </ion-button>
 
-          <ion-button expand="block" color="warning" (click)="votar(3)">
+          <ion-button expand="block" color="warning" (click)="votar('ABSTENCION')">
             Abstención
           </ion-button>
 
-           <ion-button expand="block" color="medium" (click)="votar(4)">
+           <ion-button expand="block" color="medium" (click)="votar('SIN REGISTRO')">
             S/R
           </ion-button>
         </ion-card-content>

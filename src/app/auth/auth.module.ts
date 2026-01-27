@@ -6,6 +6,8 @@ import { IonicModule } from '@ionic/angular';
 
 import { AuthPageRoutingModule } from './auth-routing.module';
 
+import { IonAlert } from '@ionic/angular/standalone';
+
 import { AuthPage } from './auth.page';
 
 @NgModule({
@@ -13,7 +15,10 @@ import { AuthPage } from './auth.page';
     CommonModule,
     FormsModule,
     IonicModule,
-    AuthPageRoutingModule
+    AuthPageRoutingModule,
+    IonAlert,
+
+
   ],
   declarations: [AuthPage]
 })

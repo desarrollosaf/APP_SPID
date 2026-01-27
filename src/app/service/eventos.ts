@@ -20,4 +20,12 @@ export class Eventos {
     return this.http.get<any>(`${this.myAppUrl}${this.myAPIUrl}/validacionEvento`)
   }
 
+  saveAsistencia(data: any ): Observable<any> {
+    return this.http.post<any>(`${this.myAppUrl}${this.myAPIUrl}/asistenciaDip`, data)
+  }
+
+  saveVotacion(data: any ): Observable<any> {
+    return this.http.post<any>(`${this.myAppUrl}${this.myAPIUrl}/votoDip`, data)
+  }
+
 }
