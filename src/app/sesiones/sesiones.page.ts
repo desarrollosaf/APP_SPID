@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { Eventos } from '../service/eventos';
+import { Sse } from '../service/sse';
 import { interval, Subscription } from 'rxjs';
 import { exhaustMap, distinctUntilChanged } from 'rxjs/operators';
 import { User } from '../service/user'
@@ -18,7 +19,24 @@ export class SesionesPage implements OnInit {
   pdfUrl!: SafeResourceUrl;
   private eventoSub!: Subscription;
 
-  constructor(private sanitizer: DomSanitizer, private eventosService: Eventos, private userService: User) { }
+  constructor(private sanitizer: DomSanitizer, private eventosService: Eventos, private userService: User, private sseService: Sse) { }
+
+  // ionViewDidEnter() {
+  //   this.eventoSub = this.sseService.streamEvento().pipe(
+  //     distinctUntilChanged((a, b) => a?.bandera === b?.bandera && a?.tema === b?.tema)
+  //   ).subscribe({
+  //     next: (resp) => {
+  //       this.evento = resp.bandera;
+  //       //this.tema = resp.tema ?? null;
+  //       console.log('evento:', resp);
+  //     },
+  //     error: (err) => console.error('SSE error', err)
+  //   });
+  // }
+
+  // ionViewWillLeave() {
+  //   this.eventoSub?.unsubscribe();
+  // }
 
    ngOnInit() {
     this.eventoSub = interval(1000)
