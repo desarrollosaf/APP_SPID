@@ -1,40 +1,42 @@
-<ion-header [translucent]="true">
-  <ion-toolbar>
-    <ion-title>Iniciar sesión</ion-title>
-  </ion-toolbar>
-</ion-header>
+<ion-content fullscreen class="login-content">
 
-<ion-content [fullscreen]="true" class="ion-padding">
+  <div class="login-wrapper">
 
-  <ion-header collapse="condense">
-    <ion-toolbar>
-      <ion-title size="large">Iniciar sesión</ion-title>
-    </ion-toolbar>
-  </ion-header>
+    <!-- Logo -->
+    <img
+      src="assets/congreso_fondo_blanco.png"
+      class="logo"
+      alt="Congreso"
+    />
 
-  <ion-item>
-    <ion-label position="floating">Usuario</ion-label>
-    <ion-input
-      [(ngModel)]="usuario"
-      name="usuario"
-      type="text">
-    </ion-input>
-  </ion-item>
+    <!-- Card -->
+    <ion-card class="login-card">
+      <ion-card-header>
+        <ion-card-title>Iniciar sesión</ion-card-title>
+        <ion-card-subtitle>Acceso al sistema</ion-card-subtitle>
+      </ion-card-header>
 
-  <ion-item>
-    <ion-label position="floating">Contraseña</ion-label>
-    <ion-input
-      [(ngModel)]="password"
-      name="password"
-      type="password">
-    </ion-input>
-  </ion-item>
+      <ion-card-content>
+        <ion-item fill="outline" class="ion-margin-bottom">
+          <ion-label position="floating">Usuario</ion-label>
+          <ion-input [(ngModel)]="usuario" type="text"></ion-input>
+        </ion-item>
 
-  <ion-button
-    expand="block"
-    class="ion-margin-top"
-    (click)="login()">
-    Entrar
-  </ion-button>
+        <ion-item fill="outline">
+          <ion-label position="floating">Contraseña</ion-label>
+          <ion-input [(ngModel)]="password" type="password"></ion-input>
+        </ion-item>
+
+        <ion-button
+          expand="block"
+          class="ion-margin-top"
+          color="primary"
+          (click)="login()">
+          Entrar
+        </ion-button>
+      </ion-card-content>
+    </ion-card>
+
+  </div>
 
 </ion-content>

@@ -2,8 +2,8 @@ import { Component, OnInit } from '@angular/core';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { Eventos } from '../service/eventos';
 import { Sse } from '../service/sse';
-import { interval, Subscription } from 'rxjs';
-import { exhaustMap, distinctUntilChanged } from 'rxjs/operators';
+import { interval, Subscription, of, timer } from 'rxjs';
+import { catchError, distinctUntilChanged, exhaustMap, retryWhen, scan, switchMap } from 'rxjs/operators';
 import { User } from '../service/user'
 
 @Component({
@@ -38,22 +38,40 @@ export class SesionesPage implements OnInit {
   //   this.eventoSub?.unsubscribe();
   // }
 
-   ngOnInit() {
-    this.eventoSub = interval(1000)
-       .pipe(
-        exhaustMap(() => this.eventosService.getEvento()),
-        distinctUntilChanged((prev, curr) => prev?.bandera === curr?.bandera)
-      )
-      .subscribe({
-        next: (resp) => {
-          this.evento = resp.bandera
-          console.log(this.evento);
-         
-        },
-        error: (err) => {
-          console.error('Error al consultar evento', err);
-        }
-      });
+  ngOnInit() {
+    this.eventoSub = interval(2000).pipe(
+      exhaustMap(() =>
+        this.eventosService.getEvento().pipe(
+          retryWhen(errors =>
+            errors.pipe(
+              // contamos reintentos y calculamos espera
+              scan((acc, err) => {
+                const status = err?.status;
+                if (status !== 429) throw err; // si NO es 429, que reviente normal
+                return acc + 1;
+              }, 0),
+              switchMap(retryCount => {
+                // backoff: 5s, 10s, 20s, 40s (tope 60s)
+                const waitMs = Math.min(5000 * Math.pow(2, retryCount - 1), 60000);
+                console.warn(`429 Too Many Requests. Reintentando en ${waitMs / 1000}s...`);
+                return timer(waitMs);
+              })
+            )
+          ),
+          catchError(err => {
+            // si quieres: no romper todo; solo log y continuar
+            console.error('Error getEvento', err);
+            return of(null); // evita que se caiga el stream
+          })
+        )
+      ),
+      distinctUntilChanged((prev: any, curr: any) => prev?.bandera === curr?.bandera)
+    )
+    .subscribe(resp => {
+      if (!resp) return;
+      this.evento = resp.bandera;
+      console.log(this.evento);
+    });
   }
 
  

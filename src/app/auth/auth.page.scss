@@ -1,0 +1,35 @@
+.login-content {
+  --background: #ffffff;
+}
+
+.login-wrapper {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 24px;
+}
+
+.logo {
+  width: 220px;
+  max-width: 80%;
+  margin-bottom: 28px;
+}
+
+.login-card {
+  width: 100%;
+  max-width: 420px;
+  border-radius: 16px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+}
+
+ion-card-title {
+  text-align: center;
+  font-weight: 600;
+}
+
+ion-card-subtitle {
+  text-align: center;
+  color: #666;
+}
