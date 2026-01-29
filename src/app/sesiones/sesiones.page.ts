@@ -18,6 +18,7 @@ export class SesionesPage implements OnInit {
   evento: number = 0;
   temaVotacion: string  = '';
   pdfUrl!: SafeResourceUrl;
+  miVoto: string = '';
   private eventoSub!: Subscription;
 
   constructor(private sanitizer: DomSanitizer, private eventosService: Eventos, private userService: User, private sseService: Sse) { }
@@ -89,7 +90,7 @@ export class SesionesPage implements OnInit {
 
   votar(tipo: string) {
     console.log('Voto:', tipo);
-
+    this.miVoto = tipo;
     const votacion = {
       id: this.userService.currentUserValue?.id_diputado,
       sentido: tipo
@@ -125,5 +126,15 @@ export class SesionesPage implements OnInit {
     });
     console.log('Asistencia registrada');
   }
+
+  get miVotoLabel() {
+  switch (this.miVoto) {
+    case 'FAVOR': return 'A Favor';
+    case 'CONTRA': return 'En Contra';
+    case 'ABSTENCION': return 'Abstención';
+    case 'SIN REGISTRO': return 'Sin Registro';
+    default: return '';
+  }
+}
 
 }

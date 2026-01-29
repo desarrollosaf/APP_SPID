@@ -74,18 +74,16 @@
   } @else if (evento == 3){
    
     <div class="ion-text-center ion-padding">
-       <ion-card class="votacion-card">
+       <div class="votacion-header ion-text-center">
+        <div class="votacion-sub">VOTACIÓN</div>
+        <div class="votacion-title">{{ temaVotacion }}</div>
 
-    <ion-card-header class="ion-text-center">
-      <ion-card-subtitle>Votación</ion-card-subtitle>
-      <ion-card-title class="tema">
-        {{ temaVotacion }}
-      </ion-card-title>
-    </ion-card-header>
+        <div *ngIf="miVoto" class="votacion-status">
+          Votaste: <strong>{{ miVotoLabel }}</strong>
+        </div>
+      </div>
 
-    <ion-card-content>
-
-      <div class="botones-votacion">
+      <div class="votacion-actions">
         <ion-button expand="block" color="success" (click)="votar('FAVOR')">
           A Favor
         </ion-button>
@@ -103,11 +101,7 @@
         </ion-button>
       </div>
 
-    </ion-card-content>
-
-  </ion-card>
     </div>
-
   } @else {
 
     <div  class="ion-text-center ion-padding">
