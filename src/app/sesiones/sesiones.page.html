@@ -73,30 +73,39 @@
 
   } @else if (evento == 3){
    
-    <div *ngIf="evento === 3" class="ion-text-center ion-padding">
-      <ion-card>
-        <ion-card-header>
-          <ion-card-title>Votación</ion-card-title>
-        </ion-card-header>
+    <div class="ion-text-center ion-padding">
+       <ion-card class="votacion-card">
 
-        <ion-card-content>
-          <ion-button expand="block" color="success" (click)="votar('FAVOR')">
-            A Favor
-          </ion-button>
+    <ion-card-header class="ion-text-center">
+      <ion-card-subtitle>Votación</ion-card-subtitle>
+      <ion-card-title class="tema">
+        {{ temaVotacion }}
+      </ion-card-title>
+    </ion-card-header>
 
-          <ion-button expand="block" color="danger" (click)="votar('CONTRA')">
-            En Contra
-          </ion-button>
+    <ion-card-content>
 
-          <ion-button expand="block" color="warning" (click)="votar('ABSTENCION')">
-            Abstención
-          </ion-button>
+      <div class="botones-votacion">
+        <ion-button expand="block" color="success" (click)="votar('FAVOR')">
+          A Favor
+        </ion-button>
 
-           <ion-button expand="block" color="medium" (click)="votar('SIN REGISTRO')">
-            S/R
-          </ion-button>
-        </ion-card-content>
-      </ion-card>
+        <ion-button expand="block" color="danger" (click)="votar('CONTRA')">
+          En Contra
+        </ion-button>
+
+        <ion-button expand="block" color="warning" (click)="votar('ABSTENCION')">
+          Abstención
+        </ion-button>
+
+        <ion-button expand="block" color="medium" (click)="votar('SIN REGISTRO')">
+          Sin Registro
+        </ion-button>
+      </div>
+
+    </ion-card-content>
+
+  </ion-card>
     </div>
 
   } @else {

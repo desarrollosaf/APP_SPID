@@ -17,3 +17,35 @@
     font-weight: 600;
   }
 }
+
+
+.votacion-wrapper {
+  display: flex;
+  justify-content: center;
+}
+
+.votacion-card {
+  width: 100%;
+  max-width: 420px;
+  border-radius: 18px;
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.15);
+}
+
+.tema {
+  margin-top: 8px;
+  font-size: 1.2rem;
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+.botones-votacion {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+ion-button {
+  height: 48px;
+  font-size: 1rem;
+}
+

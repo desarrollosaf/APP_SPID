@@ -16,6 +16,7 @@ export class SesionesPage implements OnInit {
 
   isModalOpen = false;
   evento: number = 0;
+  temaVotacion: string  = '';
   pdfUrl!: SafeResourceUrl;
   private eventoSub!: Subscription;
 
@@ -70,7 +71,7 @@ export class SesionesPage implements OnInit {
     .subscribe(resp => {
       if (!resp) return;
       this.evento = resp.bandera;
-      console.log(this.evento);
+      this.temaVotacion = this.evento === 3 ? resp.tema : this.temaVotacion;
     });
   }
 
