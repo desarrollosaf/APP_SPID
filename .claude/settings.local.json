@@ -1,0 +1,7 @@
+{
+  "permissions": {
+    "allow": [
+      "PowerShell(Get-ChildItem -Path \"c:\\\\Users\\\\MartinSG\\\\Documents\\\\angular\\\\IONIC\\\\APP_SPID\\\\src\\\\app\" | Where-Object { $_.PSIsContainer } | Select-Object Name)"
+    ]
+  }
+}

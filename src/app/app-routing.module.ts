@@ -19,6 +19,10 @@ const routes: Routes = [
       {
         path: 'sesiones',
         loadChildren: () => import('./sesiones/sesiones.module').then( m => m.SesionesPageModule)
+      },
+      {
+        path: 'comisiones',
+        loadChildren: () => import('./comisiones/comisiones.module').then( m => m.ComisionesPageModule)
       }
     ]
   },

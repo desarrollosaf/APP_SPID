@@ -1,2 +1,86 @@
-// For information on how to create your own theme, please refer to:
-// https://ionicframework.com/docs/theming/
+// Tema Institucional — Congreso del Estado de México
+// Guinda #96134B  ·  Dorado #BB945C
+
+:root {
+  /** primary — Guinda Institucional **/
+  --ion-color-primary: #96134B;
+  --ion-color-primary-rgb: 150, 19, 75;
+  --ion-color-primary-contrast: #ffffff;
+  --ion-color-primary-contrast-rgb: 255, 255, 255;
+  --ion-color-primary-shade: #841142;
+  --ion-color-primary-tint: #A02B5D;
+
+  /** secondary — Dorado Institucional **/
+  --ion-color-secondary: #BB945C;
+  --ion-color-secondary-rgb: 187, 148, 92;
+  --ion-color-secondary-contrast: #ffffff;
+  --ion-color-secondary-contrast-rgb: 255, 255, 255;
+  --ion-color-secondary-shade: #A58251;
+  --ion-color-secondary-tint: #C29F6C;
+
+  /** tertiary **/
+  --ion-color-tertiary: #7A1040;
+  --ion-color-tertiary-rgb: 122, 16, 64;
+  --ion-color-tertiary-contrast: #ffffff;
+  --ion-color-tertiary-contrast-rgb: 255, 255, 255;
+  --ion-color-tertiary-shade: #6B0E38;
+  --ion-color-tertiary-tint: #872153;
+
+  /** success **/
+  --ion-color-success: #27AE60;
+  --ion-color-success-rgb: 39, 174, 96;
+  --ion-color-success-contrast: #ffffff;
+  --ion-color-success-contrast-rgb: 255, 255, 255;
+  --ion-color-success-shade: #229950;
+  --ion-color-success-tint: #3DB670;
+
+  /** warning **/
+  --ion-color-warning: #E67E22;
+  --ion-color-warning-rgb: 230, 126, 34;
+  --ion-color-warning-contrast: #ffffff;
+  --ion-color-warning-contrast-rgb: 255, 255, 255;
+  --ion-color-warning-shade: #CA6E1D;
+  --ion-color-warning-tint: #E98B38;
+
+  /** danger **/
+  --ion-color-danger: #C0392B;
+  --ion-color-danger-rgb: 192, 57, 43;
+  --ion-color-danger-contrast: #ffffff;
+  --ion-color-danger-contrast-rgb: 255, 255, 255;
+  --ion-color-danger-shade: #A93224;
+  --ion-color-danger-tint: #C64A3D;
+
+  /** medium **/
+  --ion-color-medium: #8C9BA5;
+  --ion-color-medium-rgb: 140, 155, 165;
+  --ion-color-medium-contrast: #ffffff;
+  --ion-color-medium-contrast-rgb: 255, 255, 255;
+  --ion-color-medium-shade: #7B888F;
+  --ion-color-medium-tint: #98A5AE;
+
+  /** light **/
+  --ion-color-light: #F5F0F2;
+  --ion-color-light-rgb: 245, 240, 242;
+  --ion-color-light-contrast: #96134B;
+  --ion-color-light-contrast-rgb: 150, 19, 75;
+  --ion-color-light-shade: #E0D8DB;
+  --ion-color-light-tint: #F7F2F4;
+
+  /** fondo y texto global **/
+  --ion-background-color: #F6F3F4;
+  --ion-background-color-rgb: 246, 243, 244;
+  --ion-text-color: #1A1014;
+  --ion-text-color-rgb: 26, 16, 20;
+
+  /** toolbar — Guinda con acento Dorado **/
+  --ion-toolbar-background: #96134B;
+  --ion-toolbar-color: #ffffff;
+  --ion-toolbar-segment-color: rgba(255, 255, 255, 0.7);
+  --ion-toolbar-segment-color-checked: #ffffff;
+  --ion-toolbar-segment-background: rgba(255, 255, 255, 0.1);
+  --ion-toolbar-segment-background-checked: #BB945C;
+  --ion-toolbar-border-color: rgba(187, 148, 92, 0.35);
+
+  /** item **/
+  --ion-item-background: #ffffff;
+}
