@@ -54,7 +54,7 @@ export class AuthPage implements OnInit {
         }
         localStorage.setItem('isLoggedin', 'true');
         this._userService.setCurrentUser(response);
-        this.router.navigate(['/folder/inbox']);
+        this.router.navigate(['/tabs/inicio']);
 
       },
       error: (e: HttpErrorResponse) => {

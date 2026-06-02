@@ -9,10 +9,10 @@ import { Router } from '@angular/router';
 })
 export class AppComponent {
   public appPages = [
-    { title: 'Inicio',        url: '/folder/inbox', icon: 'home'          },
-    { title: 'Sesión',        url: '/sesiones',      icon: 'business'      },
-    { title: 'Comisiones',    url: '/comisiones',    icon: 'people-circle' },
-    { title: 'Cerrar sesión', action: 'logout',      icon: 'log-out'       },
+    { title: 'Inicio',        url: '/tabs/inicio',      icon: 'home'          },
+    { title: 'Sesión',        url: '/tabs/sesiones',     icon: 'business'      },
+    { title: 'Comisiones',    url: '/tabs/comisiones',   icon: 'people-circle' },
+    { title: 'Cerrar sesión', action: 'logout',          icon: 'log-out'       },
   ];
 
   constructor(private router: Router) {}

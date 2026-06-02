@@ -9,26 +9,18 @@ const routes: Routes = [
     children: [
       {
         path: '',
-        redirectTo: 'folder/inbox',
+        redirectTo: 'tabs',
         pathMatch: 'full'
       },
       {
-        path: 'folder/:id',
-        loadChildren: () => import('./folder/folder.module').then( m => m.FolderPageModule)
-      },
-      {
-        path: 'sesiones',
-        loadChildren: () => import('./sesiones/sesiones.module').then( m => m.SesionesPageModule)
-      },
-      {
-        path: 'comisiones',
-        loadChildren: () => import('./comisiones/comisiones.module').then( m => m.ComisionesPageModule)
+        path: 'tabs',
+        loadChildren: () => import('./tabs/tabs.module').then(m => m.TabsPageModule)
       }
     ]
   },
   {
     path: 'auth',
-    loadChildren: () => import('./auth/auth.module').then( m => m.AuthPageModule)
+    loadChildren: () => import('./auth/auth.module').then(m => m.AuthPageModule)
   }
 ];
 
