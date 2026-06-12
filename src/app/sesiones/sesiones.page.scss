@@ -19,6 +19,29 @@ $gray:      #8C9BA5;
   display: flex;
   align-items: center;
   justify-content: space-between;
+
+  .banner-right {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-shrink: 0;
+  }
+
+  .asistencia-badge {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    background: rgba(39, 174, 96, 0.25);
+    border: 1px solid rgba(39, 174, 96, 0.5);
+    border-radius: 20px;
+    padding: 3px 10px;
+    font-size: 11px;
+    font-weight: 600;
+    color: #5dbb7f;
+
+    .badge-ico { font-size: 14px; }
+  }
+  justify-content: space-between;
   background: linear-gradient(135deg, $guinda 0%, $guinda-dk 100%);
   border-radius: 16px;
   padding: 16px 20px;
@@ -242,8 +265,16 @@ $gray:      #8C9BA5;
 }
 
 .vote-header {
-  background: linear-gradient(160deg, $guinda 0%, $guinda-dk 100%);
+  background: linear-gradient(160deg, #3a4556 0%, #536071 100%);
   padding: 24px 20px 20px;
+
+  .vote-meta-row {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 7px;
+    margin-bottom: 10px;
+  }
 
   .vote-label-tag {
     font-size: 10px;
@@ -251,15 +282,51 @@ $gray:      #8C9BA5;
     letter-spacing: 3px;
     color: rgba(255, 255, 255, 0.55);
     text-transform: uppercase;
-    margin-bottom: 10px;
+  }
+
+  .vote-num-badge {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.9);
+    background: rgba(255, 255, 255, 0.15);
+    border-radius: 8px;
+    padding: 3px 10px;
+  }
+
+  .vote-tipo-badge {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    color: #fff;
+    background: rgba($gold, 0.35);
+    border: 1px solid rgba($gold, 0.55);
+    border-radius: 8px;
+    padding: 3px 10px;
   }
 
   .vote-topic {
-    font-size: 17px;
-    font-weight: 700;
+    font-size: 15px;
+    font-weight: 600;
     color: #ffffff;
-    line-height: 1.4;
+    line-height: 1.5;
     margin-bottom: 18px;
+    word-break: break-word;
+  }
+
+  .vote-mas-btn {
+    background: none;
+    border: none;
+    color: $gold;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    padding: 0;
+    display: inline;
+    text-decoration: underline;
+    text-underline-offset: 2px;
   }
 
   .vote-gold-line {
@@ -383,4 +450,180 @@ $gray:      #8C9BA5;
     color: rgba(0, 0, 0, 0.40);
     line-height: 1.5;
   }
+}
+
+// ── Chips de estado de asistencia ──────────────────────────────────────
+.asistencia-confirmada-chip,
+.asistencia-pendiente-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 20px;
+  padding: 8px 18px;
+  border-radius: 24px;
+  font-size: 13px;
+  font-weight: 600;
+
+  ion-icon { font-size: 17px; }
+}
+
+.asistencia-confirmada-chip {
+  background: rgba($success, 0.12);
+  border: 1px solid rgba($success, 0.35);
+  color: darken($success, 5%);
+}
+
+.asistencia-pendiente-chip {
+  background: rgba($gray, 0.12);
+  border: 1px solid rgba($gray, 0.3);
+  color: $gray;
+}
+
+// ── Botones de detalle (Orden del día / Mis votos) ────────────────────
+.detalle-btns {
+  display: flex;
+  gap: 10px;
+  padding: 0 16px 4px;
+}
+
+.detalle-btn {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  height: 46px;
+  border-radius: 14px;
+  border: 1.5px solid rgba($guinda, 0.18);
+  background: #fff;
+  color: $guinda;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  box-shadow: 0 2px 8px rgba($guinda, 0.06);
+
+  ion-icon { font-size: 18px; }
+
+  &.detalle-btn-active {
+    background: $guinda;
+    color: #fff;
+    border-color: $guinda;
+    box-shadow: 0 4px 14px rgba($guinda, 0.3);
+  }
+}
+
+// ── Panel de detalle ──────────────────────────────────────────────────
+.detalle-panel {
+  margin: 12px 16px 0;
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 3px 14px rgba($guinda, 0.09);
+  overflow: hidden;
+  padding: 4px 0 8px;
+}
+
+.detalle-loading {
+  display: flex;
+  justify-content: center;
+  padding: 24px;
+}
+
+.detalle-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 28px 16px;
+  color: rgba(0,0,0,0.35);
+  font-size: 13px;
+  ion-icon { font-size: 32px; }
+}
+
+// ── Ítem del orden del día ────────────────────────────────────────────
+.punto-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 12px 16px;
+  border-bottom: 1px solid rgba(0,0,0,0.05);
+
+  &:last-child { border-bottom: none; }
+}
+
+.punto-num {
+  min-width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  background: rgba($guinda, 0.08);
+  color: $guinda;
+  font-size: 12px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+.punto-texto {
+  font-size: 13px;
+  color: #1A1014;
+  line-height: 1.45;
+  flex: 1;
+}
+
+// ── Ítem de voto ──────────────────────────────────────────────────────
+.voto-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 12px 16px;
+  border-bottom: 1px solid rgba(0,0,0,0.05);
+  &:last-child { border-bottom: none; }
+}
+
+.voto-num {
+  min-width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  background: rgba($guinda, 0.08);
+  color: $guinda;
+  font-size: 12px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.voto-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.voto-punto {
+  font-size: 13px;
+  color: #1A1014;
+  line-height: 1.4;
+  margin-bottom: 5px;
+}
+
+.voto-sentido {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  padding: 3px 10px;
+  border-radius: 12px;
+
+  ion-icon { font-size: 14px; }
+
+  &.vs-favor     { background: rgba($success,0.12); color: darken($success,5%); }
+  &.vs-abstencion{ background: rgba($warn,0.12);    color: darken($warn,8%); }
+  &.vs-contra    { background: rgba($danger,0.12);  color: darken($danger,5%); }
 }

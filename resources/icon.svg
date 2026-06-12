@@ -1,0 +1,63 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" width="1024" height="1024">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#9a0058"/>
+      <stop offset="100%" stop-color="#3d0022"/>
+    </linearGradient>
+    <linearGradient id="gold" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#f5d97a"/>
+      <stop offset="100%" stop-color="#c9930a"/>
+    </linearGradient>
+    <filter id="shadow" x="-10%" y="-10%" width="120%" height="130%">
+      <feDropShadow dx="0" dy="6" stdDeviation="10" flood-color="#00000066"/>
+    </filter>
+  </defs>
+
+  <!-- Fondo redondeado -->
+  <rect width="1024" height="1024" rx="200" fill="url(#bg)"/>
+
+  <!-- Brillo sutil superior -->
+  <ellipse cx="512" cy="80" rx="420" ry="120" fill="rgba(255,255,255,0.07)"/>
+
+  <!-- ── EDIFICIO LEGISLATIVO ── -->
+
+  <!-- Cúpula -->
+  <ellipse cx="512" cy="272" rx="72" ry="22" fill="url(#gold)" filter="url(#shadow)"/>
+  <path d="M440,272 Q512,158 584,272 Z" fill="url(#gold)" filter="url(#shadow)"/>
+  <!-- linterna de la cúpula -->
+  <rect x="498" y="150" width="28" height="42" rx="6" fill="url(#gold)"/>
+  <ellipse cx="512" cy="150" rx="20" ry="8" fill="#f5d97a"/>
+
+  <!-- Frontón triangular -->
+  <polygon points="512,310 220,430 804,430" fill="rgba(255,255,255,0.95)" filter="url(#shadow)"/>
+  <!-- Estrella en el frontón -->
+  <text x="512" y="416" text-anchor="middle" font-size="72" fill="url(#gold)" font-family="serif">★</text>
+
+  <!-- Entablamento -->
+  <rect x="208" y="430" width="608" height="44" rx="6" fill="rgba(255,255,255,0.95)"/>
+
+  <!-- 7 columnas -->
+  <rect x="228" y="474" width="36" height="280" rx="5" fill="rgba(255,255,255,0.90)"/>
+  <rect x="322" y="474" width="36" height="280" rx="5" fill="rgba(255,255,255,0.90)"/>
+  <rect x="416" y="474" width="36" height="280" rx="5" fill="rgba(255,255,255,0.90)"/>
+  <rect x="494" y="474" width="36" height="280" rx="5" fill="rgba(255,255,255,0.90)"/>
+  <rect x="572" y="474" width="36" height="280" rx="5" fill="rgba(255,255,255,0.90)"/>
+  <rect x="666" y="474" width="36" height="280" rx="5" fill="rgba(255,255,255,0.90)"/>
+  <rect x="760" y="474" width="36" height="280" rx="5" fill="rgba(255,255,255,0.90)"/>
+
+  <!-- Estilóbato (base columnas) -->
+  <rect x="208" y="754" width="608" height="30" rx="4" fill="rgba(255,255,255,0.95)"/>
+
+  <!-- Escalinata - 3 peldaños -->
+  <rect x="188" y="784" width="648" height="28" rx="4" fill="rgba(255,255,255,0.85)"/>
+  <rect x="162" y="812" width="700" height="28" rx="4" fill="rgba(255,255,255,0.80)"/>
+  <rect x="130" y="840" width="764" height="32" rx="6" fill="rgba(255,255,255,0.75)"/>
+
+  <!-- Línea dorada decorativa inferior -->
+  <rect x="200" y="896" width="624" height="6" rx="3" fill="url(#gold)" opacity="0.7"/>
+
+  <!-- Texto SPID pequeño -->
+  <text x="512" y="960" text-anchor="middle" font-size="52" font-weight="bold"
+        font-family="Georgia, serif" letter-spacing="14"
+        fill="rgba(255,255,255,0.55)">SPID</text>
+</svg>

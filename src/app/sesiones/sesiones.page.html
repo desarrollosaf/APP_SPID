@@ -9,172 +9,234 @@
 
 <ion-content>
 
-  <!-- ══════════════════════════════════════════
-       ESTADO 1 — DOCUMENTOS DE SESIÓN
-  ══════════════════════════════════════════ -->
-  @if (evento == 1) {
-    <div class="page-pad">
+  <div class="page-pad">
 
+    <!-- ══ BANNER EN VIVO — siempre visible cuando hay sesión activa ══ -->
+    @if (sesionActiva) {
       <div class="session-banner">
         <div class="banner-left">
           <span class="pulse-dot"></span>
           <div>
-            <div class="banner-status">SESIÓN EN CURSO</div>
-            <div class="banner-org">Congreso del Estado de México</div>
+            <div class="banner-status">EN VIVO</div>
+            <div class="banner-org">{{ sesionNombre || 'Sesión en Curso' }}</div>
           </div>
         </div>
-        <ion-icon name="business-outline" class="banner-ico"></ion-icon>
-      </div>
-
-      <div class="section-label">Documentos</div>
-
-      <ion-grid class="docs-grid">
-        <ion-row>
-          <ion-col size="6">
-            <div class="doc-card" (click)="setOpen(true)" role="button">
-              <div class="doc-icon-wrap">
-                <ion-icon name="document-text-outline"></ion-icon>
-              </div>
-              <span class="doc-label">Acta</span>
+        <div class="banner-right">
+          @if (asistenciaRegistrada) {
+            <div class="asistencia-badge">
+              <ion-icon name="checkmark-circle" class="badge-ico"></ion-icon>
+              <span>Asistencia</span>
             </div>
-          </ion-col>
-
-          <ion-col size="6">
-            <div class="doc-card" (click)="setOpen(true)" role="button">
-              <div class="doc-icon-wrap">
-                <ion-icon name="list-outline"></ion-icon>
-              </div>
-              <span class="doc-label">Asuntos del Orden</span>
-            </div>
-          </ion-col>
-
-          <ion-col size="6">
-            <div class="doc-card" (click)="setOpen(true)" role="button">
-              <div class="doc-icon-wrap">
-                <ion-icon name="calendar-outline"></ion-icon>
-              </div>
-              <span class="doc-label">Orden del Día</span>
-            </div>
-          </ion-col>
-
-          <ion-col size="6">
-            <div class="doc-card" (click)="setOpen(true)" role="button">
-              <div class="doc-icon-wrap">
-                <ion-icon name="scale-outline"></ion-icon>
-              </div>
-              <span class="doc-label">Marco Jurídico</span>
-            </div>
-          </ion-col>
-        </ion-row>
-      </ion-grid>
-    </div>
-  }
-
-  <!-- ══════════════════════════════════════════
-       ESTADO 2 — REGISTRO DE ASISTENCIA
-  ══════════════════════════════════════════ -->
-  @else if (evento == 2) {
-    <div class="page-pad event-center">
-      <div class="attend-card">
-
-        <div class="attend-header">
-          <ion-icon name="people-outline" class="attend-header-ico"></ion-icon>
-          <div class="attend-header-label">REGISTRO DE ASISTENCIA</div>
-          <div class="attend-header-sub">Sesión Plenaria</div>
+          }
+          <ion-icon name="business-outline" class="banner-ico"></ion-icon>
         </div>
+      </div>
+    }
 
-        <div class="attend-body">
-          @if (nombreDiputado) {
-            <div class="deputy-chip">
-              <ion-icon name="person-circle-outline"></ion-icon>
-              <span>{{ nombreDiputado }}</span>
+    <!-- ══════════════════════════════════════════
+         ESTADO 2 — REGISTRO DE ASISTENCIA
+    ══════════════════════════════════════════ -->
+    @if (evento == 2) {
+      <div class="event-center">
+        <div class="attend-card">
+
+          <div class="attend-header">
+            <ion-icon name="people-outline" class="attend-header-ico"></ion-icon>
+            <div class="attend-header-label">REGISTRO DE ASISTENCIA</div>
+            <div class="attend-header-sub">{{ sesionNombre || 'Sesión Plenaria' }}</div>
+          </div>
+
+          <div class="attend-body">
+            @if (nombreDiputado) {
+              <div class="deputy-chip">
+                <ion-icon name="person-circle-outline"></ion-icon>
+                <span>{{ nombreDiputado }}</span>
+              </div>
+            }
+
+            @if (!asistenciaRegistrada) {
+              <ion-button expand="block" class="btn-attend" (click)="registrarAsistencia()">
+                <ion-icon slot="start" name="finger-print-outline"></ion-icon>
+                Registrar Asistencia
+              </ion-button>
+            } @else {
+              <div class="attend-success">
+                <ion-icon name="checkmark-circle-outline" class="success-ico"></ion-icon>
+                <div class="attend-success-title">Asistencia Registrada</div>
+                <div class="attend-success-sub">Tu asistencia ha sido confirmada</div>
+              </div>
+            }
+          </div>
+
+        </div>
+      </div>
+    }
+
+    <!-- ══════════════════════════════════════════
+         ESTADO 3 — VOTACIÓN
+    ══════════════════════════════════════════ -->
+    @else if (evento == 3) {
+      <div class="event-center">
+        <div class="vote-card">
+
+          <div class="vote-header">
+            <div class="vote-meta-row">
+              @if (noPuntoVotacion) {
+                <span class="vote-num-badge">Punto {{ noPuntoVotacion }}</span>
+              }
+              @if (tipoPuntoVotacion) {
+                <span class="vote-tipo-badge">{{ tipoPuntoVotacion }}</span>
+              }
+              @if (!noPuntoVotacion && !tipoPuntoVotacion) {
+                <span class="vote-label-tag">VOTACIÓN EN CURSO</span>
+              }
+            </div>
+            <div class="vote-topic">
+              {{ textoExpandido ? temaVotacion : temaVotacionCorto }}
+              @if (!textoExpandido && temaVotacion.length > 110) {
+                <button class="vote-mas-btn" (click)="textoExpandido = true">… ver más</button>
+              }
+              @if (textoExpandido && temaVotacion.length > 110) {
+                <button class="vote-mas-btn" (click)="textoExpandido = false"> ver menos</button>
+              }
+            </div>
+            <div class="vote-gold-line"></div>
+          </div>
+
+          @if (miVoto) {
+            <div class="vote-status-bar"
+              [class.vs-favor]="miVoto === 'FAVOR'"
+              [class.vs-contra]="miVoto === 'CONTRA'"
+              [class.vs-abstencion]="miVoto === 'ABSTENCION'"
+              [class.vs-sin-registro]="miVoto === 'SIN REGISTRO'">
+              <ion-icon [name]="votoIcono"></ion-icon>
+              <span>Tu voto: <strong>{{ miVotoLabel }}</strong></span>
             </div>
           }
 
-          @if (!asistenciaRegistrada) {
-            <ion-button expand="block" class="btn-attend" (click)="registrarAsistencia()">
-              <ion-icon slot="start" name="finger-print-outline"></ion-icon>
-              Registrar Asistencia
-            </ion-button>
-          } @else {
-            <div class="attend-success">
-              <ion-icon name="checkmark-circle-outline" class="success-ico"></ion-icon>
-              <div class="attend-success-title">Asistencia Registrada</div>
-              <div class="attend-success-sub">Tu asistencia ha sido confirmada</div>
-            </div>
-          }
-        </div>
+          <div class="vote-actions">
+            <button class="vote-btn vb-favor" [class.vb-active]="miVoto === 'FAVOR'" (click)="votar('FAVOR')">
+              <ion-icon name="thumbs-up-outline"></ion-icon>
+              <span>A Favor</span>
+            </button>
 
+            <button class="vote-btn vb-contra" [class.vb-active]="miVoto === 'CONTRA'" (click)="votar('CONTRA')">
+              <ion-icon name="thumbs-down-outline"></ion-icon>
+              <span>En Contra</span>
+            </button>
+
+            <button class="vote-btn vb-abstencion" [class.vb-active]="miVoto === 'ABSTENCION'" (click)="votar('ABSTENCION')">
+              <ion-icon name="remove-circle-outline"></ion-icon>
+              <span>Abstención</span>
+            </button>
+
+            <button class="vote-btn vb-sin-registro" [class.vb-active]="miVoto === 'SIN REGISTRO'" (click)="votar('SIN REGISTRO')">
+              <ion-icon name="ellipsis-horizontal-circle-outline"></ion-icon>
+              <span>Sin Registro</span>
+            </button>
+          </div>
+
+        </div>
       </div>
-    </div>
-  }
+    }
 
-  <!-- ══════════════════════════════════════════
-       ESTADO 3 — VOTACIÓN
-  ══════════════════════════════════════════ -->
-  @else if (evento == 3) {
-    <div class="page-pad event-center">
-      <div class="vote-card">
+    <!-- ══════════════════════════════════════════
+         DEFAULT — SIN EVENTO ACTIVO
+    ══════════════════════════════════════════ -->
+    @else {
+      @if (sesionActiva) {
+        
 
-        <div class="vote-header">
-          <div class="vote-label-tag">VOTACIÓN EN CURSO</div>
-          <div class="vote-topic">{{ temaVotacion }}</div>
-          <div class="vote-gold-line"></div>
+        <!-- Botones de consulta -->
+        <div class="detalle-btns">
+          <button class="detalle-btn" [class.detalle-btn-active]="vistaDetalle === 'orden'" (click)="verOrden()">
+            <ion-icon name="list-outline"></ion-icon>
+            <span>Orden del día</span>
+          </button>
+          <button class="detalle-btn" [class.detalle-btn-active]="vistaDetalle === 'votos'" (click)="verVotos()">
+            <ion-icon name="checkmark-done-outline"></ion-icon>
+            <span>Mis votos</span>
+          </button>
         </div>
 
-        @if (miVoto) {
-          <div class="vote-status-bar"
-            [class.vs-favor]="miVoto === 'FAVOR'"
-            [class.vs-contra]="miVoto === 'CONTRA'"
-            [class.vs-abstencion]="miVoto === 'ABSTENCION'"
-            [class.vs-sin-registro]="miVoto === 'SIN REGISTRO'">
-            <ion-icon [name]="votoIcono"></ion-icon>
-            <span>Tu voto: <strong>{{ miVotoLabel }}</strong></span>
+        <!-- Estado de espera + badge asistencia -->
+         @if (!vistaDetalle || vistaDetalle === 'none') {
+          <div class="no-event-wrap">
+            <div class="no-event-seal">
+              <ion-icon name="hourglass-outline"></ion-icon>
+            </div>
+            <div class="no-event-org">{{ sesionNombre }}</div>
+            <div class="no-event-title">Sesión en curso</div>
+          </div>
+         }
+        <!-- Panel de detalle -->
+        @if (vistaDetalle !== 'none') {
+          <div class="detalle-panel">
+
+            @if (cargandoDetalle) {
+              <div class="detalle-loading">
+                <ion-spinner name="crescent"></ion-spinner>
+              </div>
+            }
+
+            <!-- ORDEN DEL DÍA -->
+            @if (vistaDetalle === 'orden' && !cargandoDetalle) {
+              @if (ordenDelDia.length === 0) {
+                <div class="detalle-empty">
+                  <ion-icon name="document-outline"></ion-icon>
+                  <span>Sin puntos registrados</span>
+                </div>
+              }
+              @for (punto of ordenDelDia; track punto.id) {
+                <div class="punto-item">
+                  <div class="punto-num">{{ punto.nopunto }}</div>
+                  <div class="punto-texto">{{ punto.punto }}</div>
+                </div>
+              }
+            }
+
+            <!-- MIS VOTOS -->
+            @if (vistaDetalle === 'votos' && !cargandoDetalle) {
+              @if (misVotos.length === 0) {
+                <div class="detalle-empty">
+                  <ion-icon name="ballot-outline"></ion-icon>
+                  <span>Aún no has participado en votaciones</span>
+                </div>
+              }
+              @for (voto of misVotos; track voto.nopunto) {
+                <div class="voto-item">
+                  <div class="voto-num">{{ voto.nopunto }}</div>
+                  <div class="voto-info">
+                    <div class="voto-punto">{{ voto.punto }}</div>
+                    <div class="voto-sentido"
+                         [class.vs-favor]="voto.sentido === 1"
+                         [class.vs-abstencion]="voto.sentido === 2"
+                         [class.vs-contra]="voto.sentido === 3">
+                      <ion-icon [name]="voto.sentido === 1 ? 'thumbs-up-outline' : voto.sentido === 3 ? 'thumbs-down-outline' : 'remove-circle-outline'"></ion-icon>
+                      {{ voto.mensaje }}
+                    </div>
+                  </div>
+                </div>
+              }
+            }
+
           </div>
         }
-
-        <div class="vote-actions">
-          <button class="vote-btn vb-favor" [class.vb-active]="miVoto === 'FAVOR'" (click)="votar('FAVOR')">
-            <ion-icon name="thumbs-up-outline"></ion-icon>
-            <span>A Favor</span>
-          </button>
-
-          <button class="vote-btn vb-contra" [class.vb-active]="miVoto === 'CONTRA'" (click)="votar('CONTRA')">
-            <ion-icon name="thumbs-down-outline"></ion-icon>
-            <span>En Contra</span>
-          </button>
-
-          <button class="vote-btn vb-abstencion" [class.vb-active]="miVoto === 'ABSTENCION'" (click)="votar('ABSTENCION')">
-            <ion-icon name="remove-circle-outline"></ion-icon>
-            <span>Abstención</span>
-          </button>
-
-          <button class="vote-btn vb-sin-registro" [class.vb-active]="miVoto === 'SIN REGISTRO'" (click)="votar('SIN REGISTRO')">
-            <ion-icon name="ellipsis-horizontal-circle-outline"></ion-icon>
-            <span>Sin Registro</span>
-          </button>
+      } @else {
+        <div class="no-event-wrap">
+          <div class="no-event-seal">
+            <ion-icon name="shield-checkmark-outline"></ion-icon>
+          </div>
+          <div class="no-event-org">Congreso del Estado de México</div>
+          <div class="no-event-title">Sin evento activo</div>
         </div>
+      }
+    }
 
-      </div>
-    </div>
-  }
-
-  <!-- ══════════════════════════════════════════
-       DEFAULT — SIN EVENTO ACTIVO
-  ══════════════════════════════════════════ -->
-  @else {
-    <div class="no-event-wrap">
-      <div class="no-event-seal">
-        <ion-icon name="shield-checkmark-outline"></ion-icon>
-      </div>
-      <div class="no-event-org">Congreso del Estado de México</div>
-      <div class="no-event-title">Sin evento activo</div>
-      <div class="no-event-sub">El sistema está en espera de instrucciones</div>
-    </div>
-  }
+  </div>
 
 
-  <!-- ══════ MODAL PDF ══════ -->
+  <!-- ══ MODAL PDF ══ -->
   <ion-modal [isOpen]="isModalOpen">
     <ng-template>
       <ion-header>

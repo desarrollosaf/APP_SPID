@@ -23,32 +23,40 @@ $voc-color:  #5B7EA5;   // Vocal      → Azul medio neutral
 // LISTA DE COMISIONES
 // ══════════════════════════════════════════════════════════════════════
 
+// ══════════════════════════════════════════════════════════════════════
+// BANNER SUPERIOR
+// ══════════════════════════════════════════════════════════════════════
+
 .com-banner {
   display: flex;
   align-items: center;
-  gap: 14px;
+  gap: 16px;
   background: linear-gradient(135deg, $guinda 0%, $guinda-dk 100%);
-  border-radius: 16px;
-  padding: 16px 20px;
-  margin-bottom: 24px;
+  border-radius: 20px;
+  padding: 18px 20px;
+  margin-bottom: 20px;
 
-  .com-banner-ico {
-    font-size: 40px;
-    color: $gold;
+  .com-banner-icon-wrap {
+    width: 52px;
+    height: 52px;
+    border-radius: 14px;
+    background: rgba(255, 255, 255, 0.15);
+    display: flex;
+    align-items: center;
+    justify-content: center;
     flex-shrink: 0;
+    ion-icon { font-size: 28px; color: $gold; }
   }
 
   .com-banner-label {
-    font-size: 11px;
+    font-size: 16px;
     font-weight: 700;
-    letter-spacing: 2px;
-    color: $gold;
-    text-transform: uppercase;
+    color: #ffffff;
   }
 
   .com-banner-sub {
-    font-size: 13px;
-    color: rgba(255, 255, 255, 0.7);
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.65);
     margin-top: 2px;
   }
 }
@@ -56,91 +64,175 @@ $voc-color:  #5B7EA5;   // Vocal      → Azul medio neutral
 .section-label {
   font-size: 12px;
   font-weight: 700;
-  letter-spacing: 2px;
+  letter-spacing: 1.5px;
   text-transform: uppercase;
   color: $guinda;
-  opacity: 0.6;
-  margin-bottom: 12px;
-  padding-left: 4px;
+  opacity: 0.55;
+  margin-bottom: 14px;
+  padding-left: 2px;
 }
+
+// ══════════════════════════════════════════════════════════════════════
+// TARJETAS DE COMISIÓN
+// ══════════════════════════════════════════════════════════════════════
 
 .com-card {
   display: flex;
   align-items: center;
   gap: 14px;
   background: #ffffff;
-  border-radius: 14px;
-  padding: 14px 16px;
-  margin-bottom: 10px;
-  box-shadow: 0 2px 10px rgba($guinda, 0.08);
+  border-radius: 16px;
+  padding: 16px;
+  margin-bottom: 12px;
   cursor: pointer;
-  transition: transform 0.12s ease, box-shadow 0.12s ease;
+  transition: transform 0.13s ease, box-shadow 0.13s ease;
+  border-left: 4px solid transparent;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.07);
 
-  &:active {
-    transform: scale(0.98);
-    box-shadow: 0 1px 5px rgba($guinda, 0.1);
+  &:active { transform: scale(0.985); }
+
+  &.card-presidente {
+    border-left-color: $pres-color;
+    box-shadow: 0 3px 14px rgba($pres-color, 0.14);
+  }
+  &.card-secretario {
+    border-left-color: $sec-color;
+    box-shadow: 0 3px 14px rgba($sec-color, 0.12);
+  }
+  &.card-vocal {
+    border-left-color: $voc-color;
+    box-shadow: 0 3px 14px rgba($voc-color, 0.10);
   }
 }
 
-.com-badge {
-  width: 44px;
-  height: 44px;
-  border-radius: 12px;
+// Columna del icono
+.com-icon-col {
+  width: 50px;
+  height: 50px;
+  border-radius: 14px;
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
 
-  ion-icon { font-size: 22px; }
+  ion-icon { font-size: 24px; }
 
-  &.rol-presidente { background: rgba($pres-color, 0.12); color: $pres-color; }
-  &.rol-secretario { background: rgba($sec-color,  0.10); color: $sec-color;  }
-  &.rol-vocal      { background: rgba($voc-color,  0.10); color: $voc-color;  }
+  &.icon-presidente { background: linear-gradient(135deg, rgba($pres-color,.18), rgba($pres-color,.08)); color: $pres-color; }
+  &.icon-secretario { background: linear-gradient(135deg, rgba($sec-color,.15), rgba($sec-color,.07)); color: $sec-color; }
+  &.icon-vocal      { background: linear-gradient(135deg, rgba($voc-color,.15), rgba($voc-color,.07)); color: $voc-color; }
 }
 
 .com-info {
   flex: 1;
   min-width: 0;
+}
 
-  .com-nombre {
-    font-size: 14px;
-    font-weight: 600;
-    color: #1A1014;
-    line-height: 1.3;
+.com-nombre {
+  font-size: 14px;
+  font-weight: 600;
+  color: #1A1014;
+  line-height: 1.35;
+  margin-bottom: 6px;
+  white-space: normal;
+}
+
+// Pill del cargo — protagonista
+.cargo-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 12px 4px 8px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+
+  ion-icon { font-size: 13px; }
+
+  &.pill-presidente {
+    background: linear-gradient(90deg, rgba($pres-color,.18), rgba($pres-color,.10));
+    color: darken($pres-color, 5%);
+    border: 1px solid rgba($pres-color, 0.25);
   }
-
-  .com-rol {
-    font-size: 12px;
-    font-weight: 700;
-    margin-top: 3px;
-    &.rol-text-presidente { color: $pres-color; }
-    &.rol-text-secretario { color: $sec-color;  }
-    &.rol-text-vocal      { color: $voc-color;  }
+  &.pill-secretario {
+    background: linear-gradient(90deg, rgba($sec-color,.14), rgba($sec-color,.07));
+    color: $sec-color;
+    border: 1px solid rgba($sec-color, 0.2);
+  }
+  &.pill-vocal {
+    background: linear-gradient(90deg, rgba($voc-color,.14), rgba($voc-color,.07));
+    color: darken($voc-color, 8%);
+    border: 1px solid rgba($voc-color, 0.2);
   }
 }
 
 .com-arrow {
   font-size: 18px;
-  color: rgba(0, 0, 0, 0.25);
+  color: rgba(0, 0, 0, 0.2);
   flex-shrink: 0;
 }
 
-// ── Chip de rol en vista detalle ──────────────────────────────────────
+.com-end {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+// ── Badge EN VIVO ─────────────────────────────────────────────────────
+.live-tag {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  background: rgba($guinda, 0.08);
+  border: 1px solid rgba($guinda, 0.2);
+  border-radius: 20px;
+  padding: 4px 10px;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  color: $guinda;
+  text-transform: uppercase;
+}
+
+.live-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #E53935;
+  flex-shrink: 0;
+  animation: live-pulse 1.6s ease-in-out infinite;
+}
+
+@keyframes live-pulse {
+  0%   { box-shadow: 0 0 0 0 rgba(#E53935, 0.6); }
+  70%  { box-shadow: 0 0 0 6px rgba(#E53935, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(#E53935, 0); }
+}
+
+// Tarjeta con sesión viva — sutil realce
+.card-vivo {
+  background: linear-gradient(135deg, #fff 85%, rgba($guinda, 0.04) 100%);
+  box-shadow: 0 3px 16px rgba($guinda, 0.15) !important;
+}
+
+// ── Chip en vista detalle ─────────────────────────────────────────────
 .rol-chip {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  padding: 6px 14px;
-  border-radius: 20px;
+  padding: 7px 16px 7px 12px;
+  border-radius: 24px;
   font-size: 13px;
   font-weight: 700;
   margin-bottom: 4px;
+  letter-spacing: 0.3px;
 
   ion-icon { font-size: 16px; }
 
-  &.rol-chip-presidente { background: rgba($pres-color, 0.12); color: $pres-color; }
-  &.rol-chip-secretario { background: rgba($sec-color,  0.10); color: $sec-color;  }
-  &.rol-chip-vocal      { background: rgba($voc-color,  0.10); color: $voc-color;  }
+  &.rol-chip-presidente { background: rgba($pres-color, 0.14); color: $pres-color; border: 1px solid rgba($pres-color,.25); }
+  &.rol-chip-secretario { background: rgba($sec-color,  0.12); color: $sec-color;  border: 1px solid rgba($sec-color,.2);  }
+  &.rol-chip-vocal      { background: rgba($voc-color,  0.12); color: $voc-color;  border: 1px solid rgba($voc-color,.2);  }
 }
 
 // ══════════════════════════════════════════════════════════════════════
@@ -276,12 +368,86 @@ $voc-color:  #5B7EA5;   // Vocal      → Azul medio neutral
 }
 
 .vote-header {
-  background: linear-gradient(160deg, $guinda 0%, $guinda-dk 100%);
+  background: linear-gradient(160deg, #3a4556 0%, #536071 100%);
   padding: 24px 20px 20px;
 
-  .vote-label-tag { font-size: 10px; font-weight: 700; letter-spacing: 3px; color: rgba(255,255,255,0.55); text-transform: uppercase; margin-bottom: 10px; }
-  .vote-topic     { font-size: 17px; font-weight: 700; color: #ffffff; line-height: 1.4; margin-bottom: 18px; }
+  .vote-meta-row {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 7px;
+    margin-bottom: 10px;
+  }
+
+  .vote-label-tag {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 3px;
+    color: rgba(255,255,255,0.55);
+    text-transform: uppercase;
+  }
+
+  .vote-num-badge {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.9);
+    background: rgba(255,255,255,0.15);
+    border-radius: 8px;
+    padding: 3px 10px;
+  }
+
+  .vote-tipo-badge {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    color: #fff;
+    background: rgba($gold, 0.35);
+    border: 1px solid rgba($gold, 0.55);
+    border-radius: 8px;
+    padding: 3px 10px;
+  }
+
+  .vote-topic {
+    font-size: 15px;
+    font-weight: 600;
+    color: #ffffff;
+    line-height: 1.5;
+    margin-bottom: 18px;
+    word-break: break-word;
+  }
+
+  .vote-mas-btn {
+    background: none;
+    border: none;
+    color: $gold;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    padding: 0;
+    display: inline;
+    text-decoration: underline;
+    text-underline-offset: 2px;
+  }
+
   .vote-gold-line { height: 3px; background: linear-gradient(90deg, $gold, lighten($gold, 12%)); border-radius: 2px; }
+}
+
+// ── no-event compacto (sesión activa, sin evento abierto) ─────────────
+.no-event-wrap-sm {
+  padding: 28px 32px !important;
+
+  .no-event-seal {
+    width: 68px !important;
+    height: 68px !important;
+    margin-bottom: 16px !important;
+    ion-icon { font-size: 34px !important; }
+  }
+
+  .no-event-title { font-size: 16px !important; }
+  .no-event-sub   { font-size: 13px !important; }
 }
 
 .vote-status-bar {

@@ -1,9 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-import { User } from '../service/user'
-import { HttpErrorResponse } from '@angular/common/http';
+import { User } from '../service/user';
 import { AlertController } from '@ionic/angular';
-import type { OverlayEventDetail } from '@ionic/core';
 
 @Component({
   selector: 'app-auth',
@@ -15,58 +13,39 @@ export class AuthPage implements OnInit {
 
   usuario: string = '';
   password: string = '';
-  
- 
 
-  constructor(private router: Router, private _userService: User, private alertCtrl: AlertController) { }
+  constructor(
+    private router: Router,
+    private _userService: User,
+    private alertCtrl: AlertController
+  ) {}
 
-  ngOnInit() {
-  }
+  ngOnInit() {}
 
-  async showInvalidAlert() {
+  async showAlert(message: string) {
     const alert = await this.alertCtrl.create({
       header: 'Error',
-      message: 'Usuario o contraseña incorrecta.',
+      message,
       buttons: ['OK'],
     });
-
     await alert.present();
   }
 
   login() {
+    if (!this.usuario || !this.password) {
+      this.showAlert('Ingresa usuario y contraseña.');
+      return;
+    }
 
-    const user = {
-      email: this.usuario,
-      psw: this.password
-    };
-    console.log(user)
-
-    this._userService.login(user).subscribe({
-      next: (response: any) => {
-        console.log(response)
-        const data = response;
-        
-        if(data.bandera == 0 || data.bandera == 1){
-          this.showInvalidAlert();
-          return;
-        }else{
-
-        }
+    this._userService.login({ name: this.usuario, password: this.password }).subscribe({
+      next: () => {
         localStorage.setItem('isLoggedin', 'true');
-        this._userService.setCurrentUser(response);
         this.router.navigate(['/tabs/inicio']);
-
       },
-      error: (e: HttpErrorResponse) => {
-        if (e.error && e.error.msg) {
-          alert('Usuario o contraseña incorrectos');
-        } else {
-          alert('Error desconocido'+ e);
-        }
+      error: (e) => {
+        const msg = e?.error?.msg || 'Usuario o contraseña incorrectos.';
+        this.showAlert(msg);
       },
     });
-   
-    
   }
-
 }

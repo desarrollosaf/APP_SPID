@@ -1,16 +1,17 @@
-import { Component, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, ChangeDetectorRef } from '@angular/core';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { Eventos } from '../service/eventos';
+import { SocketService } from '../service/socket.service';
 import { User } from '../service/user';
-import { interval, Subscription, of, timer } from 'rxjs';
-import { catchError, distinctUntilChanged, exhaustMap } from 'rxjs/operators';
-import { retry } from 'rxjs';
+import { EstadoPanel, MiComision } from '../interface/user';
 
 export interface Comision {
-  id: number;
+  id: string;
   nombre: string;
-  rol: 'Presidente' | 'Secretario' | 'Vocal';
+  cargo: string;
 }
+
+const SENTIDO: Record<string, number> = { FAVOR: 1, ABSTENCION: 2, CONTRA: 3 };
 
 @Component({
   selector: 'app-comisiones',
@@ -18,23 +19,28 @@ export interface Comision {
   styleUrls: ['./comisiones.page.scss'],
   standalone: false,
 })
-export class ComisionesPage implements OnDestroy {
+export class ComisionesPage implements OnInit, OnDestroy {
 
-  // ── Datos estáticos (reemplazar con API cuando esté disponible) ──────
-  readonly comisiones: Comision[] = [
-    { id: 1, nombre: 'Comisión de Educación, Ciencia y Tecnología', rol: 'Presidente' },
-    { id: 2, nombre: 'Comisión de Salud y Asistencia Social',        rol: 'Vocal'      },
-    { id: 3, nombre: 'Comisión de Presupuesto y Cuenta Pública',     rol: 'Secretario' },
-    { id: 4, nombre: 'Comisión de Seguridad Pública',                rol: 'Vocal'      },
-    { id: 5, nombre: 'Comisión de Medio Ambiente y Ecología',        rol: 'Secretario' },
-  ];
+  // ── Lista de comisiones del diputado ─────────────────────────────────
+  comisiones: Comision[] = [];
+  cargandoComisiones = true;
 
-  // ── Estado de navegación ──────────────────────────────────────────────
+  // ── Comisiones con sesión activa (vivo) ───────────────────────────────
+  comisionesEnVivo = new Set<string>();
+
+  // ── Navegación ────────────────────────────────────────────────────────
   selectedComision: Comision | null = null;
+
+  // ── Estado de sesión de la comisión seleccionada ──────────────────────
+  sesionActivaComision: boolean = false;
+  sesionNombreComision: string = '';
 
   // ── Estado del evento ─────────────────────────────────────────────────
   evento: number = 0;
   temaVotacion: string = '';
+  tipoPuntoVotacion: string = '';
+  noPuntoVotacion: number | null = null;
+  textoExpandido: boolean = false;
   miVoto: string = '';
   asistenciaRegistrada: boolean = false;
   nombreDiputado: string = '';
@@ -43,89 +49,261 @@ export class ComisionesPage implements OnDestroy {
   isModalOpen = false;
   pdfUrl!: SafeResourceUrl;
 
-  private eventoSub?: Subscription;
+  private idAgendaActual: string = '';
+  private idVotoPuntoActual: string = '';
 
   constructor(
     private sanitizer: DomSanitizer,
     private eventosService: Eventos,
-    private userService: User
+    private socketService: SocketService,
+    private userService: User,
+    private cdr: ChangeDetectorRef
   ) {}
 
+  ngOnInit() {
+    this.nombreDiputado = this.userService.currentUserValue?.user?.name ?? '';
+    this.cargarComisiones();
+
+    const miId = this.userService.currentUserValue?.user?.integrante_legislatura_id ?? null;
+    this.socketService.conectarComoDiputado(miId);
+
+    // Sesiones activas via REST (resuelve idComision incluso para sesiones antiguas)
+    this.eventosService.getSesionesComisionesActivas().subscribe({
+      next: (res) => {
+        console.log('[COMISIONES REST] sesiones activas:', res.sesiones);
+        res.sesiones.forEach(s => this.comisionesEnVivo.add(s.idComision));
+        console.log('[COMISIONES REST] comisionesEnVivo después:', Array.from(this.comisionesEnVivo));
+        console.log('[COMISIONES REST] IDs cargados:', this.comisiones.map(c => c.id));
+        this.cdr.detectChanges();
+        if (this.selectedComision) {
+          const activa = res.sesiones.find(s => s.idComision === this.selectedComision!.id);
+          this.sesionActivaComision = !!activa;
+          if (activa) this.sesionNombreComision = activa.titulo ?? '';
+        }
+      },
+      error: (err) => console.error('[COMISIONES REST] error:', err)
+    });
+
+    // Sesiones activas via socket (idComision ya disponible en nuevas sesiones)
+    this.socketService.onSesionesActivas((lista: any[]) => {
+      console.log('[COMISIONES SOCKET] sesiones-activas recibido:', lista);
+      lista.filter(s => s.esComision && s.idComision).forEach(s => {
+        this.comisionesEnVivo.add(s.idComision);
+      });
+      console.log('[COMISIONES SOCKET] comisionesEnVivo después:', Array.from(this.comisionesEnVivo));
+      this.cdr.detectChanges();
+      if (this.selectedComision) {
+        const activa = lista.find(s => s.esComision && s.idComision === this.selectedComision!.id);
+        if (activa) {
+          this.sesionActivaComision = true;
+          this.sesionNombreComision = activa.titulo ?? '';
+        }
+      }
+    });
+    this.socketService.emitGetSesionesActivas();
+
+    // Sesión iniciada en cualquier comisión
+    this.socketService.onSesionIniciada((data: any) => {
+      console.log('[COMISIONES SOCKET] sesion-iniciada recibido:', data);
+      if (data.esComision && data.idComision) {
+        this.comisionesEnVivo.add(data.idComision);
+        console.log('[COMISIONES SOCKET] comisionesEnVivo después de sesion-iniciada:', Array.from(this.comisionesEnVivo));
+        console.log('[COMISIONES SOCKET] IDs de comisiones cargadas:', this.comisiones.map(c => c.id));
+        this.cdr.detectChanges();
+        if (this.selectedComision?.id === data.idComision) {
+          this.sesionActivaComision = true;
+          this.sesionNombreComision = data.titulo ?? '';
+        }
+      }
+    });
+
+    // Sesión terminada
+    this.socketService.onSesionTerminada((data: any) => {
+      if (data.idComision) {
+        this.comisionesEnVivo.delete(data.idComision);
+        if (this.selectedComision?.id === data.idComision) {
+          this.sesionActivaComision = false;
+          this.sesionNombreComision = '';
+          this.evento = 0;
+        }
+      }
+    });
+
+    // Asistencia abierta
+    this.socketService.onAsistenciaAbierta((data) => {
+      if (data.idComision !== this.selectedComision?.id) return;
+      this.idAgendaActual = data.idAgenda;
+      this.evento = 2;
+      this.eventosService.getEstadoPanel().subscribe({
+        next: (estado) => { this.asistenciaRegistrada = estado.asistencia?.yaRegistro ?? false; },
+        error: () => { this.asistenciaRegistrada = false; }
+      });
+    });
+
+    this.socketService.onAsistenciaCerrada((data) => {
+      if (data.idComision !== this.selectedComision?.id) return;
+      if (this.evento === 2) this.evento = 0;
+    });
+
+    // Votación abierta
+    this.socketService.onVotacionAbierta((data) => {
+      if (data.idComision !== this.selectedComision?.id) return;
+      this.idAgendaActual = data.idAgenda;
+      this.idVotoPuntoActual = '';
+      const idRes = (data as any).idReserva;
+      const idIni = (data as any).idIniciativa;
+      this.temaVotacion = this.extraerTextoVotacion(data.punto, idRes, idIni);
+      this.noPuntoVotacion = (data.punto as any)?.nopunto ?? null;
+      this.tipoPuntoVotacion = idRes ? 'Reserva' : idIni ? 'Iniciativa' : '';
+      this.textoExpandido = false;
+      this.miVoto = '';
+      this.evento = 3;
+      this.eventosService.getEstadoPanel().subscribe({
+        next: (estado) => {
+          if (estado.votacion) this.idVotoPuntoActual = estado.votacion.id_voto_punto;
+        },
+        error: (err) => console.error('Error id_voto_punto', err)
+      });
+    });
+
+    this.socketService.onVotacionCerrada((data) => {
+      if (data.idComision !== this.selectedComision?.id) return;
+      if (this.evento === 3) {
+        this.evento = 0;
+        this.temaVotacion = '';
+        this.tipoPuntoVotacion = '';
+        this.noPuntoVotacion = null;
+        this.miVoto = '';
+      }
+    });
+
+    // Actualizaciones del admin
+    this.socketService.onAsistenciaActualizadaAdmin(() => {
+      this.eventosService.getEstadoPanel().subscribe({
+        next: (estado) => this.aplicarEstadoPanelParaComision(estado),
+        error: () => {}
+      });
+    });
+
+    this.socketService.onVotoActualizadoAdmin(() => {
+      this.eventosService.getEstadoPanel().subscribe({
+        next: (estado) => this.aplicarEstadoPanelParaComision(estado),
+        error: () => {}
+      });
+    });
+  }
+
   ngOnDestroy() {
-    this.eventoSub?.unsubscribe();
+    this.socketService.offSesionesActivas();
+    this.socketService.offSesionIniciada();
+    this.socketService.offSesionTerminada();
+    this.socketService.offAsistenciaAbierta();
+    this.socketService.offAsistenciaCerrada();
+    this.socketService.offVotacionAbierta();
+    this.socketService.offVotacionCerrada();
+    this.socketService.offAsistenciaActualizadaAdmin();
+    this.socketService.offVotoActualizadoAdmin();
+  }
+
+  // ── Cargar comisiones desde el backend ───────────────────────────────
+  private cargarComisiones() {
+    this.cargandoComisiones = true;
+    this.eventosService.getMisComisiones().subscribe({
+      next: (res) => {
+        this.comisiones = res.comisiones.map((c: MiComision) => ({
+          id: c.id,
+          nombre: c.nombre,
+          cargo: c.cargo,
+        }));
+        this.cargandoComisiones = false;
+      },
+      error: (err) => {
+        console.error('Error al cargar comisiones', err);
+        this.cargandoComisiones = false;
+      }
+    });
   }
 
   // ── Seleccionar comisión ──────────────────────────────────────────────
   selectComision(comision: Comision) {
     this.selectedComision = comision;
+    this.sesionActivaComision = this.comisionesEnVivo.has(comision.id);
     this.evento = 0;
     this.miVoto = '';
     this.asistenciaRegistrada = false;
-    this.nombreDiputado = this.userService.currentUserValue?.nombre ?? '';
-    this.iniciarPolling();
-  }
+    this.textoExpandido = false;
 
-  goBack() {
-    this.eventoSub?.unsubscribe();
-    this.selectedComision = null;
-    this.evento = 0;
-  }
-
-  // ── Polling de evento ─────────────────────────────────────────────────
-  private iniciarPolling() {
-    this.eventoSub?.unsubscribe();
-
-    this.eventoSub = interval(2000).pipe(
-      exhaustMap(() =>
-        this.eventosService.getEvento().pipe(
-          retry({
-            delay: (err, retryCount) => {
-              if (err?.status !== 429) throw err;
-              const waitMs = Math.min(5000 * Math.pow(2, retryCount - 1), 60000);
-              console.warn(`429 Reintentando en ${waitMs / 1000}s...`);
-              return timer(waitMs);
-            }
-          }),
-          catchError(err => {
-            console.error('Error getEvento (comisiones)', err);
-            return of(null);
-          })
-        )
-      ),
-      distinctUntilChanged((prev: any, curr: any) => prev?.bandera === curr?.bandera)
-    )
-    .subscribe(resp => {
-      if (!resp) return;
-      const prevBandera = this.evento;
-      this.evento = resp.bandera;
-
-      if (resp.bandera === 2 && prevBandera !== 2) this.asistenciaRegistrada = false;
-      if (resp.bandera === 3 && prevBandera !== 3) this.miVoto = '';
-
-      this.temaVotacion = this.evento === 3 ? resp.tema : this.temaVotacion;
+    // Restaurar estado actual de esta comisión
+    this.eventosService.getEstadoPanel().subscribe({
+      next: (estado: EstadoPanel) => this.aplicarEstadoPanelParaComision(estado),
+      error: (err) => console.error('Error estado-panel (comision)', err)
     });
   }
 
-  // ── Acciones ──────────────────────────────────────────────────────────
+  goBack() {
+    this.selectedComision = null;
+    this.sesionActivaComision = false;
+    this.sesionNombreComision = '';
+    this.evento = 0;
+  }
+
+  private extraerTextoVotacion(punto: any, idReserva?: any, idIniciativa?: any): string {
+    if (!punto) return '';
+    if (typeof punto === 'string') return punto;
+    if (idReserva && punto.reservas?.length) {
+      const r = punto.reservas.find((x: any) => String(x.id) === String(idReserva));
+      if (r?.tema_votacion) return r.tema_votacion;
+    }
+    if (idIniciativa && punto.iniciativas?.length) {
+      const i = punto.iniciativas.find((x: any) => String(x.id) === String(idIniciativa));
+      if (i?.iniciativa) return i.iniciativa;
+    }
+    return punto.punto ?? punto.descripcion ?? punto.titulo ?? '';
+  }
+
+  get temaVotacionCorto(): string {
+    return this.temaVotacion.length > 110 ? this.temaVotacion.slice(0, 110) : this.temaVotacion;
+  }
+
+  private aplicarEstadoPanelParaComision(estado: EstadoPanel) {
+    if (!this.selectedComision) return;
+    const idComision = this.selectedComision.id;
+
+    if (estado.votacion && estado.votacion.idComision === idComision) {
+      this.evento = 3;
+      this.idAgendaActual = estado.votacion.idAgenda;
+      this.idVotoPuntoActual = estado.votacion.id_voto_punto;
+      this.temaVotacion = this.extraerTextoVotacion(estado.votacion.punto, estado.votacion.idReserva, estado.votacion.idIniciativa);
+      this.noPuntoVotacion = estado.votacion.punto?.nopunto ?? null;
+      this.tipoPuntoVotacion = estado.votacion.idReserva ? 'Reserva' : estado.votacion.idIniciativa ? 'Iniciativa' : '';
+      if (estado.votacion.yaVoto && estado.votacion.sentidoActual) {
+        const labels: Record<number, string> = { 1: 'FAVOR', 2: 'ABSTENCION', 3: 'CONTRA' };
+        this.miVoto = labels[estado.votacion.sentidoActual] ?? '';
+      }
+    } else if (estado.asistencia && estado.asistencia.idComision === idComision) {
+      this.evento = 2;
+      this.idAgendaActual = estado.asistencia.idAgenda;
+      this.asistenciaRegistrada = estado.asistencia.yaRegistro;
+    }
+  }
+
   votar(tipo: string) {
     this.miVoto = tipo;
-    const payload = {
-      id: this.userService.currentUserValue?.id_diputado,
-      sentido: tipo,
-      id_comision: this.selectedComision?.id   // listo para la API
-    };
-    this.eventosService.saveVotacion(payload).subscribe({
+    this.eventosService.registrarVoto({
+      sentido_voto: SENTIDO[tipo] ?? 1,
+      id_voto_punto: this.idVotoPuntoActual,
+      id_comision: this.selectedComision?.id
+    } as any).subscribe({
       next: (r: any) => console.log('Votación comisión registrada:', r),
       error: (e: any) => console.error('Error votación comisión', e)
     });
   }
 
   registrarAsistencia() {
-    const payload = {
-      id: this.userService.currentUserValue?.id_diputado,
-      id_comision: this.selectedComision?.id   // listo para la API
-    };
-    this.eventosService.saveAsistencia(payload).subscribe({
+    this.eventosService.registrarAsistencia({
+      id_agenda: this.idAgendaActual,
+      id_comision: this.selectedComision?.id
+    } as any).subscribe({
       next: (r: any) => {
         this.asistenciaRegistrada = true;
         console.log('Asistencia comisión registrada:', r);
@@ -139,32 +317,33 @@ export class ComisionesPage implements OnDestroy {
     this.isModalOpen = isOpen;
   }
 
-  // ── Getters de presentación ───────────────────────────────────────────
-  rolIcono(rol: string): string {
-    switch (rol) {
-      case 'Presidente':  return 'star-outline';
-      case 'Secretario':  return 'ribbon-outline';
-      default:            return 'person-outline';
-    }
+  rolIcono(cargo: string): string {
+    const c = (cargo ?? '').toLowerCase();
+    if (c.includes('president')) return 'crown-outline';
+    if (c.includes('secretar'))  return 'create-outline';
+    return 'mic-outline';
+  }
+
+  esPresidente(cargo: string): boolean {
+    return (cargo ?? '').toLowerCase().includes('president');
+  }
+
+  esSecretario(cargo: string): boolean {
+    return (cargo ?? '').toLowerCase().includes('secretar');
+  }
+
+  esVocal(cargo: string): boolean {
+    const c = (cargo ?? '').toLowerCase();
+    return !c.includes('president') && !c.includes('secretar');
   }
 
   get miVotoLabel(): string {
-    switch (this.miVoto) {
-      case 'FAVOR':        return 'A Favor';
-      case 'CONTRA':       return 'En Contra';
-      case 'ABSTENCION':   return 'Abstención';
-      case 'SIN REGISTRO': return 'Sin Registro';
-      default:             return '';
-    }
+    const map: Record<string, string> = { FAVOR: 'A Favor', CONTRA: 'En Contra', ABSTENCION: 'Abstención', 'SIN REGISTRO': 'Sin Registro' };
+    return map[this.miVoto] ?? '';
   }
 
   get votoIcono(): string {
-    switch (this.miVoto) {
-      case 'FAVOR':        return 'thumbs-up-outline';
-      case 'CONTRA':       return 'thumbs-down-outline';
-      case 'ABSTENCION':   return 'remove-circle-outline';
-      case 'SIN REGISTRO': return 'ellipsis-horizontal-circle-outline';
-      default:             return 'help-circle-outline';
-    }
+    const map: Record<string, string> = { FAVOR: 'thumbs-up-outline', CONTRA: 'thumbs-down-outline', ABSTENCION: 'remove-circle-outline', 'SIN REGISTRO': 'ellipsis-horizontal-circle-outline' };
+    return map[this.miVoto] ?? 'help-circle-outline';
   }
 }
