@@ -10,6 +10,7 @@ export class SocketService {
     if (!this.socket) {
       const token = localStorage.getItem('authToken');
       this.socket = io(environment.socketUrl, {
+        path: environment.socketPath,
         transports: ['websocket', 'polling'],
         auth: { token }
       });
