@@ -60,57 +60,52 @@ export class ComisionesPage implements OnInit, OnDestroy {
     private cdr: ChangeDetectorRef
   ) {}
 
-  ngOnInit() {
+  ionViewWillEnter() {
     this.nombreDiputado = this.userService.currentUserValue?.user?.name ?? '';
+    this.comisionesEnVivo.clear();
+    this.comisiones = [];
+    this.selectedComision = null;
     this.cargarComisiones();
 
     const miId = this.userService.currentUserValue?.user?.integrante_legislatura_id ?? null;
     this.socketService.conectarComoDiputado(miId);
-
-    // Sesiones activas via REST (resuelve idComision incluso para sesiones antiguas)
     this.eventosService.getSesionesComisionesActivas().subscribe({
       next: (res) => {
-        console.log('[COMISIONES REST] sesiones activas:', res.sesiones);
         res.sesiones.forEach(s => this.comisionesEnVivo.add(s.idComision));
-        console.log('[COMISIONES REST] comisionesEnVivo después:', Array.from(this.comisionesEnVivo));
-        console.log('[COMISIONES REST] IDs cargados:', this.comisiones.map(c => c.id));
         this.cdr.detectChanges();
-        if (this.selectedComision) {
-          const activa = res.sesiones.find(s => s.idComision === this.selectedComision!.id);
-          this.sesionActivaComision = !!activa;
-          if (activa) this.sesionNombreComision = activa.titulo ?? '';
-        }
       },
-      error: (err) => console.error('[COMISIONES REST] error:', err)
+      error: () => {}
     });
+    this.socketService.emitGetSesionesActivas();
+  }
 
-    // Sesiones activas via socket (idComision ya disponible en nuevas sesiones)
+  ngOnInit() {
+    // Sesiones activas via socket
     this.socketService.onSesionesActivas((lista: any[]) => {
-      console.log('[COMISIONES SOCKET] sesiones-activas recibido:', lista);
-      lista.filter(s => s.esComision && s.idComision).forEach(s => {
-        this.comisionesEnVivo.add(s.idComision);
+      lista.filter(s => s.esComision).forEach(s => {
+        const ids: string[] = s.idComisiones?.length ? s.idComisiones : (s.idComision ? [s.idComision] : []);
+        ids.forEach(id => this.comisionesEnVivo.add(id));
       });
-      console.log('[COMISIONES SOCKET] comisionesEnVivo después:', Array.from(this.comisionesEnVivo));
       this.cdr.detectChanges();
       if (this.selectedComision) {
-        const activa = lista.find(s => s.esComision && s.idComision === this.selectedComision!.id);
+        const activa = lista.find(s => s.esComision && (
+          s.idComision === this.selectedComision!.id ||
+          s.idComisiones?.includes(this.selectedComision!.id)
+        ));
         if (activa) {
           this.sesionActivaComision = true;
           this.sesionNombreComision = activa.titulo ?? '';
         }
       }
     });
-    this.socketService.emitGetSesionesActivas();
 
     // Sesión iniciada en cualquier comisión
     this.socketService.onSesionIniciada((data: any) => {
-      console.log('[COMISIONES SOCKET] sesion-iniciada recibido:', data);
-      if (data.esComision && data.idComision) {
-        this.comisionesEnVivo.add(data.idComision);
-        console.log('[COMISIONES SOCKET] comisionesEnVivo después de sesion-iniciada:', Array.from(this.comisionesEnVivo));
-        console.log('[COMISIONES SOCKET] IDs de comisiones cargadas:', this.comisiones.map(c => c.id));
+      if (data.esComision) {
+        const ids: string[] = data.idComisiones?.length ? data.idComisiones : (data.idComision ? [data.idComision] : []);
+        ids.forEach(id => this.comisionesEnVivo.add(id));
         this.cdr.detectChanges();
-        if (this.selectedComision?.id === data.idComision) {
+        if (this.selectedComision && ids.includes(this.selectedComision.id)) {
           this.sesionActivaComision = true;
           this.sesionNombreComision = data.titulo ?? '';
         }
@@ -320,8 +315,8 @@ export class ComisionesPage implements OnInit, OnDestroy {
   rolIcono(cargo: string): string {
     const c = (cargo ?? '').toLowerCase();
     if (c.includes('president')) return 'crown-outline';
-    if (c.includes('secretar'))  return 'create-outline';
-    return 'mic-outline';
+    if (c.includes('secretar'))  return 'document-text-outline';
+    return 'person-outline';
   }
 
   esPresidente(cargo: string): boolean {

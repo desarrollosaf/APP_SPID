@@ -33,13 +33,13 @@ $voc-color:  #5B7EA5;   // Vocal      → Azul medio neutral
   gap: 16px;
   background: linear-gradient(135deg, $guinda 0%, $guinda-dk 100%);
   border-radius: 20px;
-  padding: 18px 20px;
+  padding: 20px 20px;
   margin-bottom: 20px;
 
   .com-banner-icon-wrap {
-    width: 52px;
-    height: 52px;
-    border-radius: 14px;
+    width: 54px;
+    height: 54px;
+    border-radius: 16px;
     background: rgba(255, 255, 255, 0.15);
     display: flex;
     align-items: center;
@@ -48,16 +48,27 @@ $voc-color:  #5B7EA5;   // Vocal      → Azul medio neutral
     ion-icon { font-size: 28px; color: $gold; }
   }
 
+  .com-banner-text { display: flex; flex-direction: column; gap: 1px; }
+
+  .com-banner-welcome {
+    font-size: 11px;
+    font-weight: 500;
+    color: rgba(255, 255, 255, 0.55);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+
   .com-banner-label {
-    font-size: 16px;
+    font-size: 15px;
     font-weight: 700;
     color: #ffffff;
+    line-height: 1.2;
   }
 
   .com-banner-sub {
-    font-size: 12px;
-    color: rgba(255, 255, 255, 0.65);
-    margin-top: 2px;
+    font-size: 11px;
+    color: rgba(255, 255, 255, 0.5);
+    margin-top: 3px;
   }
 }
 
@@ -81,28 +92,18 @@ $voc-color:  #5B7EA5;   // Vocal      → Azul medio neutral
   align-items: center;
   gap: 14px;
   background: #ffffff;
-  border-radius: 16px;
+  border-radius: 18px;
   padding: 16px;
-  margin-bottom: 12px;
+  margin-bottom: 10px;
   cursor: pointer;
   transition: transform 0.13s ease, box-shadow 0.13s ease;
-  border-left: 4px solid transparent;
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.07);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.06);
 
   &:active { transform: scale(0.985); }
 
-  &.card-presidente {
-    border-left-color: $pres-color;
-    box-shadow: 0 3px 14px rgba($pres-color, 0.14);
-  }
-  &.card-secretario {
-    border-left-color: $sec-color;
-    box-shadow: 0 3px 14px rgba($sec-color, 0.12);
-  }
-  &.card-vocal {
-    border-left-color: $voc-color;
-    box-shadow: 0 3px 14px rgba($voc-color, 0.10);
-  }
+  &.card-presidente { box-shadow: 0 3px 14px rgba($pres-color, 0.13); }
+  &.card-secretario { box-shadow: 0 3px 14px rgba($sec-color,  0.11); }
+  &.card-vocal      { box-shadow: 0 3px 14px rgba($voc-color,  0.09); }
 }
 
 // Columna del icono
@@ -117,9 +118,9 @@ $voc-color:  #5B7EA5;   // Vocal      → Azul medio neutral
 
   ion-icon { font-size: 24px; }
 
-  &.icon-presidente { background: linear-gradient(135deg, rgba($pres-color,.18), rgba($pres-color,.08)); color: $pres-color; }
-  &.icon-secretario { background: linear-gradient(135deg, rgba($sec-color,.15), rgba($sec-color,.07)); color: $sec-color; }
-  &.icon-vocal      { background: linear-gradient(135deg, rgba($voc-color,.15), rgba($voc-color,.07)); color: $voc-color; }
+  &.icon-presidente,
+  &.icon-secretario,
+  &.icon-vocal      { background: linear-gradient(135deg, rgba($sec-color,.15), rgba($sec-color,.07)); color: $sec-color; }
 }
 
 .com-info {
@@ -150,20 +151,12 @@ $voc-color:  #5B7EA5;   // Vocal      → Azul medio neutral
 
   ion-icon { font-size: 13px; }
 
-  &.pill-presidente {
-    background: linear-gradient(90deg, rgba($pres-color,.18), rgba($pres-color,.10));
-    color: darken($pres-color, 5%);
-    border: 1px solid rgba($pres-color, 0.25);
-  }
-  &.pill-secretario {
+  &.pill-presidente,
+  &.pill-secretario,
+  &.pill-vocal {
     background: linear-gradient(90deg, rgba($sec-color,.14), rgba($sec-color,.07));
     color: $sec-color;
     border: 1px solid rgba($sec-color, 0.2);
-  }
-  &.pill-vocal {
-    background: linear-gradient(90deg, rgba($voc-color,.14), rgba($voc-color,.07));
-    color: darken($voc-color, 8%);
-    border: 1px solid rgba($voc-color, 0.2);
   }
 }
 
@@ -252,6 +245,13 @@ $voc-color:  #5B7EA5;   // Vocal      → Azul medio neutral
   .banner-status { font-size: 11px; font-weight: 700; letter-spacing: 2px; color: $gold; text-transform: uppercase; }
   .banner-org    { font-size: 13px; color: rgba(255,255,255,0.75); margin-top: 2px; }
   .banner-ico    { font-size: 28px; color: rgba(255,255,255,0.25); }
+  .banner-cargo  {
+    display: inline-flex; align-items: center; gap: 5px;
+    margin-top: 7px;
+    font-size: 11px; font-weight: 700; letter-spacing: 0.5px; text-transform: uppercase;
+    color: rgba(255,255,255,0.55);
+    ion-icon { font-size: 13px; }
+  }
 }
 
 .pulse-dot {
@@ -324,6 +324,13 @@ $voc-color:  #5B7EA5;   // Vocal      → Azul medio neutral
   .attend-header-ico   { font-size: 44px; color: $gold; display: block; margin-bottom: 10px; }
   .attend-header-label { font-size: 11px; font-weight: 700; letter-spacing: 2.5px; color: rgba(255,255,255,0.65); text-transform: uppercase; margin-bottom: 4px; }
   .attend-header-sub   { font-size: 14px; font-weight: 600; color: #fff; line-height: 1.3; }
+  .attend-header-cargo {
+    display: inline-flex; align-items: center; justify-content: center; gap: 5px;
+    margin-top: 8px;
+    font-size: 11px; font-weight: 700; letter-spacing: 0.5px; text-transform: uppercase;
+    color: rgba(255,255,255,0.5);
+    ion-icon { font-size: 13px; }
+  }
 }
 
 .attend-body { padding: 24px 20px; }

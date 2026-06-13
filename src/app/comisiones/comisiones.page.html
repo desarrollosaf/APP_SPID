@@ -28,8 +28,9 @@
         <div class="com-banner-icon-wrap">
           <ion-icon name="library-outline"></ion-icon>
         </div>
-        <div>
-          <div class="com-banner-label">Mis Comisiones</div>
+        <div class="com-banner-text">
+          <div class="com-banner-welcome">Bienvenido</div>
+          <div class="com-banner-label">{{ nombreDiputado }}</div>
           <div class="com-banner-sub">Congreso del Estado de México</div>
         </div>
       </div>
@@ -98,14 +99,6 @@
 
     <div class="page-pad">
 
-      <!-- Chip de rol -->
-      <div class="rol-chip" [class.rol-chip-presidente]="esPresidente(selectedComision.cargo)"
-                            [class.rol-chip-secretario]="esSecretario(selectedComision.cargo)"
-                            [class.rol-chip-vocal]="esVocal(selectedComision.cargo)">
-        <ion-icon [name]="rolIcono(selectedComision.cargo)"></ion-icon>
-        <span>{{ selectedComision.cargo }}</span>
-      </div>
-
       <!-- Banner EN VIVO cuando hay sesión activa pero sin evento abierto -->
       @if (sesionActivaComision && evento === 0) {
         <div class="session-banner">
@@ -114,6 +107,10 @@
             <div>
               <div class="banner-status">EN VIVO</div>
               <div class="banner-org">{{ selectedComision.nombre }}</div>
+              <div class="banner-cargo">
+                <ion-icon [name]="rolIcono(selectedComision.cargo)"></ion-icon>
+                {{ selectedComision.cargo }}
+              </div>
             </div>
           </div>
           <ion-icon name="people-outline" class="banner-ico"></ion-icon>
@@ -135,6 +132,10 @@
               <ion-icon name="people-outline" class="attend-header-ico"></ion-icon>
               <div class="attend-header-label">REGISTRO DE ASISTENCIA</div>
               <div class="attend-header-sub">{{ selectedComision.nombre }}</div>
+              <div class="attend-header-cargo">
+                <ion-icon [name]="rolIcono(selectedComision.cargo)"></ion-icon>
+                {{ selectedComision.cargo }}
+              </div>
             </div>
             <div class="attend-body">
               @if (nombreDiputado) {

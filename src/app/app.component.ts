@@ -1,5 +1,7 @@
 import { Component } from '@angular/core';
 import { Router } from '@angular/router';
+import { SocketService } from './service/socket.service';
+import { User } from './service/user';
 
 @Component({
   selector: 'app-root',
@@ -15,9 +17,16 @@ export class AppComponent {
     { title: 'Cerrar sesión', action: 'logout',          icon: 'log-out'       },
   ];
 
-  constructor(private router: Router) {}
+  constructor(
+    private router: Router,
+    private socketService: SocketService,
+    private userService: User
+  ) {}
 
   logout() {
+    this.socketService.disconnect();
+    this.userService.logout().subscribe({ error: () => {} });
+    localStorage.removeItem('authToken');
     localStorage.setItem('isLoggedin', 'false');
     this.router.navigate(['/auth/login']);
   }
