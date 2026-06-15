@@ -61,7 +61,7 @@ export class ComisionesPage implements OnInit, OnDestroy {
   ) {}
 
   ionViewWillEnter() {
-    this.nombreDiputado = this.userService.currentUserValue?.user?.name ?? '';
+    this.nombreDiputado = this.userService.nombreCompleto;
     this.comisionesEnVivo.clear();
     this.comisiones = [];
     this.selectedComision = null;

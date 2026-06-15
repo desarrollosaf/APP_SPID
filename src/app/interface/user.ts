@@ -15,6 +15,7 @@ export interface IntegranteLegislatura {
 export interface UserBackend {
   id: string;
   name: string;
+  nombreCompleto?: string;
   email: string;
   integrante_legislatura_id: string | null;
 }

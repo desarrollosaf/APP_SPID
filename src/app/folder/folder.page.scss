@@ -1,28 +1,62 @@
-ion-menu-button {
-  color: var(--ion-color-primary);
+$guinda: #7b1034;
+
+.home-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 32px 24px 24px;
+  gap: 24px;
 }
 
-#container {
+.welcome-banner {
+  width: 100%;
+  background: linear-gradient(135deg, $guinda, lighten($guinda, 10%));
+  border-radius: 16px;
+  padding: 24px 20px;
   text-align: center;
-  position: absolute;
-  left: 0;
-  right: 0;
-  top: 50%;
-  transform: translateY(-50%);
+  color: #fff;
+  box-shadow: 0 4px 16px rgba($guinda, 0.3);
 }
 
-#container strong {
+.welcome-text {
+  font-size: 13px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  opacity: 0.85;
+  margin-bottom: 4px;
+}
+
+.welcome-name {
   font-size: 20px;
-  line-height: 26px;
+  font-weight: 700;
+  margin-bottom: 4px;
 }
 
-#container p {
-  font-size: 16px;
-  line-height: 22px;
+.welcome-sub {
+  font-size: 12px;
+  opacity: 0.75;
+}
+
+.logo-card {
+  width: 100%;
+  background: #fff;
+  border-radius: 16px;
+  padding: 28px 20px 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+
+  img {
+    width: 80%;
+    max-width: 280px;
+    object-fit: contain;
+  }
+}
+
+.sistema-label {
+  margin-top: 16px;
+  font-size: 13px;
   color: #8c8c8c;
-  margin: 0;
-}
-
-#container a {
-  text-decoration: none;
+  letter-spacing: 0.5px;
 }

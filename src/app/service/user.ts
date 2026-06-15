@@ -81,6 +81,11 @@ export class User {
     return this.currentUserValue?.user?.integrante_legislatura_id ?? null;
   }
 
+  get nombreCompleto(): string {
+    const u = this.currentUserValue?.user;
+    return u?.nombreCompleto ?? u?.name ?? '';
+  }
+
   setCurrentUser(user: Users) {
     this.currentUserSubject.next(user);
     localStorage.setItem('currentUser', JSON.stringify(user));

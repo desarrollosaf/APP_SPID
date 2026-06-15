@@ -1,21 +1,25 @@
-<ion-header [translucent]="true">
+<ion-header>
   <ion-toolbar>
     <ion-buttons slot="start">
-      <ion-menu-button></ion-menu-button>
+      <ion-menu-button auto-hide="false"></ion-menu-button>
     </ion-buttons>
-    <ion-title>Bienvenidos</ion-title>
+    <ion-title>Inicio</ion-title>
   </ion-toolbar>
 </ion-header>
 
-<ion-content [fullscreen]="true">
-  <ion-header collapse="condense">
-    <ion-toolbar>
-      <ion-title size="large">Bienvenido</ion-title>
-    </ion-toolbar>
-  </ion-header>
+<ion-content>
+  <div class="home-wrap">
 
-  <div id="container">
-    <img src="assets/congreso_fondo_blanco.png" >
-    <p>Sistema de votacion</p>
+    <div class="welcome-banner">
+      <div class="welcome-text">Bienvenido</div>
+      <div class="welcome-name">{{ nombreDiputado }}</div>
+      <div class="welcome-sub">Congreso del Estado de México</div>
+    </div>
+
+    <div class="logo-card">
+      <img src="assets/congreso_fondo_blanco.png" alt="Congreso del Estado de México" />
+      <p class="sistema-label">Sistema de Votación</p>
+    </div>
+
   </div>
 </ion-content>
