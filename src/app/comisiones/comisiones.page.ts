@@ -71,7 +71,10 @@ export class ComisionesPage implements OnInit, OnDestroy {
     this.socketService.conectarComoDiputado(miId);
     this.eventosService.getSesionesComisionesActivas().subscribe({
       next: (res) => {
-        res.sesiones.forEach(s => this.comisionesEnVivo.add(s.idComision));
+        res.sesiones.forEach(s => {
+          const ids: string[] = s.idComisiones?.length ? s.idComisiones : (s.idComision ? [s.idComision] : []);
+          ids.forEach(id => this.comisionesEnVivo.add(id));
+        });
         this.cdr.detectChanges();
       },
       error: () => {}

@@ -38,7 +38,7 @@ export class Eventos {
     return this.http.get<any>(`${environment.apiUrl}/diputado/mis-votos/${idAgenda}`);
   }
 
-  getSesionesComisionesActivas(): Observable<{ sesiones: { idAgenda: string; titulo: string; fecha: string; idComision: string }[] }> {
+  getSesionesComisionesActivas(): Observable<{ sesiones: { idAgenda: string; titulo: string; fecha: string; idComision: string; idComisiones?: string[] }[] }> {
     return this.http.get<any>(`${environment.apiUrl}/diputado/sesiones-comisiones-activas`);
   }
 }
