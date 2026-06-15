@@ -117,13 +117,13 @@ export class ComisionesPage implements OnInit, OnDestroy {
 
     // Sesión terminada
     this.socketService.onSesionTerminada((data: any) => {
-      if (data.idComision) {
-        this.comisionesEnVivo.delete(data.idComision);
-        if (this.selectedComision?.id === data.idComision) {
-          this.sesionActivaComision = false;
-          this.sesionNombreComision = '';
-          this.evento = 0;
-        }
+      const ids: string[] = data.idComisiones?.length ? data.idComisiones : (data.idComision ? [data.idComision] : []);
+      ids.forEach(id => this.comisionesEnVivo.delete(id));
+      this.cdr.detectChanges();
+      if (this.selectedComision && ids.includes(this.selectedComision.id)) {
+        this.sesionActivaComision = false;
+        this.sesionNombreComision = '';
+        this.evento = 0;
       }
     });
 

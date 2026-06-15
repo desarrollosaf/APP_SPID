@@ -5,6 +5,7 @@ import { environment } from '../../environments/environment';
 @Injectable({ providedIn: 'root' })
 export class SocketService {
   private socket?: Socket;
+  private joinHandler?: () => void;
 
   private ensureConnected(): Socket {
     if (!this.socket) {
@@ -18,14 +19,24 @@ export class SocketService {
     return this.socket;
   }
 
-  /** Conecta como diputado, se une a sala-diputados y a sala personal */
+  /** Conecta como diputado, se une a sala-diputados y a sala personal.
+   *  Usa on('connect') persistente para re-unirse tras reconexión del socket. */
   conectarComoDiputado(integranteId?: string | null): void {
     const socket = this.ensureConnected();
-    const join = () => socket.emit('unirse-diputado', integranteId ? { integranteId } : undefined);
+
+    // Quitar handler anterior para evitar duplicados
+    if (this.joinHandler) {
+      socket.off('connect', this.joinHandler);
+    }
+
+    this.joinHandler = () => socket.emit('unirse-diputado', integranteId ? { integranteId } : undefined);
+
+    // Re-unirse en cada reconexión
+    socket.on('connect', this.joinHandler);
+
+    // Si ya está conectado, unirse inmediatamente
     if (socket.connected) {
-      join();
-    } else {
-      socket.once('connect', join);
+      this.joinHandler();
     }
   }
 
