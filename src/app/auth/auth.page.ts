@@ -13,6 +13,9 @@ export class AuthPage implements OnInit {
 
   usuario: string = '';
   password: string = '';
+  showPassword: boolean = false;
+
+  togglePassword() { this.showPassword = !this.showPassword; }
 
   constructor(
     private router: Router,
