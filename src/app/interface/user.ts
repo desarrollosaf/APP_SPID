@@ -40,6 +40,7 @@ export interface MiComision {
 export interface EstadoPanel {
   asistencia: {
     idComision: string;
+    idComisiones?: string[];
     idAgenda: string;
     yaRegistro: boolean;
     descripcion: string;
@@ -47,6 +48,7 @@ export interface EstadoPanel {
   } | null;
   votacion: {
     idComision: string;
+    idComisiones?: string[];
     idAgenda: string;
     punto: any;
     id_voto_punto: string;

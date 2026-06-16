@@ -267,7 +267,12 @@ export class ComisionesPage implements OnInit, OnDestroy {
     if (!this.selectedComision) return;
     const idComision = this.selectedComision.id;
 
-    if (estado.votacion && estado.votacion.idComision === idComision) {
+    const enVotacion = estado.votacion &&
+      ((estado.votacion.idComisiones ?? [estado.votacion.idComision]).includes(idComision));
+    const enAsistencia = estado.asistencia &&
+      ((estado.asistencia.idComisiones ?? [estado.asistencia.idComision]).includes(idComision));
+
+    if (enVotacion && estado.votacion) {
       this.evento = 3;
       this.idAgendaActual = estado.votacion.idAgenda;
       this.idVotoPuntoActual = estado.votacion.id_voto_punto;
@@ -278,7 +283,7 @@ export class ComisionesPage implements OnInit, OnDestroy {
         const labels: Record<number, string> = { 1: 'FAVOR', 2: 'ABSTENCION', 3: 'CONTRA' };
         this.miVoto = labels[estado.votacion.sentidoActual] ?? '';
       }
-    } else if (estado.asistencia && estado.asistencia.idComision === idComision) {
+    } else if (enAsistencia && estado.asistencia) {
       this.evento = 2;
       this.idAgendaActual = estado.asistencia.idAgenda;
       this.asistenciaRegistrada = estado.asistencia.yaRegistro;
