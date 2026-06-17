@@ -109,7 +109,7 @@ export class SocketService {
     this.socket?.off('sesion-iniciada');
   }
 
-  onSesionTerminada(cb: (data: { clave: string; idAgenda: string }) => void): void {
+  onSesionTerminada(cb: (data: { clave: string; idAgenda: string; esComision?: boolean; idComision?: string; idComisiones?: string[] }) => void): void {
     this.ensureConnected().on('sesion-terminada', cb);
   }
 

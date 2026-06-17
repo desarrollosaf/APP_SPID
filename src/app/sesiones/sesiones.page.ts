@@ -53,18 +53,23 @@ export class SesionesPage implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit() {
-    this.nombreDiputado = this.userService.currentUserValue?.user?.name ?? '';
+    this.nombreDiputado = this.userService.nombreCompleto;
 
-    // Cargar IDs de comisiones del diputado para filtrar eventos de comisión
+    // Cargar IDs de comisiones y después verificar estado del panel (orden importa para el filtro)
     this.eventosService.getMisComisiones().subscribe({
-      next: (res) => res.comisiones.forEach(c => this.misComisionIds.add(c.id)),
-      error: () => {}
-    });
-
-    // Estado inicial
-    this.eventosService.getEstadoPanel().subscribe({
-      next: (estado: EstadoPanel) => this.aplicarEstadoPanel(estado),
-      error: (err) => console.error('Error estado-panel', err)
+      next: (res) => {
+        res.comisiones.forEach(c => this.misComisionIds.add(c.id));
+        this.eventosService.getEstadoPanel().subscribe({
+          next: (estado: EstadoPanel) => this.aplicarEstadoPanel(estado),
+          error: () => {}
+        });
+      },
+      error: () => {
+        this.eventosService.getEstadoPanel().subscribe({
+          next: (estado: EstadoPanel) => this.aplicarEstadoPanel(estado),
+          error: () => {}
+        });
+      }
     });
 
     const miId = this.userService.currentUserValue?.user?.integrante_legislatura_id ?? null;
@@ -97,6 +102,7 @@ export class SesionesPage implements OnInit, OnDestroy {
     });
 
     this.socketService.onSesionTerminada((data) => {
+      if (data.esComision) return; // Solo reaccionar a sesiones plenarias
       if (this.sesionIdAgenda && data.idAgenda !== this.sesionIdAgenda) return;
       this.sesionActiva = false;
       this.sesionNombre = '';
@@ -207,6 +213,15 @@ export class SesionesPage implements OnInit, OnDestroy {
   }
 
   private aplicarEstadoPanel(estado: EstadoPanel) {
+    // Ignorar eventos de comisión en la vista de sesiones plenarias
+    if (estado.votacion) {
+      const ids = estado.votacion.idComisiones ?? [estado.votacion.idComision];
+      if (ids.some(id => this.misComisionIds.has(id))) return;
+    }
+    if (estado.asistencia) {
+      const ids = estado.asistencia.idComisiones ?? [estado.asistencia.idComision];
+      if (ids.some(id => this.misComisionIds.has(id))) return;
+    }
     if (estado.votacion) {
       this.evento = 3;
       this.idAgendaActual = estado.votacion.idAgenda;

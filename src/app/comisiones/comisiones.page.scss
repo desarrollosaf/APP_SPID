@@ -72,6 +72,313 @@ $voc-color:  #5B7EA5;   // Vocal      → Azul medio neutral
   }
 }
 
+// ── Eventos en vivo (antes de la lista de comisiones) ─────────────────
+.evento-vivo-card {
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 2px 12px rgba($guinda, 0.12);
+  border: 1.5px solid rgba($guinda, 0.18);
+  margin-bottom: 16px;
+  overflow: hidden;
+  cursor: pointer;
+  transition: transform 0.12s ease;
+  &:active { transform: scale(0.985); }
+}
+
+.evento-vivo-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: linear-gradient(135deg, $guinda, $guinda-dk);
+  padding: 10px 16px;
+
+  .live-dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: #fff;
+    flex-shrink: 0;
+    animation: pulse-dot 1.4s ease-in-out infinite;
+  }
+}
+
+.evento-vivo-titulo {
+  color: #fff;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.3px;
+  line-height: 1.3;
+}
+
+// ── Card evento en vivo: chips de roles y flecha ─────────────────────
+.ev-hdr-arrow {
+  font-size: 14px;
+  color: rgba(255,255,255,0.55);
+  margin-left: auto;
+  flex-shrink: 0;
+}
+
+.ev-roles-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  padding: 10px 14px 12px;
+}
+
+.ev-role-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 10px 4px 8px;
+  border-radius: 20px;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  ion-icon { font-size: 12px; }
+
+  &.erc-pres { background: rgba($pres-color, 0.13); color: $pres-color; border: 1px solid rgba($pres-color,.25); }
+  &.erc-sec  { background: rgba($sec-color,  0.10); color: $sec-color;  border: 1px solid rgba($sec-color,.2);  }
+  &.erc-voc  { background: rgba($voc-color,  0.10); color: $voc-color;  border: 1px solid rgba($voc-color,.2);  }
+}
+
+// ── Tarjeta de tema de votación (aparece una sola vez arriba) ────────
+.ev-voto-tema-card {
+  background: #fff;
+  border-radius: 14px;
+  border-left: 4px solid $guinda;
+  box-shadow: 0 2px 10px rgba($guinda, 0.10);
+  padding: 12px 14px;
+  margin-bottom: 14px;
+}
+
+.ev-voto-meta {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 8px;
+
+  .vote-num-badge {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    color: $guinda;
+    background: rgba($guinda, 0.10);
+    border-radius: 8px;
+    padding: 3px 10px;
+    border: 1px solid rgba($guinda, 0.20);
+  }
+
+  .vote-tipo-badge {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    color: $gold;
+    background: rgba($gold, 0.12);
+    border: 1px solid rgba($gold, 0.30);
+    border-radius: 8px;
+    padding: 3px 10px;
+  }
+
+  .vote-label-tag {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: rgba($guinda, 0.55);
+  }
+}
+
+.ev-voto-tema {
+  font-size: 13px;
+  font-weight: 500;
+  color: #2a2a2a;
+  line-height: 1.5;
+  word-break: break-word;
+
+  .vote-mas-btn {
+    background: none;
+    border: none;
+    color: $guinda;
+    font-size: 12px;
+    font-weight: 700;
+    cursor: pointer;
+    padding: 0;
+    text-decoration: underline;
+    text-underline-offset: 2px;
+  }
+}
+
+// ── Detalle de evento conjunto ────────────────────────────────────────
+.ev-detail-titulo {
+  font-size: 13px;
+  font-weight: 700;
+  color: $guinda;
+  line-height: 1.4;
+  margin-bottom: 16px;
+  padding: 0 2px;
+}
+
+.btn-attend-all {
+  --background: #{$guinda};
+  --background-activated: #{$guinda-dk};
+  --border-radius: 14px;
+  --box-shadow: 0 4px 14px rgba(150,19,75,0.28);
+  height: 48px;
+  font-weight: 700;
+  font-size: 14px;
+  margin-bottom: 16px;
+}
+
+.attend-all-ok {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba($success, 0.08);
+  border: 1px solid rgba($success, 0.25);
+  border-radius: 12px;
+  padding: 10px 14px;
+  margin-bottom: 16px;
+  ion-icon { font-size: 20px; color: $success; flex-shrink: 0; }
+  span { font-size: 13px; font-weight: 600; color: $success; }
+}
+
+// ── Mini panel por comisión ───────────────────────────────────────────
+.mini-panel-card {
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.07);
+  margin-bottom: 12px;
+  overflow: hidden;
+}
+
+.mini-panel-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+
+  &.mph-pres { background: linear-gradient(90deg, rgba($pres-color,.12), rgba($pres-color,.04)); border-left: 3px solid $pres-color; }
+  &.mph-sec  { background: linear-gradient(90deg, rgba($sec-color,.10), rgba($sec-color,.03)); border-left: 3px solid $sec-color; }
+  &.mph-voc  { background: linear-gradient(90deg, rgba($voc-color,.10), rgba($voc-color,.03)); border-left: 3px solid $voc-color; }
+
+  .mph-ico { font-size: 18px; flex-shrink: 0; }
+  &.mph-pres .mph-ico { color: $pres-color; }
+  &.mph-sec  .mph-ico { color: $sec-color;  }
+  &.mph-voc  .mph-ico { color: $voc-color;  }
+}
+
+.mph-info {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  min-width: 0;
+}
+
+.mph-nombre {
+  font-size: 12px;
+  font-weight: 700;
+  color: #1A1014;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: block;
+}
+
+.mph-cargo {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  opacity: 0.65;
+}
+
+.mini-panel-body {
+  padding: 12px 14px;
+}
+
+.mini-sin-evento {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 14px;
+  ion-icon { font-size: 16px; color: $gray; }
+  span { font-size: 12px; color: $gray; }
+}
+
+.btn-mini-attend {
+  --background: #{$guinda};
+  --background-activated: #{$guinda-dk};
+  --border-radius: 10px;
+  height: 40px;
+  font-weight: 700;
+  font-size: 13px;
+}
+
+.mini-attend-ok {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  ion-icon { font-size: 20px; color: $success; }
+  span { font-size: 13px; font-weight: 600; color: $success; }
+}
+
+// ── Mini panel: votación ──────────────────────────────────────────────
+.mini-vote-body {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 12px 14px 14px;
+}
+
+.mini-vote-tema {
+  font-size: 12px;
+  color: #333;
+  line-height: 1.45;
+  word-break: break-word;
+}
+
+.mini-voto-actual {
+  font-size: 12px;
+  font-weight: 500;
+  padding: 6px 10px;
+  border-radius: 8px;
+  strong { font-weight: 700; }
+  &.mva-favor  { color: $success; background: rgba($success,.08); }
+  &.mva-contra { color: $danger;  background: rgba($danger,.08);  }
+  &.mva-abs    { color: $warn;    background: rgba($warn,.08);    }
+  &.mva-sin    { color: $gray;    background: rgba($gray,.08);    }
+}
+
+// ── Fila de botones de voto (solo íconos) ────────────────────────────
+.mini-vote-row {
+  display: flex;
+  gap: 22px;
+  justify-content: center;
+}
+
+.mv-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  border: 2px solid transparent;
+  background: transparent;
+  cursor: pointer;
+  transition: transform 0.12s ease, background 0.12s;
+  outline: none;
+  ion-icon { font-size: 22px; }
+  &:active { transform: scale(0.92); }
+
+  &.mv-favor  { border-color: $success; color: $success; &.mv-active { background: $success; color: #fff; box-shadow: 0 3px 12px rgba($success,.35); } }
+  &.mv-contra { border-color: $danger;  color: $danger;  &.mv-active { background: $danger;  color: #fff; box-shadow: 0 3px 12px rgba($danger,.35);  } }
+  &.mv-abs    { border-color: $warn;    color: $warn;    &.mv-active { background: $warn;    color: #fff; box-shadow: 0 3px 12px rgba($warn,.30);    } }
+  &.mv-sin    { border-color: $gray;    color: $gray;    &.mv-active { background: $gray;    color: #fff; box-shadow: 0 3px 12px rgba($gray,.28);    } }
+}
+
 .section-label {
   font-size: 12px;
   font-weight: 700;
@@ -170,6 +477,232 @@ $voc-color:  #5B7EA5;   // Vocal      → Azul medio neutral
   display: flex;
   align-items: center;
   flex-shrink: 0;
+}
+
+// ══════════════════════════════════════════════════════════════════════
+// DETALLE DE COMISIÓN — rediseño
+// ══════════════════════════════════════════════════════════════════════
+
+.ci-loading {
+  display: flex;
+  justify-content: center;
+  padding: 40px 0;
+}
+
+// ── Hero de rol ───────────────────────────────────────────────────────
+.ci-role-hero {
+  border-radius: 20px;
+  padding: 18px 18px 18px 18px;
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  position: relative;
+  overflow: hidden;
+
+  &::after {
+    content: '';
+    position: absolute;
+    top: -28px; right: -28px;
+    width: 90px; height: 90px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.08);
+    pointer-events: none;
+  }
+
+  &.cirh-pres { background: linear-gradient(135deg, #c4a55a 0%, #917122 100%); }
+  &.cirh-sec  { background: linear-gradient(135deg, $guinda 0%, $guinda-dk 100%); }
+  &.cirh-voc  { background: linear-gradient(135deg, #4a6d94 0%, #334f6e 100%); }
+}
+
+.ci-rh-ico-wrap {
+  width: 52px; height: 52px;
+  border-radius: 14px;
+  background: rgba(255,255,255,0.18);
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+  ion-icon { font-size: 26px; color: rgba(255,255,255,0.92); }
+}
+
+.ci-rh-text {
+  display: flex; flex-direction: column; gap: 2px;
+  min-width: 0; flex: 1;
+}
+
+.ci-rh-label {
+  font-size: 10px; font-weight: 700; letter-spacing: 2px;
+  text-transform: uppercase; color: rgba(255,255,255,0.55);
+}
+
+.ci-rh-cargo {
+  font-size: 18px; font-weight: 800; color: #fff; line-height: 1.1;
+}
+
+.ci-rh-nombre {
+  font-size: 11px; color: rgba(255,255,255,0.60); margin-top: 2px;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+
+.ci-rh-live-badge {
+  position: absolute; top: 11px; right: 14px;
+  display: flex; align-items: center; gap: 5px;
+  background: rgba(255,255,255,0.18);
+  border: 1px solid rgba(255,255,255,0.35);
+  border-radius: 20px; padding: 4px 10px;
+  font-size: 9px; font-weight: 800; letter-spacing: 2px;
+  color: #fff; text-transform: uppercase;
+}
+
+.ci-rh-live-dot {
+  width: 7px; height: 7px; border-radius: 50%;
+  background: #fff; flex-shrink: 0;
+  animation: pulse-dot 1.4s ease-in-out infinite;
+}
+
+@keyframes pulse-dot {
+  0%   { box-shadow: 0 0 0 0 rgba(255,255,255,0.7); }
+  70%  { box-shadow: 0 0 0 5px rgba(255,255,255,0); }
+  100% { box-shadow: 0 0 0 0 rgba(255,255,255,0); }
+}
+
+// ── Tira de estadísticas ──────────────────────────────────────────────
+.ci-stats-strip {
+  display: flex;
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+  margin-bottom: 20px;
+  overflow: hidden;
+}
+
+.ci-stat-chip {
+  flex: 1;
+  display: flex; flex-direction: column; align-items: center; gap: 2px;
+  padding: 14px 8px;
+
+  ion-icon { font-size: 15px; color: $guinda; opacity: 0.45; margin-bottom: 1px; }
+  .csc-val { font-size: 22px; font-weight: 800; color: $guinda; line-height: 1; }
+  .csc-lbl { font-size: 10px; font-weight: 600; color: $gray; letter-spacing: 0.4px; text-transform: uppercase; }
+}
+
+.ci-stat-sep {
+  width: 1px; background: rgba(0,0,0,0.06); margin: 12px 0;
+}
+
+// ── Tarjetas de evento con date-box ──────────────────────────────────
+.ci-ev-card {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  background: #fff;
+  border-radius: 16px;
+  padding: 12px 14px;
+  margin-bottom: 8px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  border: 1px solid rgba(0,0,0,0.04);
+
+  &.ci-ev-featured {
+    box-shadow: 0 4px 16px rgba($guinda, 0.13);
+    border-color: rgba($guinda, 0.10);
+  }
+
+  &.ci-ev-past { opacity: 0.72; }
+}
+
+.ci-datebox {
+  width: 46px; min-width: 46px;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  background: linear-gradient(135deg, $guinda, $guinda-dk);
+  border-radius: 12px; padding: 8px 4px;
+
+  .cdb-mes { font-size: 9px; font-weight: 700; letter-spacing: 0.5px; color: rgba(255,255,255,0.72); text-transform: uppercase; }
+  .cdb-dia { font-size: 22px; font-weight: 800; color: #fff; line-height: 1.15; }
+
+  &.ci-datebox-past { background: linear-gradient(135deg, #8C9BA5, #6e7f89); }
+}
+
+.ci-ev-body {
+  flex: 1; min-width: 0;
+  display: flex; flex-direction: column; gap: 5px;
+}
+
+.ci-ev-desc {
+  font-size: 13px; font-weight: 600; color: #1A1014; line-height: 1.35;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.ci-ev-hora {
+  display: inline-flex; align-items: center; gap: 4px;
+  font-size: 11px; font-weight: 700; color: $guinda;
+  background: rgba($guinda, 0.08); border-radius: 6px;
+  padding: 2px 8px 2px 6px; align-self: flex-start;
+  ion-icon { font-size: 11px; }
+}
+
+.ci-ev-next-badge {
+  font-size: 10px; font-weight: 800; letter-spacing: 0.8px;
+  text-transform: uppercase; color: $guinda;
+  background: rgba($guinda, 0.08); border: 1px solid rgba($guinda, 0.18);
+  border-radius: 8px; padding: 3px 9px; flex-shrink: 0;
+}
+
+.ci-ev-done-badge {
+  display: inline-flex; align-items: center; gap: 4px;
+  font-size: 11px; font-weight: 600; color: $success; align-self: flex-start;
+  ion-icon { font-size: 13px; }
+}
+
+// ── Tarjeta de integrantes ────────────────────────────────────────────
+.ci-members-card {
+  background: #fff;
+  border-radius: 18px;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+  overflow: hidden;
+}
+
+.ci-member-row {
+  display: flex; align-items: center; gap: 12px;
+  padding: 12px 16px;
+  border-bottom: 1px solid rgba(0,0,0,0.045);
+
+  &.ci-mr-last { border-bottom: none; }
+  &.ci-mr-pres { background: linear-gradient(90deg, rgba($pres-color, 0.07), transparent); }
+}
+
+.ci-m-avatar {
+  width: 40px; height: 40px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+  ion-icon { font-size: 18px; }
+
+  &.cma-pres { background: rgba($pres-color, 0.14); ion-icon { color: $pres-color; } }
+  &.cma-sec  { background: rgba($sec-color,  0.12); ion-icon { color: $sec-color;  } }
+  &.cma-voc  { background: rgba($voc-color,  0.11); ion-icon { color: $voc-color;  } }
+}
+
+.ci-m-info {
+  flex: 1; min-width: 0;
+  display: flex; flex-direction: column; gap: 2px;
+}
+
+.ci-m-nombre {
+  font-size: 13px; font-weight: 600; color: #1A1014;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+
+.ci-m-cargo {
+  font-size: 10px; font-weight: 700; letter-spacing: 0.5px; text-transform: uppercase;
+  &.cmc-pres { color: $pres-color; }
+  &.cmc-sec  { color: $sec-color;  }
+  &.cmc-voc  { color: $voc-color;  }
+}
+
+.ci-m-crown {
+  font-size: 16px; color: $pres-color; flex-shrink: 0;
 }
 
 // ── Badge EN VIVO ─────────────────────────────────────────────────────
