@@ -4,8 +4,8 @@
 
 export const environment = {
   production: false,
-  apiUrl: 'http://localhost:3013/api',
-  socketUrl: 'http://localhost:3013',
+  apiUrl: 'https://parlamentario.congresoedomex.gob.mx/backend/api',
+  socketUrl: 'https://parlamentario.congresoedomex.gob.mx/backend',
   socketPath: '/socket.io'
 };
 
