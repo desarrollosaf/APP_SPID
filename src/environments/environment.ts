@@ -5,8 +5,8 @@
 export const environment = {
   production: false,
   apiUrl: 'https://parlamentario.congresoedomex.gob.mx/backend/api',
-  socketUrl: 'https://parlamentario.congresoedomex.gob.mx/backend',
-  socketPath: '/socket.io'
+  socketUrl: 'https://parlamentario.congresoedomex.gob.mx',
+  socketPath: '/backend/socket.io'
 };
 
 /*
