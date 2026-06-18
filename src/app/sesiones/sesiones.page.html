@@ -114,25 +114,22 @@
             </div>
           }
 
-          <div class="vote-actions">
-            <button class="vote-btn vb-favor" [class.vb-active]="miVoto === 'FAVOR'" (click)="votar('FAVOR')">
+          <div class="ses-vote-row">
+            <button class="sv-btn sv-favor" [class.sv-active]="miVoto === 'FAVOR'"
+                    (click)="votar('FAVOR')" title="A Favor">
               <ion-icon name="thumbs-up-outline"></ion-icon>
-              <span>A Favor</span>
             </button>
-
-            <button class="vote-btn vb-contra" [class.vb-active]="miVoto === 'CONTRA'" (click)="votar('CONTRA')">
+            <button class="sv-btn sv-contra" [class.sv-active]="miVoto === 'CONTRA'"
+                    (click)="votar('CONTRA')" title="En Contra">
               <ion-icon name="thumbs-down-outline"></ion-icon>
-              <span>En Contra</span>
             </button>
-
-            <button class="vote-btn vb-abstencion" [class.vb-active]="miVoto === 'ABSTENCION'" (click)="votar('ABSTENCION')">
+            <button class="sv-btn sv-abs" [class.sv-active]="miVoto === 'ABSTENCION'"
+                    (click)="votar('ABSTENCION')" title="Abstención">
               <ion-icon name="remove-circle-outline"></ion-icon>
-              <span>Abstención</span>
             </button>
-
-            <button class="vote-btn vb-sin-registro" [class.vb-active]="miVoto === 'SIN REGISTRO'" (click)="votar('SIN REGISTRO')">
+            <button class="sv-btn sv-sin" [class.sv-active]="miVoto === 'SIN REGISTRO'"
+                    (click)="votar('SIN REGISTRO')" title="Sin Registro">
               <ion-icon name="ellipsis-horizontal-circle-outline"></ion-icon>
-              <span>Sin Registro</span>
             </button>
           </div>
 

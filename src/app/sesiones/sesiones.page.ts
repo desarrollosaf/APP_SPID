@@ -5,7 +5,7 @@ import { SocketService } from '../service/socket.service';
 import { User } from '../service/user';
 import { EstadoPanel } from '../interface/user';
 
-const SENTIDO: Record<string, number> = { FAVOR: 1, ABSTENCION: 2, CONTRA: 3 };
+const SENTIDO: Record<string, number> = { FAVOR: 1, ABSTENCION: 2, CONTRA: 3, 'SIN REGISTRO': 0 };
 
 @Component({
   selector: 'app-sesiones',
@@ -234,6 +234,8 @@ export class SesionesPage implements OnInit, OnDestroy {
       if (estado.votacion.yaVoto && estado.votacion.sentidoActual) {
         const labels: Record<number, string> = { 1: 'FAVOR', 2: 'ABSTENCION', 3: 'CONTRA' };
         this.miVoto = labels[estado.votacion.sentidoActual] ?? '';
+      } else {
+        this.miVoto = '';
       }
     } else if (estado.asistencia) {
       this.evento = 2;
@@ -244,29 +246,33 @@ export class SesionesPage implements OnInit, OnDestroy {
   }
 
   votar(tipo: string) {
+    const prevVoto = this.miVoto;
     this.miVoto = tipo;
-    const payload = {
+    // Sesiones plenarias: no mandar id_comision (VotosPunto.id_comision_dip es NULL para plenarias)
+    this.eventosService.registrarVoto({
       sentido_voto: SENTIDO[tipo] ?? 1,
       id_voto_punto: this.idVotoPuntoActual,
-      ...(this.idComisionActual ? { id_comision: this.idComisionActual } : {})
-    };
-    this.eventosService.registrarVoto(payload).subscribe({
+    }).subscribe({
       next: (r: any) => console.log('Votación registrada:', r),
-      error: (err: any) => console.error('Error al registrar votación', err)
+      error: (err: any) => {
+        console.error('Error al registrar votación', err);
+        this.miVoto = prevVoto;
+        alert('No se pudo registrar el voto. La votación puede haber sido cerrada o el servidor reiniciado. Intenta de nuevo.');
+      }
     });
   }
 
   registrarAsistencia() {
-    const payload = {
-      id_agenda: this.idAgendaActual,
-      ...(this.idComisionActual ? { id_comision: this.idComisionActual } : {})
-    };
-    this.eventosService.registrarAsistencia(payload).subscribe({
+    // Sesiones plenarias: nunca mandar id_comision porque AsistenciaVoto.comision_dip_id es NULL
+    this.eventosService.registrarAsistencia({ id_agenda: this.idAgendaActual }).subscribe({
       next: (r: any) => {
         this.asistenciaRegistrada = true;
         console.log('Asistencia registrada:', r);
       },
-      error: (err: any) => console.error('Error al registrar asistencia', err)
+      error: (err: any) => {
+        console.error('Error al registrar asistencia', err);
+        alert('No se pudo registrar la asistencia. Intenta de nuevo o contacta al administrador.');
+      }
     });
   }
 

@@ -1,4 +1,4 @@
-package io.ionic.starter;
+package mx.gob.congresoedomex.spid;
 
 import com.getcapacitor.BridgeActivity;
 

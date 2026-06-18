@@ -10,8 +10,11 @@ import { environment } from '../../environments/environment';
 export class Eventos {
   private http = inject(HttpClient);
 
-  getEstadoPanel(): Observable<EstadoPanel> {
-    return this.http.get<EstadoPanel>(`${environment.apiUrl}/diputado/estado-panel`);
+  getEstadoPanel(idAgenda?: string): Observable<EstadoPanel> {
+    const url = idAgenda
+      ? `${environment.apiUrl}/diputado/estado-panel?idAgenda=${idAgenda}`
+      : `${environment.apiUrl}/diputado/estado-panel`;
+    return this.http.get<EstadoPanel>(url);
   }
 
   registrarAsistencia(data: { id_agenda: string; id_comision?: string }): Observable<any> {

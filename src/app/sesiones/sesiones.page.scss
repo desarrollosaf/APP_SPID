@@ -352,6 +352,35 @@ $gray:      #8C9BA5;
   &.vs-sin-registro { color: $gray;    background: rgba($gray,    0.08); }
 }
 
+// ── Votación: fila de íconos circulares (igual que comisiones) ────────
+.ses-vote-row {
+  display: flex;
+  gap: 22px;
+  justify-content: center;
+  padding: 18px 20px 22px;
+}
+
+.sv-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 54px;
+  height: 54px;
+  border-radius: 50%;
+  border: 2.5px solid transparent;
+  background: transparent;
+  cursor: pointer;
+  transition: transform 0.12s ease, background 0.12s;
+  outline: none;
+  ion-icon { font-size: 26px; }
+  &:active { transform: scale(0.90); }
+
+  &.sv-favor  { border-color: $success; color: $success; &.sv-active { background: $success; color: #fff; box-shadow: 0 4px 16px rgba($success,.35); } }
+  &.sv-contra { border-color: $danger;  color: $danger;  &.sv-active { background: $danger;  color: #fff; box-shadow: 0 4px 16px rgba($danger,.35);  } }
+  &.sv-abs    { border-color: $warn;    color: $warn;    &.sv-active { background: $warn;    color: #fff; box-shadow: 0 4px 16px rgba($warn,.30);    } }
+  &.sv-sin    { border-color: $gray;    color: $gray;    &.sv-active { background: $gray;    color: #fff; box-shadow: 0 4px 14px rgba($gray,.28);    } }
+}
+
 .vote-actions {
   display: flex;
   flex-direction: column;

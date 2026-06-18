@@ -176,7 +176,7 @@ export class ComisionesPage implements OnInit, OnDestroy {
         });
         return;
       }
-      if (this.selectedEvento) {
+      if (this.selectedEvento && data.idAgenda === this.selectedEvento.idAgenda) {
         const s = this.estadosPorComision.get(data.idComision);
         if (s) {
           s.evento = 2;
@@ -194,7 +194,7 @@ export class ComisionesPage implements OnInit, OnDestroy {
       }
       if (this.selectedEvento) {
         const s = this.estadosPorComision.get(data.idComision);
-        if (s && s.evento === 2) { s.evento = 0; this.cdr.detectChanges(); }
+        if (s && s.evento === 2 && s.idAgenda === this.selectedEvento.idAgenda) { s.evento = 0; this.cdr.detectChanges(); }
       }
     });
 
@@ -216,7 +216,7 @@ export class ComisionesPage implements OnInit, OnDestroy {
         });
         return;
       }
-      if (this.selectedEvento) {
+      if (this.selectedEvento && data.idAgenda === this.selectedEvento.idAgenda) {
         const s = this.estadosPorComision.get(data.idComision);
         if (s) {
           const idRes = (data as any).idReserva;
@@ -229,9 +229,12 @@ export class ComisionesPage implements OnInit, OnDestroy {
           s.tipoPuntoVotacion = idRes ? 'Reserva' : idIni ? 'Iniciativa' : '';
           s.textoExpandido = false;
           s.miVoto = '';
-          this.eventosService.getEstadoPanel().subscribe({
+          this.eventosService.getEstadoPanel(data.idAgenda).subscribe({
             next: (estado) => {
-              if (estado.votacion) { s.idVotoPuntoActual = estado.votacion.id_voto_punto; this.cdr.detectChanges(); }
+              if (estado.votacion && estado.votacion.idAgenda === this.selectedEvento!.idAgenda) {
+                s.idVotoPuntoActual = estado.votacion.id_voto_punto;
+                this.cdr.detectChanges();
+              }
             }
           });
           this.cdr.detectChanges();
@@ -252,7 +255,7 @@ export class ComisionesPage implements OnInit, OnDestroy {
       }
       if (this.selectedEvento) {
         const s = this.estadosPorComision.get(data.idComision);
-        if (s && s.evento === 3) {
+        if (s && s.evento === 3 && s.idAgenda === this.selectedEvento.idAgenda) {
           s.evento = 0; s.temaVotacion = ''; s.tipoPuntoVotacion = ''; s.noPuntoVotacion = null; s.miVoto = '';
           this.cdr.detectChanges();
         }
@@ -260,14 +263,16 @@ export class ComisionesPage implements OnInit, OnDestroy {
     });
 
     this.socketService.onAsistenciaActualizadaAdmin(() => {
-      this.eventosService.getEstadoPanel().subscribe({
+      const idAgenda = this.selectedEvento?.idAgenda;
+      this.eventosService.getEstadoPanel(idAgenda).subscribe({
         next: (estado) => { this.aplicarEstadoPanelParaComision(estado); this.aplicarEstadoPanelParaEvento(estado); },
         error: () => {}
       });
     });
 
     this.socketService.onVotoActualizadoAdmin(() => {
-      this.eventosService.getEstadoPanel().subscribe({
+      const idAgenda = this.selectedEvento?.idAgenda;
+      this.eventosService.getEstadoPanel(idAgenda).subscribe({
         next: (estado) => { this.aplicarEstadoPanelParaComision(estado); this.aplicarEstadoPanelParaEvento(estado); },
         error: () => {}
       });
@@ -339,7 +344,7 @@ export class ComisionesPage implements OnInit, OnDestroy {
     ev.comisionesDelDiputado.forEach(c => {
       this.estadosPorComision.set(c.id, { ...DEFAULT_ESTADO_COM, idAgenda: ev.idAgenda });
     });
-    this.eventosService.getEstadoPanel().subscribe({
+    this.eventosService.getEstadoPanel(ev.idAgenda).subscribe({
       next: (estado) => this.aplicarEstadoPanelParaEvento(estado),
       error: () => {}
     });
@@ -364,14 +369,14 @@ export class ComisionesPage implements OnInit, OnDestroy {
 
   private aplicarEstadoPanelParaEvento(estado: EstadoPanel) {
     if (!this.selectedEvento) return;
-    if (estado.asistencia) {
+    if (estado.asistencia && estado.asistencia.idAgenda === this.selectedEvento.idAgenda) {
       const ids = estado.asistencia.idComisiones ?? [estado.asistencia.idComision];
       ids.forEach(id => {
         const s = this.estadosPorComision.get(id);
         if (s) { s.evento = 2; s.idAgenda = estado.asistencia!.idAgenda; s.asistenciaRegistrada = estado.asistencia!.yaRegistro; }
       });
     }
-    if (estado.votacion) {
+    if (estado.votacion && estado.votacion.idAgenda === this.selectedEvento.idAgenda) {
       const ids = estado.votacion.idComisiones ?? [estado.votacion.idComision];
       ids.forEach(id => {
         const s = this.estadosPorComision.get(id);
