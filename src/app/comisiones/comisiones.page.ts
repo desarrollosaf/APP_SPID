@@ -1,4 +1,5 @@
 import { Component, OnInit, OnDestroy, ChangeDetectorRef } from '@angular/core';
+import { ViewWillLeave } from '@ionic/angular';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { Eventos } from '../service/eventos';
 import { SocketService } from '../service/socket.service';
@@ -37,7 +38,7 @@ const DEFAULT_ESTADO_COM: EstadoCom = {
   styleUrls: ['./comisiones.page.scss'],
   standalone: false,
 })
-export class ComisionesPage implements OnInit, OnDestroy {
+export class ComisionesPage implements OnInit, OnDestroy, ViewWillLeave {
 
   // ── Lista de comisiones del diputado ─────────────────────────────────
   comisiones: Comision[] = [];
@@ -122,9 +123,7 @@ export class ComisionesPage implements OnInit, OnDestroy {
       error: () => {}
     });
     this.socketService.emitGetSesionesActivas();
-  }
 
-  ngOnInit() {
     this.socketService.onSesionesActivas((lista: any[]) => {
       this.sesionesVivas = lista.filter(s => s.esComision).map(s => ({
         idAgenda: s.idAgenda,
@@ -286,7 +285,9 @@ export class ComisionesPage implements OnInit, OnDestroy {
     });
   }
 
-  ngOnDestroy() {
+  ngOnInit() {}
+
+  ionViewWillLeave() {
     this.socketService.offSesionesActivas();
     this.socketService.offSesionIniciada();
     this.socketService.offSesionTerminada();
@@ -296,6 +297,10 @@ export class ComisionesPage implements OnInit, OnDestroy {
     this.socketService.offVotacionCerrada();
     this.socketService.offAsistenciaActualizadaAdmin();
     this.socketService.offVotoActualizadoAdmin();
+  }
+
+  ngOnDestroy() {
+    this.ionViewWillLeave();
   }
 
   // ── Cargar comisiones desde el backend ───────────────────────────────

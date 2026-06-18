@@ -43,9 +43,7 @@ export class SocketService {
   // ── Asistencia ───────────────────────────────────────────────────────────
 
   onAsistenciaAbierta(cb: (data: { idAgenda: string; idComision: string }) => void): void {
-    const s = this.ensureConnected();
-    s.off('asistencia-abierta');
-    s.on('asistencia-abierta', cb);
+    this.ensureConnected().on('asistencia-abierta', cb);
   }
 
   offAsistenciaAbierta(): void {
@@ -53,9 +51,7 @@ export class SocketService {
   }
 
   onAsistenciaCerrada(cb: (data: { idComision: string }) => void): void {
-    const s = this.ensureConnected();
-    s.off('asistencia-cerrada');
-    s.on('asistencia-cerrada', cb);
+    this.ensureConnected().on('asistencia-cerrada', cb);
   }
 
   offAsistenciaCerrada(): void {
@@ -72,9 +68,7 @@ export class SocketService {
     idReserva?: string | null;
     idIniciativa?: string | null;
   }) => void): void {
-    const s = this.ensureConnected();
-    s.off('votacion-abierta');
-    s.on('votacion-abierta', cb);
+    this.ensureConnected().on('votacion-abierta', cb);
   }
 
   offVotacionAbierta(): void {
@@ -82,9 +76,7 @@ export class SocketService {
   }
 
   onVotacionCerrada(cb: (data: { idComision: string }) => void): void {
-    const s = this.ensureConnected();
-    s.off('votacion-cerrada');
-    s.on('votacion-cerrada', cb);
+    this.ensureConnected().on('votacion-cerrada', cb);
   }
 
   offVotacionCerrada(): void {
@@ -102,9 +94,7 @@ export class SocketService {
   }
 
   onSesionesActivas(cb: (lista: any[]) => void): void {
-    const s = this.ensureConnected();
-    s.off('sesiones-activas');
-    s.on('sesiones-activas', cb);
+    this.ensureConnected().on('sesiones-activas', cb);
   }
 
   offSesionesActivas(): void {
@@ -112,9 +102,7 @@ export class SocketService {
   }
 
   onSesionIniciada(cb: (data: any) => void): void {
-    const s = this.ensureConnected();
-    s.off('sesion-iniciada');
-    s.on('sesion-iniciada', cb);
+    this.ensureConnected().on('sesion-iniciada', cb);
   }
 
   offSesionIniciada(): void {
@@ -122,9 +110,7 @@ export class SocketService {
   }
 
   onSesionTerminada(cb: (data: { clave: string; idAgenda: string; esComision?: boolean; idComision?: string; idComisiones?: string[] }) => void): void {
-    const s = this.ensureConnected();
-    s.off('sesion-terminada');
-    s.on('sesion-terminada', cb);
+    this.ensureConnected().on('sesion-terminada', cb);
   }
 
   offSesionTerminada(): void {
@@ -134,9 +120,7 @@ export class SocketService {
   // ── Actualizaciones desde el admin ───────────────────────────────────────
 
   onAsistenciaActualizadaAdmin(cb: (data: { id_diputado: string; sentido: number; mensaje: string }) => void): void {
-    const s = this.ensureConnected();
-    s.off('asistencia-actualizada-admin');
-    s.on('asistencia-actualizada-admin', cb);
+    this.ensureConnected().on('asistencia-actualizada-admin', cb);
   }
 
   offAsistenciaActualizadaAdmin(): void {
@@ -144,9 +128,7 @@ export class SocketService {
   }
 
   onVotoActualizadoAdmin(cb: (data: { id_diputado: string; sentido: number; mensaje: string }) => void): void {
-    const s = this.ensureConnected();
-    s.off('voto-actualizado-admin');
-    s.on('voto-actualizado-admin', cb);
+    this.ensureConnected().on('voto-actualizado-admin', cb);
   }
 
   offVotoActualizadoAdmin(): void {

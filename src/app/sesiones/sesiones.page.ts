@@ -1,4 +1,5 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
+import { ViewWillEnter, ViewWillLeave } from '@ionic/angular';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { Eventos } from '../service/eventos';
 import { SocketService } from '../service/socket.service';
@@ -13,7 +14,7 @@ const SENTIDO: Record<string, number> = { FAVOR: 1, ABSTENCION: 2, CONTRA: 3, 'S
   styleUrls: ['./sesiones.page.scss'],
   standalone: false,
 })
-export class SesionesPage implements OnInit, OnDestroy {
+export class SesionesPage implements OnInit, OnDestroy, ViewWillEnter, ViewWillLeave {
 
   isModalOpen = false;
   pdfUrl!: SafeResourceUrl;
@@ -54,11 +55,12 @@ export class SesionesPage implements OnInit, OnDestroy {
 
   ngOnInit() {
     this.nombreDiputado = this.userService.nombreCompleto;
+  }
 
+  ionViewWillEnter() {
     const miId = this.userService.currentUserValue?.user?.integrante_legislatura_id ?? null;
     this.socketService.conectarComoDiputado(miId);
 
-    // Verificar si ya hay sesión PLENARIA activa al abrir la app
     this.socketService.onSesionesActivas((lista: any[]) => {
       const plenaria = lista.find((s: any) => !s.esComision);
       if (plenaria) {
@@ -73,7 +75,6 @@ export class SesionesPage implements OnInit, OnDestroy {
     });
     this.socketService.emitGetSesionesActivas();
 
-    // Solo sesiones PLENARIAS (esComision = false)
     this.socketService.onSesionIniciada((data) => {
       if (data.esComision) return;
       this.sesionActiva = true;
@@ -93,8 +94,25 @@ export class SesionesPage implements OnInit, OnDestroy {
       this.vistaDetalle = 'none';
     });
 
-    // Cargar IDs de comisiones PRIMERO, luego registrar listeners de asistencia/votación
-    // para garantizar que misComisionIds esté poblado antes de cualquier evento de socket
+    const refrescarEstado = () => {
+      this.eventosService.getEstadoPanel().subscribe({
+        next: (estado) => this.aplicarEstadoPanel(estado),
+        error: (err) => console.error('Error al refrescar estado-panel', err)
+      });
+    };
+
+    this.socketService.onAsistenciaActualizadaAdmin((data) => {
+      if (miId && data.id_diputado && data.id_diputado !== miId) return;
+      refrescarEstado();
+    });
+
+    this.socketService.onVotoActualizadoAdmin((data) => {
+      if (miId && data.id_diputado && data.id_diputado !== miId) return;
+      refrescarEstado();
+    });
+
+    // Cargar IDs de comisiones y luego registrar listeners de asistencia/votación
+    this.misComisionIds.clear();
     this.eventosService.getMisComisiones().subscribe({
       next: (res) => {
         res.comisiones.forEach(c => this.misComisionIds.add(c.id));
@@ -112,28 +130,9 @@ export class SesionesPage implements OnInit, OnDestroy {
         this.registrarListenersAsistenciaVotacion();
       }
     });
-
-    // Actualizaciones del admin → refrescar estado desde el backend (fuente de verdad)
-    const refrescarEstado = () => {
-      this.eventosService.getEstadoPanel().subscribe({
-        next: (estado) => this.aplicarEstadoPanel(estado),
-        error: (err) => console.error('Error al refrescar estado-panel', err)
-      });
-    };
-
-    this.socketService.onAsistenciaActualizadaAdmin((data) => {
-      // Si estamos en sala personal el evento ya es nuestro; si hay miId lo verificamos
-      if (miId && data.id_diputado && data.id_diputado !== miId) return;
-      refrescarEstado();
-    });
-
-    this.socketService.onVotoActualizadoAdmin((data) => {
-      if (miId && data.id_diputado && data.id_diputado !== miId) return;
-      refrescarEstado();
-    });
   }
 
-  ngOnDestroy() {
+  ionViewWillLeave() {
     this.socketService.offSesionesActivas();
     this.socketService.offSesionIniciada();
     this.socketService.offSesionTerminada();
@@ -143,6 +142,10 @@ export class SesionesPage implements OnInit, OnDestroy {
     this.socketService.offVotacionCerrada();
     this.socketService.offAsistenciaActualizadaAdmin();
     this.socketService.offVotoActualizadoAdmin();
+  }
+
+  ngOnDestroy() {
+    this.ionViewWillLeave();
   }
 
   // Registrar listeners de asistencia/votación DESPUÉS de cargar misComisionIds
