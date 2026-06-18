@@ -6,6 +6,7 @@ import { environment } from '../../environments/environment';
 export class SocketService {
   private socket?: Socket;
   private joinHandler?: () => void;
+  private reconnectHandler?: () => void;
 
   private ensureConnected(): Socket {
     if (!this.socket) {
@@ -136,6 +137,20 @@ export class SocketService {
   }
 
   // ── Conexión ─────────────────────────────────────────────────────────────
+
+  onReconnect(cb: () => void): void {
+    const socket = this.ensureConnected();
+    if (this.reconnectHandler) socket.off('connect', this.reconnectHandler);
+    this.reconnectHandler = cb;
+    socket.on('connect', cb);
+  }
+
+  offReconnect(): void {
+    if (this.reconnectHandler) {
+      this.socket?.off('connect', this.reconnectHandler);
+      this.reconnectHandler = undefined;
+    }
+  }
 
   disconnect(): void {
     this.socket?.disconnect();

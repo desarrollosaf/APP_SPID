@@ -71,6 +71,11 @@ export class SesionesPage implements OnInit, OnDestroy, ViewWillEnter, ViewWillL
           next: (r) => { this.asistenciaRegistrada = r.yaRegistro; },
           error: () => {}
         });
+      } else {
+        this.sesionActiva = false;
+        this.sesionNombre = '';
+        this.sesionIdAgenda = '';
+        this.limpiarEvento();
       }
     });
     this.socketService.emitGetSesionesActivas();
@@ -90,16 +95,20 @@ export class SesionesPage implements OnInit, OnDestroy, ViewWillEnter, ViewWillL
       this.sesionActiva = false;
       this.sesionNombre = '';
       this.sesionIdAgenda = '';
-      this.evento = 0;
       this.vistaDetalle = 'none';
+      this.limpiarEvento();
     });
 
     const refrescarEstado = () => {
+      this.socketService.emitGetSesionesActivas();
       this.eventosService.getEstadoPanel().subscribe({
         next: (estado) => this.aplicarEstadoPanel(estado),
         error: (err) => console.error('Error al refrescar estado-panel', err)
       });
     };
+
+    // Al reconectar tras caída de red, volver a pedir el estado actual
+    this.socketService.onReconnect(refrescarEstado);
 
     this.socketService.onAsistenciaActualizadaAdmin((data) => {
       if (miId && data.id_diputado && data.id_diputado !== miId) return;
@@ -133,6 +142,7 @@ export class SesionesPage implements OnInit, OnDestroy, ViewWillEnter, ViewWillL
   }
 
   ionViewWillLeave() {
+    this.socketService.offReconnect();
     this.socketService.offSesionesActivas();
     this.socketService.offSesionIniciada();
     this.socketService.offSesionTerminada();
@@ -216,16 +226,34 @@ export class SesionesPage implements OnInit, OnDestroy, ViewWillEnter, ViewWillL
     return this.temaVotacion.length > 110 ? this.temaVotacion.slice(0, 110) : this.temaVotacion;
   }
 
+  private limpiarEvento() {
+    this.evento = 0;
+    this.temaVotacion = '';
+    this.tipoPuntoVotacion = '';
+    this.noPuntoVotacion = null;
+    this.miVoto = '';
+    this.idAgendaActual = '';
+    this.idVotoPuntoActual = '';
+    this.idComisionActual = '';
+  }
+
   private aplicarEstadoPanel(estado: EstadoPanel) {
-    // Ignorar eventos de comisión en la vista de sesiones plenarias
+    // Si el evento activo es de una comisión, limpiar estado de sesión y salir
     if (estado.votacion) {
       const ids = estado.votacion.idComisiones ?? [estado.votacion.idComision];
-      if (ids.some(id => this.misComisionIds.has(id))) return;
+      if (ids.some(id => this.misComisionIds.has(id))) {
+        this.limpiarEvento();
+        return;
+      }
     }
     if (estado.asistencia) {
       const ids = estado.asistencia.idComisiones ?? [estado.asistencia.idComision];
-      if (ids.some(id => this.misComisionIds.has(id))) return;
+      if (ids.some(id => this.misComisionIds.has(id))) {
+        this.limpiarEvento();
+        return;
+      }
     }
+
     if (estado.votacion) {
       this.evento = 3;
       this.idAgendaActual = estado.votacion.idAgenda;
@@ -246,6 +274,9 @@ export class SesionesPage implements OnInit, OnDestroy, ViewWillEnter, ViewWillL
       this.idAgendaActual = estado.asistencia.idAgenda;
       this.idComisionActual = estado.asistencia.idComision ?? '';
       this.asistenciaRegistrada = estado.asistencia.yaRegistro;
+    } else {
+      // Nada activo → limpiar
+      this.limpiarEvento();
     }
   }
 

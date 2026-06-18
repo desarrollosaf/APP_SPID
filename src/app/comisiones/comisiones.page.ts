@@ -124,6 +124,21 @@ export class ComisionesPage implements OnInit, OnDestroy, ViewWillLeave {
     });
     this.socketService.emitGetSesionesActivas();
 
+    // Refrescar estado del panel al entrar, por si hubo eventos mientras no estaba visible
+    this.eventosService.getEstadoPanel().subscribe({
+      next: (estado) => { this.aplicarEstadoPanelParaComision(estado); this.aplicarEstadoPanelParaEvento(estado); },
+      error: () => {}
+    });
+
+    // Al reconectar tras caída de red, volver a pedir el estado actual
+    this.socketService.onReconnect(() => {
+      this.socketService.emitGetSesionesActivas();
+      this.eventosService.getEstadoPanel().subscribe({
+        next: (estado) => { this.aplicarEstadoPanelParaComision(estado); this.aplicarEstadoPanelParaEvento(estado); },
+        error: () => {}
+      });
+    });
+
     this.socketService.onSesionesActivas((lista: any[]) => {
       this.sesionesVivas = lista.filter(s => s.esComision).map(s => ({
         idAgenda: s.idAgenda,
@@ -288,6 +303,7 @@ export class ComisionesPage implements OnInit, OnDestroy, ViewWillLeave {
   ngOnInit() {}
 
   ionViewWillLeave() {
+    this.socketService.offReconnect();
     this.socketService.offSesionesActivas();
     this.socketService.offSesionIniciada();
     this.socketService.offSesionTerminada();
