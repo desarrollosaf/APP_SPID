@@ -55,23 +55,6 @@ export class SesionesPage implements OnInit, OnDestroy {
   ngOnInit() {
     this.nombreDiputado = this.userService.nombreCompleto;
 
-    // Cargar IDs de comisiones y después verificar estado del panel (orden importa para el filtro)
-    this.eventosService.getMisComisiones().subscribe({
-      next: (res) => {
-        res.comisiones.forEach(c => this.misComisionIds.add(c.id));
-        this.eventosService.getEstadoPanel().subscribe({
-          next: (estado: EstadoPanel) => this.aplicarEstadoPanel(estado),
-          error: () => {}
-        });
-      },
-      error: () => {
-        this.eventosService.getEstadoPanel().subscribe({
-          next: (estado: EstadoPanel) => this.aplicarEstadoPanel(estado),
-          error: () => {}
-        });
-      }
-    });
-
     const miId = this.userService.currentUserValue?.user?.integrante_legislatura_id ?? null;
     this.socketService.conectarComoDiputado(miId);
 
@@ -82,7 +65,6 @@ export class SesionesPage implements OnInit, OnDestroy {
         this.sesionActiva = true;
         this.sesionNombre = plenaria.titulo ?? '';
         this.sesionIdAgenda = plenaria.idAgenda ?? '';
-        // Consultar si ya tiene asistencia registrada en esta sesión
         this.eventosService.getMiAsistencia(this.sesionIdAgenda).subscribe({
           next: (r) => { this.asistenciaRegistrada = r.yaRegistro; },
           error: () => {}
@@ -102,7 +84,7 @@ export class SesionesPage implements OnInit, OnDestroy {
     });
 
     this.socketService.onSesionTerminada((data) => {
-      if (data.esComision) return; // Solo reaccionar a sesiones plenarias
+      if (data.esComision) return;
       if (this.sesionIdAgenda && data.idAgenda !== this.sesionIdAgenda) return;
       this.sesionActiva = false;
       this.sesionNombre = '';
@@ -111,54 +93,23 @@ export class SesionesPage implements OnInit, OnDestroy {
       this.vistaDetalle = 'none';
     });
 
-    // Asistencia abierta — ignorar eventos de comisión
-    this.socketService.onAsistenciaAbierta((data) => {
-      if (this.misComisionIds.has(data.idComision)) return;
-      this.idAgendaActual = data.idAgenda;
-      this.idComisionActual = data.idComision ?? '';
-      this.evento = 2;
-      this.eventosService.getEstadoPanel().subscribe({
-        next: (estado) => {
-          this.asistenciaRegistrada = estado.asistencia?.yaRegistro ?? false;
-        },
-        error: () => { this.asistenciaRegistrada = false; }
-      });
-    });
-
-    // Asistencia cerrada — ignorar si es de comisión
-    this.socketService.onAsistenciaCerrada((data) => {
-      if (this.misComisionIds.has(data.idComision)) return;
-      if (this.evento === 2) this.evento = 0;
-    });
-
-    // Votación abierta — ignorar eventos de comisión
-    this.socketService.onVotacionAbierta((data) => {
-      if (this.misComisionIds.has(data.idComision)) return;
-      this.idAgendaActual = data.idAgenda;
-      this.idComisionActual = data.idComision ?? '';
-      const idRes = (data as any).idReserva;
-      const idIni = (data as any).idIniciativa;
-      this.temaVotacion = this.extraerTextoVotacion(data.punto, idRes, idIni);
-      this.noPuntoVotacion = (data.punto as any)?.nopunto ?? null;
-      this.tipoPuntoVotacion = idRes ? 'Reserva' : idIni ? 'Iniciativa' : '';
-      this.textoExpandido = false;
-      this.miVoto = '';
-      this.evento = 3;
-      this.eventosService.getEstadoPanel().subscribe({
-        next: (estado) => {
-          if (estado.votacion) this.idVotoPuntoActual = estado.votacion.id_voto_punto;
-        },
-        error: (err) => console.error('Error al obtener id_voto_punto', err)
-      });
-    });
-
-    this.socketService.onVotacionCerrada(() => {
-      if (this.evento === 3) {
-        this.evento = 0;
-        this.tipoPuntoVotacion = '';
-        this.noPuntoVotacion = null;
-        this.temaVotacion = '';
-        this.miVoto = '';
+    // Cargar IDs de comisiones PRIMERO, luego registrar listeners de asistencia/votación
+    // para garantizar que misComisionIds esté poblado antes de cualquier evento de socket
+    this.eventosService.getMisComisiones().subscribe({
+      next: (res) => {
+        res.comisiones.forEach(c => this.misComisionIds.add(c.id));
+        this.eventosService.getEstadoPanel().subscribe({
+          next: (estado: EstadoPanel) => this.aplicarEstadoPanel(estado),
+          error: () => {}
+        });
+        this.registrarListenersAsistenciaVotacion();
+      },
+      error: () => {
+        this.eventosService.getEstadoPanel().subscribe({
+          next: (estado: EstadoPanel) => this.aplicarEstadoPanel(estado),
+          error: () => {}
+        });
+        this.registrarListenersAsistenciaVotacion();
       }
     });
 
@@ -192,6 +143,56 @@ export class SesionesPage implements OnInit, OnDestroy {
     this.socketService.offVotacionCerrada();
     this.socketService.offAsistenciaActualizadaAdmin();
     this.socketService.offVotoActualizadoAdmin();
+  }
+
+  // Registrar listeners de asistencia/votación DESPUÉS de cargar misComisionIds
+  // para evitar la condición de carrera donde llegan eventos de comisión antes
+  // de que el filtro esté listo
+  private registrarListenersAsistenciaVotacion() {
+    this.socketService.onAsistenciaAbierta((data) => {
+      if (this.misComisionIds.has(data.idComision)) return;
+      this.idAgendaActual = data.idAgenda;
+      this.idComisionActual = data.idComision ?? '';
+      this.evento = 2;
+      this.eventosService.getEstadoPanel().subscribe({
+        next: (estado) => { this.asistenciaRegistrada = estado.asistencia?.yaRegistro ?? false; },
+        error: () => { this.asistenciaRegistrada = false; }
+      });
+    });
+
+    this.socketService.onAsistenciaCerrada((data) => {
+      if (this.misComisionIds.has(data.idComision)) return;
+      if (this.evento === 2) this.evento = 0;
+    });
+
+    this.socketService.onVotacionAbierta((data) => {
+      if (this.misComisionIds.has(data.idComision)) return;
+      this.idAgendaActual = data.idAgenda;
+      this.idComisionActual = data.idComision ?? '';
+      const idRes = (data as any).idReserva;
+      const idIni = (data as any).idIniciativa;
+      this.temaVotacion = this.extraerTextoVotacion(data.punto, idRes, idIni);
+      this.noPuntoVotacion = (data.punto as any)?.nopunto ?? null;
+      this.tipoPuntoVotacion = idRes ? 'Reserva' : idIni ? 'Iniciativa' : '';
+      this.textoExpandido = false;
+      this.miVoto = '';
+      this.evento = 3;
+      this.eventosService.getEstadoPanel().subscribe({
+        next: (estado) => { if (estado.votacion) this.idVotoPuntoActual = estado.votacion.id_voto_punto; },
+        error: (err) => console.error('Error al obtener id_voto_punto', err)
+      });
+    });
+
+    this.socketService.onVotacionCerrada((data) => {
+      if (this.misComisionIds.has(data.idComision)) return;
+      if (this.evento === 3) {
+        this.evento = 0;
+        this.tipoPuntoVotacion = '';
+        this.noPuntoVotacion = null;
+        this.temaVotacion = '';
+        this.miVoto = '';
+      }
+    });
   }
 
   private extraerTextoVotacion(punto: any, idReserva?: any, idIniciativa?: any): string {

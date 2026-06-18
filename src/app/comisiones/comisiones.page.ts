@@ -47,12 +47,12 @@ export class ComisionesPage implements OnInit, OnDestroy {
   comisionesEnVivo = new Set<string>();
 
   // ── Eventos activos donde el diputado es anfitrión ────────────────────
-  private sesionesVivas: { idAgenda: string; titulo: string; idComisiones: string[] }[] = [];
-  eventosActivos: { idAgenda: string; titulo: string; comisionesDelDiputado: Comision[] }[] = [];
+  private sesionesVivas: { idAgenda: string; titulo: string; sede?: string; idComisiones: string[] }[] = [];
+  eventosActivos: { idAgenda: string; titulo: string; sede?: string; comisionesDelDiputado: Comision[] }[] = [];
 
   // ── Navegación ────────────────────────────────────────────────────────
   selectedComision: Comision | null = null;
-  selectedEvento: { idAgenda: string; titulo: string; comisionesDelDiputado: Comision[] } | null = null;
+  selectedEvento: { idAgenda: string; titulo: string; sede?: string; comisionesDelDiputado: Comision[] } | null = null;
   private estadosPorComision = new Map<string, EstadoCom>();
 
   // ── Info de la comisión seleccionada ─────────────────────────────────
@@ -78,6 +78,11 @@ export class ComisionesPage implements OnInit, OnDestroy {
   // ── Modal PDF ─────────────────────────────────────────────────────────
   isModalOpen = false;
   pdfUrl!: SafeResourceUrl;
+
+  // ── Orden del día del evento conjunto ─────────────────────────────────
+  vistaDetalleEvento: 'none' | 'orden' = 'none';
+  ordenDelDiaEvento: any[] = [];
+  cargandoOrdenDiaEvento = false;
 
   private idAgendaActual: string = '';
   private idVotoPuntoActual: string = '';
@@ -108,6 +113,7 @@ export class ComisionesPage implements OnInit, OnDestroy {
         this.sesionesVivas = res.sesiones.map(s => ({
           idAgenda: s.idAgenda,
           titulo: s.titulo,
+          sede: (s as any).sedes?.sede ?? (s as any).sede ?? undefined,
           idComisiones: s.idComisiones?.length ? s.idComisiones : (s.idComision ? [s.idComision] : [])
         }));
         this.sesionesVivas.forEach(s => s.idComisiones.forEach(id => this.comisionesEnVivo.add(id)));
@@ -123,6 +129,7 @@ export class ComisionesPage implements OnInit, OnDestroy {
       this.sesionesVivas = lista.filter(s => s.esComision).map(s => ({
         idAgenda: s.idAgenda,
         titulo: s.titulo,
+        sede: s.sedes?.sede ?? s.sede ?? undefined,
         idComisiones: s.idComisiones?.length ? s.idComisiones : (s.idComision ? [s.idComision] : [])
       }));
       this.comisionesEnVivo.clear();
@@ -138,7 +145,7 @@ export class ComisionesPage implements OnInit, OnDestroy {
       if (data.esComision) {
         const ids: string[] = data.idComisiones?.length ? data.idComisiones : (data.idComision ? [data.idComision] : []);
         if (!this.sesionesVivas.find(s => s.idAgenda === data.idAgenda)) {
-          this.sesionesVivas.push({ idAgenda: data.idAgenda, titulo: data.titulo, idComisiones: ids });
+          this.sesionesVivas.push({ idAgenda: data.idAgenda, titulo: data.titulo, sede: data.sedes?.sede ?? data.sede ?? undefined, idComisiones: ids });
         }
         ids.forEach(id => this.comisionesEnVivo.add(id));
         this.computarEventosActivos();
@@ -314,6 +321,7 @@ export class ComisionesPage implements OnInit, OnDestroy {
       .map(s => ({
         idAgenda: s.idAgenda,
         titulo: s.titulo,
+        sede: s.sede,
         comisionesDelDiputado: this.comisiones.filter(c => s.idComisiones.includes(c.id))
       }))
       .filter(e => e.comisionesDelDiputado.length > 0);
@@ -337,10 +345,26 @@ export class ComisionesPage implements OnInit, OnDestroy {
     });
   }
 
+  verOrdenDiaEvento() {
+    if (this.vistaDetalleEvento === 'orden') {
+      this.vistaDetalleEvento = 'none';
+      return;
+    }
+    this.vistaDetalleEvento = 'orden';
+    if (this.ordenDelDiaEvento.length > 0 || !this.selectedEvento) return;
+    this.cargandoOrdenDiaEvento = true;
+    this.eventosService.getOrdenDelDia(this.selectedEvento.idAgenda).subscribe({
+      next: (res) => { this.ordenDelDiaEvento = res.puntos ?? []; this.cargandoOrdenDiaEvento = false; this.cdr.detectChanges(); },
+      error: () => { this.cargandoOrdenDiaEvento = false; this.cdr.detectChanges(); }
+    });
+  }
+
   selectEvento(ev: { idAgenda: string; titulo: string; comisionesDelDiputado: Comision[] }) {
     this.selectedEvento = ev;
     this.selectedComision = null;
     this.estadosPorComision.clear();
+    this.vistaDetalleEvento = 'none';
+    this.ordenDelDiaEvento = [];
     ev.comisionesDelDiputado.forEach(c => {
       this.estadosPorComision.set(c.id, { ...DEFAULT_ESTADO_COM, idAgenda: ev.idAgenda });
     });

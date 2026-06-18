@@ -13,7 +13,14 @@
           <ion-icon slot="icon-only" name="arrow-back-outline"></ion-icon>
         </ion-button>
       </ion-buttons>
-      <ion-title class="toolbar-title-sm">Evento en vivo</ion-title>
+      @if (selectedEvento.sede) {
+        <ion-title class="toolbar-title-sm">
+          <div class="ev-toolbar-sede">
+            <ion-icon name="location-outline"></ion-icon>
+            {{ selectedEvento.sede }}
+          </div>
+        </ion-title>
+      }
     } @else {
       <ion-buttons slot="start">
         <ion-menu-button></ion-menu-button>
@@ -33,24 +40,26 @@
 
       <!-- ── EVENTOS ACTIVOS ── -->
       @if (eventosActivos.length > 0) {
-        <div class="section-label">Eventos en vivo</div>
+        <div class="ev-live-section-hdr">
+          <div class="ev-live-pill">
+            <span class="live-dot"></span>
+            <span>En vivo</span>
+          </div>
+          <span class="ev-live-section-title">Comisiones activas</span>
+        </div>
         @for (ev of eventosActivos; track ev.idAgenda) {
           <div class="evento-vivo-card" (click)="selectEvento(ev)" role="button">
             <div class="evento-vivo-header">
-              <span class="live-dot"></span>
-              <span class="evento-vivo-titulo">{{ ev.titulo }}</span>
+              <div class="ev-hdr-main">
+                <span class="evento-vivo-titulo">{{ ev.titulo }}</span>
+                @if (ev.sede) {
+                  <span class="ev-hdr-sede">
+                    <ion-icon name="location-outline"></ion-icon>
+                    {{ ev.sede }}
+                  </span>
+                }
+              </div>
               <ion-icon name="chevron-forward-outline" class="ev-hdr-arrow"></ion-icon>
-            </div>
-            <div class="ev-roles-row">
-              @for (com of ev.comisionesDelDiputado; track com.id) {
-                <span class="ev-role-chip"
-                      [class.erc-pres]="esPresidente(com.cargo)"
-                      [class.erc-sec]="esSecretario(com.cargo)"
-                      [class.erc-voc]="esVocal(com.cargo)">
-                  <ion-icon [name]="rolIcono(com.cargo)"></ion-icon>
-                  {{ com.cargo }}
-                </span>
-              }
             </div>
           </div>
         }
@@ -119,8 +128,55 @@
   @else if (selectedEvento && !selectedComision) {
     <div class="page-pad">
 
-      <!-- Título del evento -->
-      <div class="ev-detail-titulo">{{ selectedEvento.titulo }}</div>
+      <!-- Banner del evento -->
+      <div class="ev-detail-banner">
+        <div class="ev-detail-banner-top">
+          <div class="ev-detail-live-chip">
+            <span class="live-dot"></span>
+            EN VIVO
+          </div>
+          <span class="ev-detail-com-count">
+            {{ selectedEvento.comisionesDelDiputado.length }}
+            {{ selectedEvento.comisionesDelDiputado.length === 1 ? 'comisión' : 'comisiones' }}
+          </span>
+        </div>
+        <div class="ev-detail-titulo">{{ selectedEvento.titulo }}</div>
+        <!-- @if (selectedEvento.sede) {
+          <div class="ev-detail-banner-sede">
+            <ion-icon name="location-outline"></ion-icon>
+            {{ selectedEvento.sede }}
+          </div>
+        } -->
+      </div>
+
+      <!-- Botones de consulta -->
+      <div class="ev-detalle-btns">
+        <button class="ev-detalle-btn" [class.ev-detalle-btn-active]="vistaDetalleEvento === 'orden'" (click)="verOrdenDiaEvento()">
+          <ion-icon name="list-outline"></ion-icon>
+          <span>Orden del día</span>
+        </button>
+      </div>
+
+      <!-- Panel de orden del día -->
+      @if (vistaDetalleEvento === 'orden') {
+        <div class="ev-detalle-panel">
+          @if (cargandoOrdenDiaEvento) {
+            <div class="ev-detalle-loading"><ion-spinner name="crescent" color="primary"></ion-spinner></div>
+          } @else if (ordenDelDiaEvento.length === 0) {
+            <div class="ev-detalle-empty">
+              <ion-icon name="document-outline"></ion-icon>
+              <span>Sin puntos registrados</span>
+            </div>
+          } @else {
+            @for (punto of ordenDelDiaEvento; track punto.id) {
+              <div class="ev-punto-item">
+                <div class="ev-punto-num">{{ punto.nopunto }}</div>
+                <div class="ev-punto-texto">{{ punto.punto }}</div>
+              </div>
+            }
+          }
+        </div>
+      }
 
       <!-- Tema de votación compartido (se muestra una sola vez) -->
       @if (votacionEvento) {
@@ -164,88 +220,95 @@
 
       <!-- Mini panel por comisión -->
       @for (com of selectedEvento.comisionesDelDiputado; track com.id) {
-        <div class="mini-panel-card">
 
-          <!-- Cabecera comisión -->
-          <div class="mini-panel-header"
-               [class.mph-pres]="esPresidente(com.cargo)"
-               [class.mph-sec]="esSecretario(com.cargo)"
-               [class.mph-voc]="esVocal(com.cargo)">
-            <ion-icon [name]="rolIcono(com.cargo)" class="mph-ico"></ion-icon>
-            <div class="mph-info">
-              <span class="mph-nombre">{{ com.nombre }}</span>
-              <span class="mph-cargo">{{ com.cargo }}</span>
-            </div>
-          </div>
-
-          <!-- Sin evento abierto -->
-          @if (getEstadoCom(com.id).evento === 0) {
-            <div class="mini-panel-body mini-sin-evento">
+        <!-- Estado 0: sin acción activa → reloj centrado con nombre de la comisión -->
+        @if (getEstadoCom(com.id).evento === 0) {
+          <div class="mini-sin-evento-wrap">
+            <div class="mini-sin-sello">
               <ion-icon name="hourglass-outline"></ion-icon>
-              <span>Evento en curso</span>
             </div>
-          }
+            <div class="mini-sin-nombre">{{ com.nombre }}</div>
+            <div class="mini-sin-titulo">Comisión en curso</div>
+          </div>
+        }
 
-          <!-- Asistencia abierta -->
-          @if (getEstadoCom(com.id).evento === 2) {
-            <div class="mini-panel-body">
-              @if (!getEstadoCom(com.id).asistenciaRegistrada) {
-                <ion-button expand="block" size="small" class="btn-mini-attend"
-                            (click)="registrarAsistenciaComision(com.id)">
-                  <ion-icon slot="start" name="finger-print-outline"></ion-icon>
-                  Registrar Asistencia
-                </ion-button>
-              } @else {
-                <div class="mini-attend-ok">
-                  <ion-icon name="checkmark-circle-outline"></ion-icon>
-                  <span>Asistencia registrada</span>
-                </div>
-              }
-            </div>
-          }
+        <!-- Estados 2 y 3: mostrar card con cabecera y acción -->
+        @if (getEstadoCom(com.id).evento === 2 || getEstadoCom(com.id).evento === 3) {
+          <div class="mini-panel-card">
 
-          <!-- Votación abierta -->
-          @if (getEstadoCom(com.id).evento === 3) {
-            <div class="mini-panel-body mini-vote-body">
-              @if (getEstadoCom(com.id).miVoto) {
-                <div class="mini-voto-actual"
-                     [class.mva-favor]="getEstadoCom(com.id).miVoto === 'FAVOR'"
-                     [class.mva-contra]="getEstadoCom(com.id).miVoto === 'CONTRA'"
-                     [class.mva-abs]="getEstadoCom(com.id).miVoto === 'ABSTENCION'"
-                     [class.mva-sin]="getEstadoCom(com.id).miVoto === 'SIN REGISTRO'">
-                  Tu voto: <strong>{{ votoLabel(getEstadoCom(com.id).miVoto) }}</strong>
-                </div>
-              }
-              <div class="mini-vote-row">
-                <button class="mv-btn mv-favor"
-                        [class.mv-active]="getEstadoCom(com.id).miVoto === 'FAVOR'"
-                        (click)="votarComision('FAVOR', com.id)"
-                        title="A Favor">
-                  <ion-icon name="thumbs-up-outline"></ion-icon>
-                </button>
-                <button class="mv-btn mv-contra"
-                        [class.mv-active]="getEstadoCom(com.id).miVoto === 'CONTRA'"
-                        (click)="votarComision('CONTRA', com.id)"
-                        title="En Contra">
-                  <ion-icon name="thumbs-down-outline"></ion-icon>
-                </button>
-                <button class="mv-btn mv-abs"
-                        [class.mv-active]="getEstadoCom(com.id).miVoto === 'ABSTENCION'"
-                        (click)="votarComision('ABSTENCION', com.id)"
-                        title="Abstención">
-                  <ion-icon name="remove-circle-outline"></ion-icon>
-                </button>
-                <button class="mv-btn mv-sin"
-                        [class.mv-active]="getEstadoCom(com.id).miVoto === 'SIN REGISTRO'"
-                        (click)="votarComision('SIN REGISTRO', com.id)"
-                        title="Sin Registro">
-                  <ion-icon name="ellipsis-horizontal-circle-outline"></ion-icon>
-                </button>
+            <div class="mini-panel-header"
+                 [class.mph-pres]="esPresidente(com.cargo)"
+                 [class.mph-sec]="esSecretario(com.cargo)"
+                 [class.mph-voc]="esVocal(com.cargo)">
+              <ion-icon [name]="rolIcono(com.cargo)" class="mph-ico"></ion-icon>
+              <div class="mph-info">
+                <span class="mph-nombre">{{ com.nombre }}</span>
+                <span class="mph-cargo">{{ com.cargo }}</span>
               </div>
             </div>
-          }
 
-        </div>
+            <!-- Asistencia abierta -->
+            @if (getEstadoCom(com.id).evento === 2) {
+              <div class="mini-panel-body">
+                @if (!getEstadoCom(com.id).asistenciaRegistrada) {
+                  <ion-button expand="block" size="small" class="btn-mini-attend"
+                              (click)="registrarAsistenciaComision(com.id)">
+                    <ion-icon slot="start" name="finger-print-outline"></ion-icon>
+                    Registrar Asistencia
+                  </ion-button>
+                } @else {
+                  <div class="mini-attend-ok">
+                    <ion-icon name="checkmark-circle-outline"></ion-icon>
+                    <span>Asistencia registrada</span>
+                  </div>
+                }
+              </div>
+            }
+
+            <!-- Votación abierta -->
+            @if (getEstadoCom(com.id).evento === 3) {
+              <div class="mini-panel-body mini-vote-body">
+                @if (getEstadoCom(com.id).miVoto) {
+                  <div class="mini-voto-actual"
+                       [class.mva-favor]="getEstadoCom(com.id).miVoto === 'FAVOR'"
+                       [class.mva-contra]="getEstadoCom(com.id).miVoto === 'CONTRA'"
+                       [class.mva-abs]="getEstadoCom(com.id).miVoto === 'ABSTENCION'"
+                       [class.mva-sin]="getEstadoCom(com.id).miVoto === 'SIN REGISTRO'">
+                    Tu voto: <strong>{{ votoLabel(getEstadoCom(com.id).miVoto) }}</strong>
+                  </div>
+                }
+                <div class="mini-vote-row">
+                  <button class="mv-btn mv-favor"
+                          [class.mv-active]="getEstadoCom(com.id).miVoto === 'FAVOR'"
+                          (click)="votarComision('FAVOR', com.id)"
+                          title="A Favor">
+                    <ion-icon name="thumbs-up-outline"></ion-icon>
+                  </button>
+                  <button class="mv-btn mv-contra"
+                          [class.mv-active]="getEstadoCom(com.id).miVoto === 'CONTRA'"
+                          (click)="votarComision('CONTRA', com.id)"
+                          title="En Contra">
+                    <ion-icon name="thumbs-down-outline"></ion-icon>
+                  </button>
+                  <button class="mv-btn mv-abs"
+                          [class.mv-active]="getEstadoCom(com.id).miVoto === 'ABSTENCION'"
+                          (click)="votarComision('ABSTENCION', com.id)"
+                          title="Abstención">
+                    <ion-icon name="remove-circle-outline"></ion-icon>
+                  </button>
+                  <button class="mv-btn mv-sin"
+                          [class.mv-active]="getEstadoCom(com.id).miVoto === 'SIN REGISTRO'"
+                          (click)="votarComision('SIN REGISTRO', com.id)"
+                          title="Sin Registro">
+                    <ion-icon name="ellipsis-horizontal-circle-outline"></ion-icon>
+                  </button>
+                </div>
+              </div>
+            }
+
+          </div>
+        }
+
       }
     </div>
   }

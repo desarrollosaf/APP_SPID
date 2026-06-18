@@ -72,48 +72,120 @@ $voc-color:  #5B7EA5;   // Vocal      → Azul medio neutral
   }
 }
 
+// ── Encabezado de sección: sesiones activas ───────────────────────────
+.ev-live-section-hdr {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
+.ev-live-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: $guinda;
+  color: #fff;
+  border-radius: 20px;
+  padding: 4px 12px;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  flex-shrink: 0;
+  box-shadow: 0 2px 8px rgba($guinda, 0.35);
+
+  .live-dot {
+    background: #fff;
+  }
+}
+
+.ev-live-section-title {
+  font-size: 14px;
+  font-weight: 700;
+  color: #1A1014;
+  letter-spacing: 0.2px;
+}
+
 // ── Eventos en vivo (antes de la lista de comisiones) ─────────────────
 .evento-vivo-card {
   background: #fff;
-  border-radius: 16px;
-  box-shadow: 0 2px 12px rgba($guinda, 0.12);
-  border: 1.5px solid rgba($guinda, 0.18);
-  margin-bottom: 16px;
+  border-radius: 20px;
+  box-shadow: 0 6px 28px rgba($guinda, 0.22), 0 1px 6px rgba(0,0,0,0.06);
+  margin-bottom: 18px;
   overflow: hidden;
   cursor: pointer;
-  transition: transform 0.12s ease;
-  &:active { transform: scale(0.985); }
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+  &:active {
+    transform: scale(0.982);
+    box-shadow: 0 3px 14px rgba($guinda, 0.15);
+  }
 }
 
 .evento-vivo-header {
   display: flex;
   align-items: center;
-  gap: 8px;
-  background: linear-gradient(135deg, $guinda, $guinda-dk);
-  padding: 10px 16px;
+  gap: 10px;
+  background: linear-gradient(135deg, $guinda 0%, #6B0D36 100%);
+  padding: 14px 16px;
+  position: relative;
+  overflow: hidden;
 
-  .live-dot {
-    width: 8px; height: 8px;
+  &::before {
+    content: '';
+    position: absolute;
+    top: -24px;
+    right: -24px;
+    width: 90px;
+    height: 90px;
     border-radius: 50%;
-    background: #fff;
-    flex-shrink: 0;
-    animation: pulse-dot 1.4s ease-in-out infinite;
+    background: rgba(255,255,255,0.07);
+    pointer-events: none;
   }
+  &::after {
+    content: '';
+    position: absolute;
+    bottom: -16px;
+    right: 30px;
+    width: 55px;
+    height: 55px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.05);
+    pointer-events: none;
+  }
+}
+
+.ev-hdr-main {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
 }
 
 .evento-vivo-titulo {
   color: #fff;
-  font-size: 12px;
-  font-weight: 600;
-  letter-spacing: 0.3px;
-  line-height: 1.3;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.2px;
+  line-height: 1.4;
+}
+
+.ev-hdr-sede {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: 4px;
+  font-size: 11px;
+  font-weight: 500;
+  color: rgba(255,255,255,0.72);
+  ion-icon { font-size: 12px; flex-shrink: 0; }
 }
 
 // ── Card evento en vivo: chips de roles y flecha ─────────────────────
 .ev-hdr-arrow {
-  font-size: 14px;
-  color: rgba(255,255,255,0.55);
-  margin-left: auto;
+  font-size: 16px;
+  color: rgba(255,255,255,0.6);
   flex-shrink: 0;
 }
 
@@ -121,14 +193,14 @@ $voc-color:  #5B7EA5;   // Vocal      → Azul medio neutral
   display: flex;
   flex-wrap: wrap;
   gap: 6px;
-  padding: 10px 14px 12px;
+  padding: 12px 16px 14px;
 }
 
 .ev-role-chip {
   display: inline-flex;
   align-items: center;
   gap: 5px;
-  padding: 4px 10px 4px 8px;
+  padding: 5px 12px 5px 9px;
   border-radius: 20px;
   font-size: 10px;
   font-weight: 700;
@@ -136,9 +208,9 @@ $voc-color:  #5B7EA5;   // Vocal      → Azul medio neutral
   text-transform: uppercase;
   ion-icon { font-size: 12px; }
 
-  &.erc-pres { background: rgba($pres-color, 0.13); color: $pres-color; border: 1px solid rgba($pres-color,.25); }
-  &.erc-sec  { background: rgba($sec-color,  0.10); color: $sec-color;  border: 1px solid rgba($sec-color,.2);  }
-  &.erc-voc  { background: rgba($voc-color,  0.10); color: $voc-color;  border: 1px solid rgba($voc-color,.2);  }
+  &.erc-pres { background: rgba($pres-color, 0.12); color: $pres-color; border: 1.5px solid rgba($pres-color,.22); }
+  &.erc-sec  { background: rgba($sec-color,  0.09); color: $sec-color;  border: 1.5px solid rgba($sec-color,.18); }
+  &.erc-voc  { background: rgba($voc-color,  0.09); color: $voc-color;  border: 1.5px solid rgba($voc-color,.18); }
 }
 
 // ── Tarjeta de tema de votación (aparece una sola vez arriba) ────────
@@ -211,13 +283,185 @@ $voc-color:  #5B7EA5;   // Vocal      → Azul medio neutral
 }
 
 // ── Detalle de evento conjunto ────────────────────────────────────────
-.ev-detail-titulo {
-  font-size: 13px;
-  font-weight: 700;
-  color: $guinda;
-  line-height: 1.4;
+.ev-detail-banner {
+  background: linear-gradient(135deg, $guinda 0%, #6B0D36 100%);
+  border-radius: 20px;
+  padding: 18px 18px 20px;
   margin-bottom: 16px;
-  padding: 0 2px;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 6px 24px rgba($guinda, 0.32);
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: -40px; right: -40px;
+    width: 130px; height: 130px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.07);
+    pointer-events: none;
+  }
+  &::after {
+    content: '';
+    position: absolute;
+    bottom: -20px; left: -20px;
+    width: 80px; height: 80px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.05);
+    pointer-events: none;
+  }
+}
+
+.ev-detail-banner-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+.ev-detail-live-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: rgba(255,255,255,0.18);
+  border-radius: 20px;
+  padding: 3px 10px;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: #fff;
+
+  .live-dot { background: #fff; width: 6px; height: 6px; }
+}
+
+.ev-detail-com-count {
+  font-size: 10px;
+  font-weight: 600;
+  color: rgba(255,255,255,0.65);
+  letter-spacing: 0.3px;
+}
+
+.ev-detail-titulo {
+  font-size: 15px;
+  font-weight: 800;
+  color: #ffffff;
+  line-height: 1.4;
+  margin-bottom: 10px;
+}
+
+.ev-detail-banner-sede {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: rgba(255,255,255,0.12);
+  border-radius: 10px;
+  padding: 4px 10px;
+  font-size: 11px;
+  font-weight: 600;
+  color: rgba(255,255,255,0.85);
+  ion-icon { font-size: 12px; }
+}
+
+// ── Toolbar sede ──────────────────────────────────────────────────────
+.ev-toolbar-sede {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  font-size: 13px;
+  font-weight: 600;
+  ion-icon { font-size: 13px; }
+}
+
+// ── Botones de consulta del evento (Orden del día) ────────────────────
+.ev-detalle-btns {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
+.ev-detalle-btn {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  background: #fff;
+  border: 1.5px solid rgba($guinda, 0.15);
+  border-radius: 12px;
+  padding: 10px 14px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #444;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  box-shadow: 0 1px 6px rgba(0,0,0,0.05);
+  ion-icon { font-size: 16px; }
+
+  &.ev-detalle-btn-active {
+    background: $guinda;
+    border-color: $guinda;
+    color: #fff;
+    box-shadow: 0 3px 12px rgba($guinda, 0.30);
+  }
+}
+
+// ── Panel del orden del día ────────────────────────────────────────────
+.ev-detalle-panel {
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.07);
+  margin-bottom: 14px;
+  overflow: hidden;
+}
+
+.ev-detalle-loading {
+  display: flex;
+  justify-content: center;
+  padding: 20px;
+}
+
+.ev-detalle-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 20px;
+  ion-icon { font-size: 24px; color: $gray; }
+  span { font-size: 13px; color: $gray; }
+}
+
+.ev-punto-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 12px 16px;
+  border-bottom: 1px solid rgba(0,0,0,0.05);
+
+  &:last-child { border-bottom: none; }
+}
+
+.ev-punto-num {
+  min-width: 26px;
+  height: 26px;
+  border-radius: 8px;
+  background: rgba($guinda, 0.09);
+  color: $guinda;
+  font-size: 11px;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.ev-punto-texto {
+  font-size: 13px;
+  color: #2a2a2a;
+  line-height: 1.45;
+  flex: 1;
+  padding-top: 3px;
 }
 
 .btn-attend-all {
@@ -296,6 +540,42 @@ $voc-color:  #5B7EA5;   // Vocal      → Azul medio neutral
 
 .mini-panel-body {
   padding: 12px 14px;
+}
+
+.mini-sin-evento-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20px 16px 22px;
+  gap: 8px;
+}
+
+.mini-sin-sello {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: rgba($guinda, 0.08);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  ion-icon { font-size: 26px; color: $guinda; opacity: 0.65; }
+}
+
+.mini-sin-nombre {
+  font-size: 13px;
+  font-weight: 600;
+  color: $guinda;
+  text-align: center;
+  opacity: 0.75;
+  max-width: 240px;
+  line-height: 1.3;
+}
+
+.mini-sin-titulo {
+  font-size: 15px;
+  font-weight: 800;
+  color: #2a2a2a;
+  letter-spacing: 0.2px;
 }
 
 .mini-sin-evento {
