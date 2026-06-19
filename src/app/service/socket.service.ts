@@ -140,14 +140,14 @@ export class SocketService {
 
   onReconnect(cb: () => void): void {
     const socket = this.ensureConnected();
-    if (this.reconnectHandler) socket.off('connect', this.reconnectHandler);
+    if (this.reconnectHandler) socket.io.off('reconnect', this.reconnectHandler);
     this.reconnectHandler = cb;
-    socket.on('connect', cb);
+    socket.io.on('reconnect', cb);
   }
 
   offReconnect(): void {
     if (this.reconnectHandler) {
-      this.socket?.off('connect', this.reconnectHandler);
+      this.socket?.io.off('reconnect', this.reconnectHandler);
       this.reconnectHandler = undefined;
     }
   }

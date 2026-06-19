@@ -1,7 +1,8 @@
-import { Component } from '@angular/core';
+import { Component, OnDestroy } from '@angular/core';
 import { Router } from '@angular/router';
 import { SocketService } from './service/socket.service';
 import { User } from './service/user';
+import { Eventos } from './service/eventos';
 
 @Component({
   selector: 'app-root',
@@ -9,7 +10,7 @@ import { User } from './service/user';
   styleUrls: ['app.component.scss'],
   standalone: false,
 })
-export class AppComponent {
+export class AppComponent implements OnDestroy {
   public appPages = [
     { title: 'Inicio',        url: '/tabs/inicio',      icon: 'home'          },
     { title: 'Sesión',        url: '/tabs/sesiones',     icon: 'business'      },
@@ -17,13 +18,48 @@ export class AppComponent {
     { title: 'Cerrar sesión', action: 'logout',          icon: 'log-out'       },
   ];
 
+  // Keep-alive: llama cada 20 min para que el backend renueve el token (si usa sliding window)
+  // y para detectar expiración antes de que ocurra en medio de una sesión parlamentaria
+  private keepAliveInterval: ReturnType<typeof setInterval> | null = null;
+  private readonly KEEP_ALIVE_MS = 20 * 60 * 1000;
+
   constructor(
     private router: Router,
     private socketService: SocketService,
-    private userService: User
-  ) {}
+    private userService: User,
+    private eventosService: Eventos
+  ) {
+    this.userService.currentUser$.subscribe(user => {
+      if (user) {
+        this.iniciarKeepAlive();
+      } else {
+        this.detenerKeepAlive();
+      }
+    });
+  }
+
+  private iniciarKeepAlive() {
+    this.detenerKeepAlive();
+    this.keepAliveInterval = setInterval(() => {
+      if (this.userService.currentUserValue) {
+        this.eventosService.getEstadoPanel().subscribe({ error: () => {} });
+      }
+    }, this.KEEP_ALIVE_MS);
+  }
+
+  private detenerKeepAlive() {
+    if (this.keepAliveInterval !== null) {
+      clearInterval(this.keepAliveInterval);
+      this.keepAliveInterval = null;
+    }
+  }
+
+  ngOnDestroy() {
+    this.detenerKeepAlive();
+  }
 
   logout() {
+    this.detenerKeepAlive();
     this.socketService.disconnect();
     this.userService.logout().subscribe({ error: () => {} });
     localStorage.removeItem('authToken');

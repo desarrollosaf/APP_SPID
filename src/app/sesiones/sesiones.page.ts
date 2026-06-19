@@ -71,6 +71,12 @@ export class SesionesPage implements OnInit, OnDestroy, ViewWillEnter, ViewWillL
           next: (r) => { this.asistenciaRegistrada = r.yaRegistro; },
           error: () => {}
         });
+        // Refrescar estado usando el idAgenda de la sesión plenaria para
+        // no recibir el estado de una comisión activa en paralelo
+        this.eventosService.getEstadoPanel(this.sesionIdAgenda).subscribe({
+          next: (estado) => this.aplicarEstadoPanel(estado),
+          error: () => {}
+        });
       } else {
         this.sesionActiva = false;
         this.sesionNombre = '';
@@ -101,7 +107,9 @@ export class SesionesPage implements OnInit, OnDestroy, ViewWillEnter, ViewWillL
 
     const refrescarEstado = () => {
       this.socketService.emitGetSesionesActivas();
-      this.eventosService.getEstadoPanel().subscribe({
+      // Si no hay sesión plenaria activa no hay nada que refrescar aquí
+      if (!this.sesionIdAgenda) return;
+      this.eventosService.getEstadoPanel(this.sesionIdAgenda).subscribe({
         next: (estado) => this.aplicarEstadoPanel(estado),
         error: (err) => console.error('Error al refrescar estado-panel', err)
       });
@@ -125,14 +133,14 @@ export class SesionesPage implements OnInit, OnDestroy, ViewWillEnter, ViewWillL
     this.eventosService.getMisComisiones().subscribe({
       next: (res) => {
         res.comisiones.forEach(c => this.misComisionIds.add(c.id));
-        this.eventosService.getEstadoPanel().subscribe({
+        this.eventosService.getEstadoPanel(this.sesionIdAgenda || undefined).subscribe({
           next: (estado: EstadoPanel) => this.aplicarEstadoPanel(estado),
           error: () => {}
         });
         this.registrarListenersAsistenciaVotacion();
       },
       error: () => {
-        this.eventosService.getEstadoPanel().subscribe({
+        this.eventosService.getEstadoPanel(this.sesionIdAgenda || undefined).subscribe({
           next: (estado: EstadoPanel) => this.aplicarEstadoPanel(estado),
           error: () => {}
         });
@@ -163,23 +171,26 @@ export class SesionesPage implements OnInit, OnDestroy, ViewWillEnter, ViewWillL
   // de que el filtro esté listo
   private registrarListenersAsistenciaVotacion() {
     this.socketService.onAsistenciaAbierta((data) => {
-      if (this.misComisionIds.has(data.idComision)) return;
+      // Solo aceptar eventos de la agenda plenaria activa
+      if (!this.sesionIdAgenda || data.idAgenda !== this.sesionIdAgenda) return;
       this.idAgendaActual = data.idAgenda;
       this.idComisionActual = data.idComision ?? '';
       this.evento = 2;
-      this.eventosService.getEstadoPanel().subscribe({
+      this.eventosService.getEstadoPanel(data.idAgenda).subscribe({
         next: (estado) => { this.asistenciaRegistrada = estado.asistencia?.yaRegistro ?? false; },
         error: () => { this.asistenciaRegistrada = false; }
       });
     });
 
     this.socketService.onAsistenciaCerrada((data) => {
-      if (this.misComisionIds.has(data.idComision)) return;
+      // Solo cerrar si el idComision coincide con el que tenemos abierto
+      if ((data.idComision ?? '') !== this.idComisionActual) return;
       if (this.evento === 2) this.evento = 0;
     });
 
     this.socketService.onVotacionAbierta((data) => {
-      if (this.misComisionIds.has(data.idComision)) return;
+      // Solo aceptar eventos de la agenda plenaria activa
+      if (!this.sesionIdAgenda || data.idAgenda !== this.sesionIdAgenda) return;
       this.idAgendaActual = data.idAgenda;
       this.idComisionActual = data.idComision ?? '';
       const idRes = (data as any).idReserva;
@@ -190,20 +201,17 @@ export class SesionesPage implements OnInit, OnDestroy, ViewWillEnter, ViewWillL
       this.textoExpandido = false;
       this.miVoto = '';
       this.evento = 3;
-      this.eventosService.getEstadoPanel().subscribe({
+      this.eventosService.getEstadoPanel(data.idAgenda).subscribe({
         next: (estado) => { if (estado.votacion) this.idVotoPuntoActual = estado.votacion.id_voto_punto; },
         error: (err) => console.error('Error al obtener id_voto_punto', err)
       });
     });
 
     this.socketService.onVotacionCerrada((data) => {
-      if (this.misComisionIds.has(data.idComision)) return;
+      // Solo cerrar si el idComision coincide con el que tenemos abierto
+      if ((data.idComision ?? '') !== this.idComisionActual) return;
       if (this.evento === 3) {
-        this.evento = 0;
-        this.tipoPuntoVotacion = '';
-        this.noPuntoVotacion = null;
-        this.temaVotacion = '';
-        this.miVoto = '';
+        this.limpiarEvento();
       }
     });
   }
@@ -237,21 +245,20 @@ export class SesionesPage implements OnInit, OnDestroy, ViewWillEnter, ViewWillL
     this.idComisionActual = '';
   }
 
+  private perteneceAComision(obj: { idComision?: string | null; idComisiones?: string[] }): boolean {
+    const ids = obj.idComisiones?.length ? obj.idComisiones : (obj.idComision ? [obj.idComision] : []);
+    return ids.some(id => this.misComisionIds.has(id));
+  }
+
   private aplicarEstadoPanel(estado: EstadoPanel) {
-    // Si el evento activo es de una comisión, limpiar estado de sesión y salir
-    if (estado.votacion) {
-      const ids = estado.votacion.idComisiones ?? [estado.votacion.idComision];
-      if (ids.some(id => this.misComisionIds.has(id))) {
-        this.limpiarEvento();
-        return;
-      }
+    // Red de seguridad: si el backend devolvió un evento de comisión, limpiar y salir
+    if (estado.votacion && this.perteneceAComision(estado.votacion)) {
+      this.limpiarEvento();
+      return;
     }
-    if (estado.asistencia) {
-      const ids = estado.asistencia.idComisiones ?? [estado.asistencia.idComision];
-      if (ids.some(id => this.misComisionIds.has(id))) {
-        this.limpiarEvento();
-        return;
-      }
+    if (estado.asistencia && this.perteneceAComision(estado.asistencia)) {
+      this.limpiarEvento();
+      return;
     }
 
     if (estado.votacion) {
