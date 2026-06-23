@@ -35,3 +35,36 @@
 /* @import "@ionic/angular/css/palettes/dark.always.css"; */
 /* @import "@ionic/angular/css/palettes/dark.class.css"; */
 /* @import "@ionic/angular/css/palettes/dark.system.css"; — deshabilitado: tema institucional fijo */
+
+// ── Bloque de nombre en toolbar ───────────────────────────────────────
+.toolbar-name-block {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 6px 0 6px 4px;
+  min-width: 0;
+  flex: 1;
+}
+
+.tnb-greeting {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.55);
+  line-height: 1;
+  margin-bottom: 2px;
+}
+
+.tnb-name {
+  font-size: 15px;
+  font-weight: 700;
+  color: #ffffff;
+  line-height: 1.25;
+  white-space: normal;
+  word-break: break-word;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}

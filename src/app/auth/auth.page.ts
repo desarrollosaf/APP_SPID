@@ -1,5 +1,6 @@
-import { Component, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
 import { Router } from '@angular/router';
+import { ViewWillEnter } from '@ionic/angular';
 import { User } from '../service/user';
 import { AlertController } from '@ionic/angular';
 
@@ -9,13 +10,15 @@ import { AlertController } from '@ionic/angular';
   styleUrls: ['./auth.page.scss'],
   standalone: false,
 })
-export class AuthPage implements OnInit {
+export class AuthPage implements ViewWillEnter {
 
-  usuario: string = '';
-  password: string = '';
-  showPassword: boolean = false;
-
-  togglePassword() { this.showPassword = !this.showPassword; }
+  usuario = '';
+  password = '';
+  showPassword = false;
+  loading = false;
+  loginSuccess = false;
+  loginError = false;
+  animated = false;
 
   constructor(
     private router: Router,
@@ -23,7 +26,45 @@ export class AuthPage implements OnInit {
     private alertCtrl: AlertController
   ) {}
 
-  ngOnInit() {}
+  ionViewWillEnter() {
+    this.usuario = '';
+    this.password = '';
+    this.loading = false;
+    this.loginSuccess = false;
+    this.loginError = false;
+    // reiniciar animación de entrada
+    this.animated = false;
+    setTimeout(() => { this.animated = true; }, 30);
+  }
+
+  togglePassword() { this.showPassword = !this.showPassword; }
+
+  login() {
+    if (!this.usuario || !this.password) {
+      this.showAlert('Ingresa usuario y contraseña.');
+      return;
+    }
+
+    this.loading = true;
+
+    this._userService.login({ name: this.usuario, password: this.password }).subscribe({
+      next: () => {
+        this.loading = false;
+        this.loginSuccess = true;
+        localStorage.setItem('isLoggedin', 'true');
+        setTimeout(() => {
+          this.router.navigate(['/tabs/inicio']);
+        }, 1100);
+      },
+      error: (e) => {
+        this.loading = false;
+        this.loginError = true;
+        setTimeout(() => { this.loginError = false; }, 600);
+        const msg = e?.error?.msg || 'Usuario o contraseña incorrectos.';
+        this.showAlert(msg);
+      },
+    });
+  }
 
   async showAlert(message: string) {
     const alert = await this.alertCtrl.create({
@@ -32,23 +73,5 @@ export class AuthPage implements OnInit {
       buttons: ['OK'],
     });
     await alert.present();
-  }
-
-  login() {
-    if (!this.usuario || !this.password) {
-      this.showAlert('Ingresa usuario y contraseña.');
-      return;
-    }
-
-    this._userService.login({ name: this.usuario, password: this.password }).subscribe({
-      next: () => {
-        localStorage.setItem('isLoggedin', 'true');
-        this.router.navigate(['/tabs/inicio']);
-      },
-      error: (e) => {
-        const msg = e?.error?.msg || 'Usuario o contraseña incorrectos.';
-        this.showAlert(msg);
-      },
-    });
   }
 }

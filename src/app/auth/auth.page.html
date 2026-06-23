@@ -1,55 +1,70 @@
 <ion-content class="login-content">
 
-  <!-- Overlay de gradiente (funciona con y sin imagen de fondo) -->
   <div class="bg-overlay"></div>
 
-  <div class="login-wrap">
+  <!-- Overlay de éxito al iniciar sesión -->
+  <div class="success-overlay" [class.success-overlay--visible]="loginSuccess">
+    <div class="so-content">
+      <div class="so-ring">
+        <ion-icon name="person-outline" class="so-icon"></ion-icon>
+      </div>
+      <div class="so-title">¡Bienvenido!</div>
+      <div class="so-dots">
+        <span></span><span></span><span></span>
+      </div>
+    </div>
+  </div>
+ <br>
+     <br>
+     <br>
+     <br>
+     <br>
+  <div class="login-wrap" [class.is-animated]="animated">
 
-    <!-- ── BLOQUE SUPERIOR: Logo + Institución ─────────────────── -->
+    <!-- ── BLOQUE SUPERIOR ─────────────────────────────────────── -->
+    
     <div class="login-top">
-      <!-- <div class="logo-ring">
-        <img src="assets/congreso_fondo_blanco.png" class="login-logo" alt="Congreso">
-      </div> --><br><br><br><br><br><br><br><br>
       <div class="login-inst">Congreso del Estado de México</div>
       <div class="login-sys">Sistema de Votación Digital</div>
     </div>
 
-    <!-- ── TARJETA DE FORMULARIO ───────────────────────────────── -->
-    <div class="login-card">
+    <!-- ── TARJETA ────────────────────────────────────────────── -->
+    <div class="login-card" [class.card-loading]="loading">
 
       <div class="login-greeting">Bienvenido</div>
       <div class="login-greeting-sub">Ingresa tus credenciales para continuar</div>
 
-      <!-- Campo Usuario -->
-      <div class="field-wrap">
+      <div class="field-wrap" [class.field-disabled]="loading">
         <ion-icon name="person-outline" class="field-ico"></ion-icon>
-        <ion-input
-          class="field-input"
-          placeholder="Usuario"
-          [(ngModel)]="usuario"
-          type="text"
-          autocomplete="username">
+        <ion-input class="field-input" placeholder="Usuario"
+          [(ngModel)]="usuario" type="text" autocomplete="username">
         </ion-input>
       </div>
 
-      <!-- Campo Contraseña -->
-      <div class="field-wrap">
+      <div class="field-wrap" [class.field-disabled]="loading">
         <ion-icon name="lock-closed-outline" class="field-ico"></ion-icon>
-        <ion-input
-          class="field-input"
-          placeholder="Contraseña"
+        <ion-input class="field-input" placeholder="Contraseña"
           [(ngModel)]="password"
           [type]="showPassword ? 'text' : 'password'"
           autocomplete="current-password">
         </ion-input>
-        <button class="eye-btn" (click)="togglePassword()" type="button" aria-label="Mostrar contraseña">
+        <button class="eye-btn" (click)="togglePassword()" type="button">
           <ion-icon [name]="showPassword ? 'eye-off-outline' : 'eye-outline'"></ion-icon>
         </button>
       </div>
 
-      <!-- Botón Iniciar Sesión -->
-      <button class="login-btn" (click)="login()">
-        Iniciar Sesión
+      <button class="login-btn"
+              [class.btn-loading]="loading"
+              [class.btn-error]="loginError"
+              (click)="login()"
+              [disabled]="loading">
+        @if (loading) {
+          <span class="dots-loader">
+            <span></span><span></span><span></span>
+          </span>
+        } @else {
+          Iniciar Sesión
+        }
       </button>
 
     </div>

@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { ViewWillEnter } from '@ionic/angular';
 import { User } from '../service/user';
 
 @Component({
@@ -7,12 +8,14 @@ import { User } from '../service/user';
   styleUrls: ['./folder.page.scss'],
   standalone: false,
 })
-export class FolderPage implements OnInit {
+export class FolderPage implements OnInit, ViewWillEnter {
   nombreDiputado: string = '';
 
   constructor(private userService: User) {}
 
-  ngOnInit() {
+  ngOnInit() {}
+
+  ionViewWillEnter(): void {
     this.nombreDiputado = this.userService.nombreCompleto;
   }
 }

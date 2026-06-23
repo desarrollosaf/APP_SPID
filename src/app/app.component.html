@@ -1,4 +1,17 @@
 <ion-app>
+  <!-- Overlay de cierre de sesión -->
+  <div class="logout-overlay" [class.logout-overlay--visible]="loggingOut">
+    <div class="lo-content">
+      <div class="lo-ring">
+        <ion-icon name="log-out-outline" class="lo-icon"></ion-icon>
+      </div>
+      <div class="lo-title">Cerrando sesión</div>
+      <div class="lo-dots">
+        <span></span><span></span><span></span>
+      </div>
+    </div>
+  </div>
+
   <ion-split-pane contentId="main-content">
     <ion-menu contentId="main-content" type="overlay">
       <ion-content>

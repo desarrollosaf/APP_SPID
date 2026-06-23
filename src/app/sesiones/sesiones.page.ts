@@ -53,11 +53,10 @@ export class SesionesPage implements OnInit, OnDestroy, ViewWillEnter, ViewWillL
     private userService: User
   ) {}
 
-  ngOnInit() {
-    this.nombreDiputado = this.userService.nombreCompleto;
-  }
+  ngOnInit() {}
 
   ionViewWillEnter() {
+    this.nombreDiputado = this.userService.nombreCompleto;
     const miId = this.userService.currentUserValue?.user?.integrante_legislatura_id ?? null;
     this.socketService.conectarComoDiputado(miId);
 

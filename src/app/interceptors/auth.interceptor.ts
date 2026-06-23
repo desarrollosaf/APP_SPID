@@ -20,10 +20,7 @@ export class AuthInterceptor implements HttpInterceptor {
     return next.handle(authReq).pipe(
       catchError((error: HttpErrorResponse) => {
         if (error.status === 401) {
-          // Token expirado o inválido — limpiar sesión y volver al login
-          localStorage.removeItem('authToken');
-          localStorage.removeItem('currentUser');
-          localStorage.removeItem('isLoggedin');
+          localStorage.clear();
           this.router.navigate(['/auth/login'], { replaceUrl: true });
         }
         return throwError(() => error);

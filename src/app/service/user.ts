@@ -59,14 +59,9 @@ export class User {
   }
 
   logout(): Observable<any> {
-    return this.http.post(`${environment.apiUrl}/user/cerrarsesion`, {}).pipe(
-      tap(() => {
-        localStorage.removeItem('authToken');
-        localStorage.removeItem('currentUser');
-        localStorage.removeItem('isLoggedin');
-        this.currentUserSubject.next(null);
-      })
-    );
+    // Limpiar sesión inmediatamente sin esperar respuesta del servidor
+    this.clearSession();
+    return this.http.post(`${environment.apiUrl}/user/cerrarsesion`, {});
   }
 
   get currentUserValue(): Users | null {

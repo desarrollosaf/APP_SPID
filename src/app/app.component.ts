@@ -11,6 +11,8 @@ import { Eventos } from './service/eventos';
   standalone: false,
 })
 export class AppComponent implements OnDestroy {
+  loggingOut = false;
+
   public appPages = [
     { title: 'Inicio',        url: '/tabs/inicio',      icon: 'home'          },
     { title: 'Sesión',        url: '/tabs/sesiones',     icon: 'business'      },
@@ -59,11 +61,14 @@ export class AppComponent implements OnDestroy {
   }
 
   logout() {
+    this.loggingOut = true;
     this.detenerKeepAlive();
     this.socketService.disconnect();
     this.userService.logout().subscribe({ error: () => {} });
-    localStorage.removeItem('authToken');
-    localStorage.setItem('isLoggedin', 'false');
-    this.router.navigate(['/auth/login']);
+    localStorage.clear();
+    setTimeout(() => {
+      this.router.navigate(['/auth/login']);
+      setTimeout(() => { this.loggingOut = false; }, 350);
+    }, 1000);
   }
 }
