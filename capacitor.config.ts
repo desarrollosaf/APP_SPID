@@ -1,7 +1,7 @@
 import type { CapacitorConfig } from '@capacitor/cli';
 
 const config: CapacitorConfig = {
-  appId: 'mx.gob.congresoedomex.spid',
+  appId: 'mx.congresoedomex.spid',
   appName: 'SPID',
   webDir: 'www'
 };

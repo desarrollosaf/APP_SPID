@@ -1,4 +1,4 @@
-import { Component, OnDestroy } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { SocketService } from './service/socket.service';
 import { User } from './service/user';
@@ -10,12 +10,14 @@ import { Eventos } from './service/eventos';
   styleUrls: ['app.component.scss'],
   standalone: false,
 })
-export class AppComponent implements OnDestroy {
-  loggingOut = false;
+export class AppComponent implements OnInit, OnDestroy {
+  loggingOut   = false;
+  splashDone   = false;
+  splashExiting = false;
 
   public appPages = [
     { title: 'Inicio',        url: '/tabs/inicio',      icon: 'home'          },
-    { title: 'Sesión',        url: '/tabs/sesiones',     icon: 'business'      },
+    { title: 'Sesión',        url: '/tabs/sesiones',     icon: 'library'       },
     { title: 'Comisiones',    url: '/tabs/comisiones',   icon: 'people-circle' },
     { title: 'Cerrar sesión', action: 'logout',          icon: 'log-out'       },
   ];
@@ -54,6 +56,13 @@ export class AppComponent implements OnDestroy {
       clearInterval(this.keepAliveInterval);
       this.keepAliveInterval = null;
     }
+  }
+
+  ngOnInit() {
+    setTimeout(() => {
+      this.splashExiting = true;
+      setTimeout(() => { this.splashDone = true; }, 650);
+    }, 2800);
   }
 
   ngOnDestroy() {

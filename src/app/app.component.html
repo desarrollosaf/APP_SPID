@@ -1,4 +1,36 @@
 <ion-app>
+
+  <!-- ══ SPLASH SCREEN ══ -->
+  @if (!splashDone) {
+    <div class="splash" [class.splash--exit]="splashExiting">
+
+      <!-- Anillos de pulso -->
+      <div class="sp-ring sp-ring--1"></div>
+      <div class="sp-ring sp-ring--2"></div>
+      <div class="sp-ring sp-ring--3"></div>
+
+      <!-- Partículas doradas -->
+      <span class="sp-p sp-p--1"></span>
+      <span class="sp-p sp-p--2"></span>
+      <span class="sp-p sp-p--3"></span>
+      <span class="sp-p sp-p--4"></span>
+      <span class="sp-p sp-p--5"></span>
+      <span class="sp-p sp-p--6"></span>
+
+      <!-- Contenido central -->
+      <div class="sp-body">
+        <div class="sp-seal">
+          <div class="sp-seal-glow"></div>
+          <ion-icon name="business-outline" class="sp-icon"></ion-icon>
+        </div>
+        <div class="sp-title">Congreso del Estado de México</div>
+        <div class="sp-divider"><span></span></div>
+        <div class="sp-subtitle">Sistema de Votación Digital</div>
+      </div>
+
+    </div>
+  }
+
   <!-- Overlay de cierre de sesión -->
   <div class="logout-overlay" [class.logout-overlay--visible]="loggingOut">
     <div class="lo-content">
