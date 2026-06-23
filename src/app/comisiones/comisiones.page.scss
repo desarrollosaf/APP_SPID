@@ -679,35 +679,36 @@ $voc-color:  #5B7EA5;   // Vocal      → Azul medio neutral
   align-items: center;
   gap: 14px;
   background: #ffffff;
-  border-radius: 18px;
-  padding: 16px;
+  border-radius: 20px;
+  padding: 14px 14px 14px 16px;
   margin-bottom: 10px;
   cursor: pointer;
-  transition: transform 0.13s ease, box-shadow 0.13s ease;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.06);
+  transition: transform 0.14s ease, box-shadow 0.14s ease;
+  box-shadow: 0 3px 16px rgba($guinda, 0.10), 0 1px 4px rgba(0,0,0,0.05);
+  position: relative;
+  overflow: hidden;
 
-  &:active { transform: scale(0.985); }
+  // Círculo decorativo de fondo
+  &::after {
+    content: '';
+    position: absolute;
+    right: -22px;
+    top: -22px;
+    width: 88px;
+    height: 88px;
+    border-radius: 50%;
+    background: rgba($guinda, 0.05);
+    pointer-events: none;
+  }
 
-  &.card-presidente { box-shadow: 0 3px 14px rgba($pres-color, 0.13); }
-  &.card-secretario { box-shadow: 0 3px 14px rgba($sec-color,  0.11); }
-  &.card-vocal      { box-shadow: 0 3px 14px rgba($voc-color,  0.09); }
-}
+  &:active {
+    transform: scale(0.982);
+    box-shadow: 0 1px 8px rgba($guinda, 0.08);
+  }
 
-// Columna del icono
-.com-icon-col {
-  width: 50px;
-  height: 50px;
-  border-radius: 14px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-
-  ion-icon { font-size: 24px; }
-
-  &.icon-presidente,
-  &.icon-secretario,
-  &.icon-vocal      { background: linear-gradient(135deg, rgba($sec-color,.15), rgba($sec-color,.07)); color: $sec-color; }
+  &.card-vivo {
+    box-shadow: 0 4px 20px rgba($guinda, 0.18), 0 1px 4px rgba(0,0,0,0.06);
+  }
 }
 
 .com-info {
@@ -720,36 +721,31 @@ $voc-color:  #5B7EA5;   // Vocal      → Azul medio neutral
   font-weight: 600;
   color: #1A1014;
   line-height: 1.35;
-  margin-bottom: 6px;
+  margin-bottom: 7px;
   white-space: normal;
 }
 
-// Pill del cargo — protagonista
+// Pill del cargo — un solo color
 .cargo-pill {
   display: inline-flex;
   align-items: center;
   gap: 5px;
-  padding: 4px 12px 4px 8px;
+  padding: 3px 10px 3px 8px;
   border-radius: 20px;
-  font-size: 11px;
+  font-size: 10px;
   font-weight: 700;
-  letter-spacing: 0.5px;
+  letter-spacing: 0.6px;
   text-transform: uppercase;
+  background: rgba($guinda, 0.09);
+  color: $guinda;
+  border: 1px solid rgba($guinda, 0.15);
 
-  ion-icon { font-size: 13px; }
-
-  &.pill-presidente,
-  &.pill-secretario,
-  &.pill-vocal {
-    background: linear-gradient(90deg, rgba($sec-color,.14), rgba($sec-color,.07));
-    color: $sec-color;
-    border: 1px solid rgba($sec-color, 0.2);
-  }
+  ion-icon { font-size: 11px; opacity: 0.75; }
 }
 
 .com-arrow {
-  font-size: 18px;
-  color: rgba(0, 0, 0, 0.2);
+  font-size: 17px;
+  color: rgba($guinda, 0.25);
   flex-shrink: 0;
 }
 
@@ -757,6 +753,7 @@ $voc-color:  #5B7EA5;   // Vocal      → Azul medio neutral
   display: flex;
   align-items: center;
   flex-shrink: 0;
+  padding-right: 2px;
 }
 
 // ══════════════════════════════════════════════════════════════════════
@@ -790,9 +787,8 @@ $voc-color:  #5B7EA5;   // Vocal      → Azul medio neutral
     pointer-events: none;
   }
 
-  &.cirh-pres { background: linear-gradient(135deg, #c4a55a 0%, #917122 100%); }
-  &.cirh-sec  { background: linear-gradient(135deg, $guinda 0%, $guinda-dk 100%); }
-  &.cirh-voc  { background: linear-gradient(135deg, #4a6d94 0%, #334f6e 100%); }
+  &.cirh-pres  { background: linear-gradient(135deg, #c4a55a 0%, #917122 100%); }
+  &.cirh-otros { background: linear-gradient(135deg, #4a6d94 0%, #334f6e 100%); }
 }
 
 .ci-rh-ico-wrap {
@@ -959,9 +955,8 @@ $voc-color:  #5B7EA5;   // Vocal      → Azul medio neutral
   flex-shrink: 0;
   ion-icon { font-size: 18px; }
 
+  background: rgba($voc-color, 0.12); ion-icon { color: $voc-color; }
   &.cma-pres { background: rgba($pres-color, 0.14); ion-icon { color: $pres-color; } }
-  &.cma-sec  { background: rgba($sec-color,  0.12); ion-icon { color: $sec-color;  } }
-  &.cma-voc  { background: rgba($voc-color,  0.11); ion-icon { color: $voc-color;  } }
 }
 
 .ci-m-info {
@@ -976,9 +971,8 @@ $voc-color:  #5B7EA5;   // Vocal      → Azul medio neutral
 
 .ci-m-cargo {
   font-size: 10px; font-weight: 700; letter-spacing: 0.5px; text-transform: uppercase;
+  color: $voc-color;
   &.cmc-pres { color: $pres-color; }
-  &.cmc-sec  { color: $sec-color;  }
-  &.cmc-voc  { color: $voc-color;  }
 }
 
 .ci-m-crown {

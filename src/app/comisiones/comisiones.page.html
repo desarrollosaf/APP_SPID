@@ -79,27 +79,13 @@
         <div class="section-label">{{ comisiones.length }} comisión{{ comisiones.length !== 1 ? 'es' : '' }} asignada{{ comisiones.length !== 1 ? 's' : '' }}</div>
 
         @for (com of comisiones; track com.id) {
-          <div class="com-card"
-               [class.card-presidente]="esPresidente(com.cargo)"
-               [class.card-secretario]="esSecretario(com.cargo)"
-               [class.card-vocal]="esVocal(com.cargo)"
-               [class.card-vivo]="comisionesEnVivo.has(com.id)"
+          <div class="com-card" [class.card-vivo]="comisionesEnVivo.has(com.id)"
                (click)="selectComision(com)" role="button">
-
-            <div class="com-icon-col"
-                 [class.icon-presidente]="esPresidente(com.cargo)"
-                 [class.icon-secretario]="esSecretario(com.cargo)"
-                 [class.icon-vocal]="esVocal(com.cargo)">
-              <ion-icon [name]="rolIcono(com.cargo)"></ion-icon>
-            </div>
 
             <div class="com-info">
               <div class="com-nombre">{{ com.nombre }}</div>
-              <div class="cargo-pill"
-                   [class.pill-presidente]="esPresidente(com.cargo)"
-                   [class.pill-secretario]="esSecretario(com.cargo)"
-                   [class.pill-vocal]="esVocal(com.cargo)">
-                <ion-icon [name]="rolIcono(com.cargo)"></ion-icon>
+              <div class="cargo-pill">
+                <ion-icon name="person-outline"></ion-icon>
                 {{ com.cargo }}
               </div>
             </div>
@@ -322,11 +308,7 @@
       <!-- ── Hero de rol ── -->
       <div class="ci-role-hero"
            [class.cirh-pres]="esPresidente(selectedComision.cargo)"
-           [class.cirh-sec]="esSecretario(selectedComision.cargo)"
-           [class.cirh-voc]="esVocal(selectedComision.cargo)">
-        <div class="ci-rh-ico-wrap">
-          <ion-icon [name]="rolIcono(selectedComision.cargo)"></ion-icon>
-        </div>
+           [class.cirh-otros]="!esPresidente(selectedComision.cargo)">
         <div class="ci-rh-text">
           <span class="ci-rh-label">Tu participación</span>
           <span class="ci-rh-cargo">{{ selectedComision.cargo }}</span>
@@ -405,18 +387,12 @@
               <div class="ci-member-row"
                    [class.ci-mr-last]="last"
                    [class.ci-mr-pres]="esPresidente(int.cargo)">
-                <div class="ci-m-avatar"
-                     [class.cma-pres]="esPresidente(int.cargo)"
-                     [class.cma-sec]="esSecretario(int.cargo)"
-                     [class.cma-voc]="esVocal(int.cargo)">
-                  <ion-icon [name]="rolIcono(int.cargo)"></ion-icon>
+                <div class="ci-m-avatar" [class.cma-pres]="esPresidente(int.cargo)">
+                  <ion-icon name="person-outline"></ion-icon>
                 </div>
                 <div class="ci-m-info">
                   <span class="ci-m-nombre">{{ int.nombre }}</span>
-                  <span class="ci-m-cargo"
-                        [class.cmc-pres]="esPresidente(int.cargo)"
-                        [class.cmc-sec]="esSecretario(int.cargo)"
-                        [class.cmc-voc]="esVocal(int.cargo)">
+                  <span class="ci-m-cargo" [class.cmc-pres]="esPresidente(int.cargo)">
                     {{ int.cargo }}
                   </span>
                 </div>

@@ -627,7 +627,7 @@ export class ComisionesPage implements OnInit, OnDestroy, ViewWillLeave {
     return 'person-outline';
   }
 
-  esPresidente(cargo: string): boolean { return (cargo ?? '').toLowerCase().includes('president'); }
+  esPresidente(cargo: string): boolean { return (cargo ?? '').toLowerCase().includes('presiden'); }
   esSecretario(cargo: string): boolean { return (cargo ?? '').toLowerCase().includes('secretar'); }
   esVocal(cargo: string): boolean {
     const c = (cargo ?? '').toLowerCase();
