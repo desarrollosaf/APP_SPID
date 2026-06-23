@@ -53,7 +53,7 @@ export class AuthPage implements ViewWillEnter {
         this.loginSuccess = true;
         localStorage.setItem('isLoggedin', 'true');
         setTimeout(() => {
-          this.router.navigate(['/tabs/inicio']);
+          this.router.navigate(['/tabs/inicio'], { replaceUrl: true });
         }, 1100);
       },
       error: (e) => {

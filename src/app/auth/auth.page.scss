@@ -132,7 +132,7 @@ $success:   #27AE60;
 // ══════════════════════════════════════════════════════════════════════
 
 .success-overlay {
-  position: absolute;
+  position: fixed;
   inset: 0;
   z-index: 10;
   background: linear-gradient(155deg, #96134B 0%, #5a0c2f 60%, #3a0820 100%);

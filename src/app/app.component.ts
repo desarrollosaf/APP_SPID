@@ -62,7 +62,7 @@ export class AppComponent implements OnInit, OnDestroy {
     setTimeout(() => {
       this.splashExiting = true;
       setTimeout(() => { this.splashDone = true; }, 650);
-    }, 2800);
+    }, 2000);
   }
 
   ngOnDestroy() {
