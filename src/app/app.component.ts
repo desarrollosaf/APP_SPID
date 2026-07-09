@@ -14,6 +14,7 @@ export class AppComponent implements OnInit, OnDestroy {
   loggingOut   = false;
   splashDone   = false;
   splashExiting = false;
+  isAuthenticated = false;
 
   public appPages = [
     { title: 'Inicio',        url: '/tabs/inicio',      icon: 'home'          },
@@ -34,6 +35,7 @@ export class AppComponent implements OnInit, OnDestroy {
     private eventosService: Eventos
   ) {
     this.userService.currentUser$.subscribe(user => {
+      this.isAuthenticated = !!user;
       if (user) {
         this.iniciarKeepAlive();
       } else {

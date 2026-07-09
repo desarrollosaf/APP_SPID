@@ -45,7 +45,7 @@
   </div>
 
   <ion-split-pane contentId="main-content">
-    <ion-menu contentId="main-content" type="overlay">
+    <ion-menu contentId="main-content" type="overlay" [disabled]="!isAuthenticated">
       <ion-content>
         <ion-list id="inbox-list">
           <ion-list-header>Inicio</ion-list-header>
