@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import { Router } from '@angular/router';
 import { ViewWillEnter } from '@ionic/angular';
+import { HttpErrorResponse } from '@angular/common/http';
 import { User } from '../service/user';
 import { AlertController } from '@ionic/angular';
 
@@ -56,19 +57,37 @@ export class AuthPage implements ViewWillEnter {
           this.router.navigate(['/tabs/inicio'], { replaceUrl: true });
         }, 1100);
       },
-      error: (e) => {
+      error: (e: HttpErrorResponse) => {
         this.loading = false;
         this.loginError = true;
         setTimeout(() => { this.loginError = false; }, 600);
-        const msg = e?.error?.msg || 'Usuario o contraseña incorrectos.';
-        this.showAlert(msg);
+        this.showAlert(this.mensajeDeError(e), this.tituloDeError(e));
       },
     });
   }
 
-  async showAlert(message: string) {
+  private esFalloDeRed(e: HttpErrorResponse): boolean {
+    return e?.status === 0 || e?.status === 504 || e?.status === 408;
+  }
+
+  private tituloDeError(e: HttpErrorResponse): string {
+    return this.esFalloDeRed(e) ? 'Sin conexión' : 'Error';
+  }
+
+  private mensajeDeError(e: HttpErrorResponse): string {
+    if (this.esFalloDeRed(e)) {
+      return 'No se pudo contactar al servidor. Verifica tu conexión a internet. ' +
+             'Este sistema solo es accesible desde la red del Congreso del Estado de México.';
+    }
+    if (e?.status >= 500) {
+      return 'El servidor no está disponible en este momento. Intenta más tarde.';
+    }
+    return e?.error?.msg || 'Usuario o contraseña incorrectos.';
+  }
+
+  async showAlert(message: string, header = 'Error') {
     const alert = await this.alertCtrl.create({
-      header: 'Error',
+      header,
       message,
       buttons: ['OK'],
     });

@@ -1,0 +1,11 @@
+node_modules
+www
+dist
+android
+ios
+.git
+.vscode
+*.log
+.DS_Store
+resources
+coverage

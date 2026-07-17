@@ -1,0 +1,11 @@
+services:
+  spid-web:
+    build: .
+    image: spid-web:latest
+    container_name: spid-web
+    restart: unless-stopped
+    # El contenedor sirve en el puerto 80 interno.
+    # Se expone en 8080 del host; tu reverse proxy de la
+    # domain (el que ya sirve /backend) debe apuntar /spid a este puerto.
+    ports:
+      - "8085:80"
