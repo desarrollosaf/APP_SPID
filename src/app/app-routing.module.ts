@@ -15,6 +15,10 @@ const routes: Routes = [
       {
         path: 'tabs',
         loadChildren: () => import('./tabs/tabs.module').then(m => m.TabsPageModule)
+      },
+      {
+        path: 'cambiar-password',
+        loadChildren: () => import('./cambiar-password/cambiar-password.module').then(m => m.CambiarPasswordPageModule)
       }
     ]
   },

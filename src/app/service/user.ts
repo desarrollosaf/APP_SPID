@@ -58,6 +58,10 @@ export class User {
     );
   }
 
+  changePassword(data: { newPassword: string }): Observable<any> {
+    return this.http.post(`${environment.apiUrl}/user/change-password`, data);
+  }
+
   logout(): Observable<any> {
     // Limpiar sesión inmediatamente sin esperar respuesta del servidor
     this.clearSession();

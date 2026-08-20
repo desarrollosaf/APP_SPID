@@ -20,6 +20,7 @@ export class AppComponent implements OnInit, OnDestroy {
     { title: 'Inicio',        url: '/tabs/inicio',      icon: 'home'          },
     { title: 'Sesión',        url: '/tabs/sesiones',     icon: 'library'       },
     { title: 'Comisiones',    url: '/tabs/comisiones',   icon: 'people-circle' },
+    { title: 'Cambiar contraseña', url: '/cambiar-password', icon: 'key'      },
     { title: 'Cerrar sesión', action: 'logout',          icon: 'log-out'       },
   ];
 
