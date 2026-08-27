@@ -1,9 +1,9 @@
 import { Component, OnInit, OnDestroy, ChangeDetectorRef } from '@angular/core';
-import { ViewWillLeave } from '@ionic/angular';
-import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
+import { ViewWillLeave, AlertController } from '@ionic/angular';
 import { Eventos } from '../service/eventos';
 import { SocketService } from '../service/socket.service';
 import { User } from '../service/user';
+import { HapticsService } from '../service/haptics.service';
 import { EstadoPanel, MiComision } from '../interface/user';
 
 export interface Comision {
@@ -43,6 +43,7 @@ export class ComisionesPage implements OnInit, OnDestroy, ViewWillLeave {
   // ── Lista de comisiones del diputado ─────────────────────────────────
   comisiones: Comision[] = [];
   cargandoComisiones = true;
+  errorComisiones = false;
 
   // ── Comisiones con sesión activa (vivo) ───────────────────────────────
   comisionesEnVivo = new Set<string>();
@@ -63,6 +64,7 @@ export class ComisionesPage implements OnInit, OnDestroy, ViewWillLeave {
     integrantes: { id: string; nombre: string; cargo: string; orden: number }[];
   } | null = null;
   cargandoComisionInfo = false;
+  errorComisionInfo = false;
 
   // ── Estado de sesión de la comisión seleccionada (vista single) ───────
   sesionActivaComision: boolean = false;
@@ -76,24 +78,22 @@ export class ComisionesPage implements OnInit, OnDestroy, ViewWillLeave {
   asistenciaRegistrada: boolean = false;
   nombreDiputado: string = '';
 
-  // ── Modal PDF ─────────────────────────────────────────────────────────
-  isModalOpen = false;
-  pdfUrl!: SafeResourceUrl;
-
   // ── Orden del día del evento conjunto ─────────────────────────────────
   vistaDetalleEvento: 'none' | 'orden' = 'none';
   ordenDelDiaEvento: any[] = [];
   cargandoOrdenDiaEvento = false;
+  errorOrdenDiaEvento = false;
 
   private idAgendaActual: string = '';
   private idVotoPuntoActual: string = '';
 
   constructor(
-    private sanitizer: DomSanitizer,
     private eventosService: Eventos,
     private socketService: SocketService,
     private userService: User,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private alertCtrl: AlertController,
+    private hapticsService: HapticsService
   ) {}
 
   ionViewWillEnter() {
@@ -322,6 +322,7 @@ export class ComisionesPage implements OnInit, OnDestroy, ViewWillLeave {
   // ── Cargar comisiones desde el backend ───────────────────────────────
   private cargarComisiones() {
     this.cargandoComisiones = true;
+    this.errorComisiones = false;
     this.eventosService.getMisComisiones().subscribe({
       next: (res) => {
         this.comisiones = res.comisiones
@@ -333,8 +334,13 @@ export class ComisionesPage implements OnInit, OnDestroy, ViewWillLeave {
       error: (err) => {
         console.error('Error al cargar comisiones', err);
         this.cargandoComisiones = false;
+        this.errorComisiones = true;
       }
     });
+  }
+
+  reintentarCargarComisiones() {
+    this.cargarComisiones();
   }
 
   private computarEventosActivos() {
@@ -360,10 +366,15 @@ export class ComisionesPage implements OnInit, OnDestroy, ViewWillLeave {
     this.textoExpandido = false;
     this.comisionInfo = null;
     this.cargandoComisionInfo = true;
+    this.errorComisionInfo = false;
     this.eventosService.getComisionInfo(comision.id).subscribe({
       next: (info) => { this.comisionInfo = info; this.cargandoComisionInfo = false; },
-      error: () => { this.cargandoComisionInfo = false; }
+      error: () => { this.cargandoComisionInfo = false; this.errorComisionInfo = true; }
     });
+  }
+
+  reintentarComisionInfo() {
+    if (this.selectedComision) this.selectComision(this.selectedComision);
   }
 
   verOrdenDiaEvento() {
@@ -373,11 +384,21 @@ export class ComisionesPage implements OnInit, OnDestroy, ViewWillLeave {
     }
     this.vistaDetalleEvento = 'orden';
     if (this.ordenDelDiaEvento.length > 0 || !this.selectedEvento) return;
+    this.cargarOrdenDiaEvento();
+  }
+
+  private cargarOrdenDiaEvento() {
+    if (!this.selectedEvento) return;
     this.cargandoOrdenDiaEvento = true;
+    this.errorOrdenDiaEvento = false;
     this.eventosService.getOrdenDelDia(this.selectedEvento.idAgenda).subscribe({
       next: (res) => { this.ordenDelDiaEvento = res.puntos ?? []; this.cargandoOrdenDiaEvento = false; this.cdr.detectChanges(); },
-      error: () => { this.cargandoOrdenDiaEvento = false; this.cdr.detectChanges(); }
+      error: () => { this.cargandoOrdenDiaEvento = false; this.errorOrdenDiaEvento = true; this.cdr.detectChanges(); }
     });
+  }
+
+  reintentarOrdenDiaEvento() {
+    this.cargarOrdenDiaEvento();
   }
 
   selectEvento(ev: { idAgenda: string; titulo: string; comisionesDelDiputado: Comision[] }) {
@@ -456,6 +477,7 @@ export class ComisionesPage implements OnInit, OnDestroy, ViewWillLeave {
   registrarAsistenciaComision(idComision: string) {
     const s = this.estadosPorComision.get(idComision);
     if (!s || s.asistenciaRegistrada) return;
+    this.hapticsService.impact();
     this.eventosService.registrarAsistencia({ id_agenda: s.idAgenda, id_comision: idComision } as any).subscribe({
       next: () => {
         s.asistenciaRegistrada = true;
@@ -467,6 +489,11 @@ export class ComisionesPage implements OnInit, OnDestroy, ViewWillLeave {
           this.cdr.detectChanges();
         } else {
           console.error('Error asistencia comisión', e);
+          this.hapticsService.error();
+          this.mostrarErrorConReintento(
+            'No se pudo registrar la asistencia. Intenta de nuevo o contacta al administrador.',
+            () => this.registrarAsistenciaComision(idComision)
+          );
         }
       }
     });
@@ -483,6 +510,8 @@ export class ComisionesPage implements OnInit, OnDestroy, ViewWillLeave {
   votarComision(tipo: string, idComision: string) {
     const s = this.estadosPorComision.get(idComision);
     if (!s) return;
+    this.hapticsService.impact();
+    const prevVoto = s.miVoto;
     s.miVoto = tipo;
     this.cdr.detectChanges();
     this.eventosService.registrarVoto({
@@ -491,7 +520,16 @@ export class ComisionesPage implements OnInit, OnDestroy, ViewWillLeave {
       id_comision: idComision
     } as any).subscribe({
       next: (r: any) => console.log('Voto comisión:', r),
-      error: (e: any) => console.error('Error votación comisión', e)
+      error: (e: any) => {
+        console.error('Error votación comisión', e);
+        s.miVoto = prevVoto;
+        this.cdr.detectChanges();
+        this.hapticsService.error();
+        this.mostrarErrorConReintento(
+          'No se pudo registrar el voto. La votación puede haber sido cerrada o el servidor reiniciado.',
+          () => this.votarComision(tipo, idComision)
+        );
+      }
     });
   }
 
@@ -522,6 +560,8 @@ export class ComisionesPage implements OnInit, OnDestroy, ViewWillLeave {
   }
 
   votar(tipo: string) {
+    this.hapticsService.impact();
+    const prevVoto = this.miVoto;
     this.miVoto = tipo;
     this.eventosService.registrarVoto({
       sentido_voto: SENTIDO[tipo] ?? 1,
@@ -529,18 +569,46 @@ export class ComisionesPage implements OnInit, OnDestroy, ViewWillLeave {
       id_comision: this.selectedComision?.id
     } as any).subscribe({
       next: (r: any) => console.log('Votación comisión registrada:', r),
-      error: (e: any) => console.error('Error votación comisión', e)
+      error: (e: any) => {
+        console.error('Error votación comisión', e);
+        this.miVoto = prevVoto;
+        this.hapticsService.error();
+        this.mostrarErrorConReintento(
+          'No se pudo registrar el voto. La votación puede haber sido cerrada o el servidor reiniciado.',
+          () => this.votar(tipo)
+        );
+      }
     });
   }
 
   registrarAsistencia() {
+    this.hapticsService.impact();
     this.eventosService.registrarAsistencia({
       id_agenda: this.idAgendaActual,
       id_comision: this.selectedComision?.id
     } as any).subscribe({
       next: (r: any) => { this.asistenciaRegistrada = true; console.log('Asistencia registrada:', r); },
-      error: (e: any) => console.error('Error asistencia comisión', e)
+      error: (e: any) => {
+        console.error('Error asistencia comisión', e);
+        this.hapticsService.error();
+        this.mostrarErrorConReintento(
+          'No se pudo registrar la asistencia. Intenta de nuevo o contacta al administrador.',
+          () => this.registrarAsistencia()
+        );
+      }
     });
+  }
+
+  private async mostrarErrorConReintento(message: string, reintentar: () => void) {
+    const alert = await this.alertCtrl.create({
+      header: 'Error',
+      message,
+      buttons: [
+        { text: 'Cerrar', role: 'cancel' },
+        { text: 'Reintentar', handler: reintentar },
+      ],
+    });
+    await alert.present();
   }
 
   // ── Helpers ───────────────────────────────────────────────────────────
@@ -614,11 +682,6 @@ export class ComisionesPage implements OnInit, OnDestroy, ViewWillLeave {
   }
 
   get temaVotacionCorto(): string { return this.temaCorto(this.temaVotacion, 110); }
-
-  setOpen(isOpen: boolean) {
-    this.pdfUrl = this.sanitizer.bypassSecurityTrustResourceUrl('assets/OD-DELIBERANTE-DIP.PER-22ENERO2026.pdf');
-    this.isModalOpen = isOpen;
-  }
 
   rolIcono(cargo: string): string {
     const c = (cargo ?? '').toLowerCase();

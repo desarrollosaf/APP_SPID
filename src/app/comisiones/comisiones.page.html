@@ -73,6 +73,16 @@
           <ion-spinner name="crescent" color="primary"></ion-spinner>
           <div class="no-event-sub" style="margin-top:12px">Cargando comisiones...</div>
         </div>
+      } @else if (errorComisiones) {
+        <div class="no-event-wrap">
+          <div class="no-event-seal no-event-seal-error"><ion-icon name="cloud-offline-outline"></ion-icon></div>
+          <div class="no-event-title">No se pudo cargar la información</div>
+          <div class="no-event-sub">Verifica tu conexión e intenta de nuevo.</div>
+          <ion-button size="small" fill="outline" (click)="reintentarCargarComisiones()" style="margin-top:16px">
+            <ion-icon name="refresh-outline" slot="start"></ion-icon>
+            Reintentar
+          </ion-button>
+        </div>
       } @else if (comisiones.length === 0) {
         <div class="no-event-wrap">
           <div class="no-event-seal"><ion-icon name="library-outline"></ion-icon></div>
@@ -151,6 +161,15 @@
         <div class="ev-detalle-panel">
           @if (cargandoOrdenDiaEvento) {
             <div class="ev-detalle-loading"><ion-spinner name="crescent" color="primary"></ion-spinner></div>
+          } @else if (errorOrdenDiaEvento) {
+            <div class="ev-detalle-error">
+              <ion-icon name="cloud-offline-outline"></ion-icon>
+              <span>No se pudo cargar el orden del día.</span>
+              <ion-button size="small" fill="outline" (click)="reintentarOrdenDiaEvento()">
+                <ion-icon name="refresh-outline" slot="start"></ion-icon>
+                Reintentar
+              </ion-button>
+            </div>
           } @else if (ordenDelDiaEvento.length === 0) {
             <div class="ev-detalle-empty">
               <ion-icon name="document-outline"></ion-icon>
@@ -355,7 +374,18 @@
         </div>
       }
 
-      @if (comisionInfo && !cargandoComisionInfo) {
+      @if (errorComisionInfo && !cargandoComisionInfo) {
+        <div class="ci-error">
+          <ion-icon name="cloud-offline-outline"></ion-icon>
+          <span>No se pudo cargar la información de la comisión.</span>
+          <ion-button size="small" fill="outline" (click)="reintentarComisionInfo()">
+            <ion-icon name="refresh-outline" slot="start"></ion-icon>
+            Reintentar
+          </ion-button>
+        </div>
+      }
+
+      @if (comisionInfo && !cargandoComisionInfo && !errorComisionInfo) {
 
         <!-- ── PRÓXIMOS EVENTOS ── -->
         @if (comisionInfo.proximos.length > 0) {
@@ -439,21 +469,5 @@
     </div>
   }
 
-  <!-- ══ MODAL PDF ══ -->
-  <ion-modal [isOpen]="isModalOpen">
-    <ng-template>
-      <ion-header>
-        <ion-toolbar>
-          <ion-title>Documento</ion-title>
-          <ion-buttons slot="end">
-            <ion-button (click)="setOpen(false)">Cerrar</ion-button>
-          </ion-buttons>
-        </ion-toolbar>
-      </ion-header>
-      <ion-content>
-        <iframe [src]="pdfUrl" style="width:100%;height:100%;border:none;"></iframe>
-      </ion-content>
-    </ng-template>
-  </ion-modal>
 
 </ion-content>

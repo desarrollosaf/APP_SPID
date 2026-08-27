@@ -4,6 +4,7 @@ import { ViewWillEnter } from '@ionic/angular';
 import { HttpErrorResponse } from '@angular/common/http';
 import { User } from '../service/user';
 import { AlertController } from '@ionic/angular';
+import { HapticsService } from '../service/haptics.service';
 
 @Component({
   selector: 'app-auth',
@@ -24,7 +25,8 @@ export class AuthPage implements ViewWillEnter {
   constructor(
     private router: Router,
     private _userService: User,
-    private alertCtrl: AlertController
+    private alertCtrl: AlertController,
+    private hapticsService: HapticsService
   ) {}
 
   ionViewWillEnter() {
@@ -52,6 +54,7 @@ export class AuthPage implements ViewWillEnter {
       next: () => {
         this.loading = false;
         this.loginSuccess = true;
+        this.hapticsService.success();
         localStorage.setItem('isLoggedin', 'true');
         setTimeout(() => {
           this.router.navigate(['/tabs/inicio'], { replaceUrl: true });
@@ -60,6 +63,7 @@ export class AuthPage implements ViewWillEnter {
       error: (e: HttpErrorResponse) => {
         this.loading = false;
         this.loginError = true;
+        this.hapticsService.error();
         setTimeout(() => { this.loginError = false; }, 600);
         this.showAlert(this.mensajeDeError(e), this.tituloDeError(e));
       },

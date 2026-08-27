@@ -1,8 +1,12 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
+import { Capacitor } from '@capacitor/core';
+import { StatusBar, Style } from '@capacitor/status-bar';
+import { Keyboard } from '@capacitor/keyboard';
 import { SocketService } from './service/socket.service';
 import { User } from './service/user';
 import { Eventos } from './service/eventos';
+import { HapticsService } from './service/haptics.service';
 
 @Component({
   selector: 'app-root',
@@ -33,7 +37,8 @@ export class AppComponent implements OnInit, OnDestroy {
     private router: Router,
     private socketService: SocketService,
     private userService: User,
-    private eventosService: Eventos
+    private eventosService: Eventos,
+    private hapticsService: HapticsService
   ) {
     this.userService.currentUser$.subscribe(user => {
       this.isAuthenticated = !!user;
@@ -62,10 +67,19 @@ export class AppComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
+    this.iniciarComportamientoNativo();
     setTimeout(() => {
       this.splashExiting = true;
       setTimeout(() => { this.splashDone = true; }, 650);
     }, 2000);
+  }
+
+  private iniciarComportamientoNativo() {
+    if (!Capacitor.isNativePlatform()) return;
+    // Texto claro de la barra de estado, acorde al fondo guinda oscuro de la app
+    StatusBar.setStyle({ style: Style.Dark }).catch(() => {});
+    // Oculta la barra de accesorios del teclado en iOS para una UI más limpia
+    Keyboard.setAccessoryBarVisible({ isVisible: false }).catch(() => {});
   }
 
   ngOnDestroy() {
@@ -73,6 +87,7 @@ export class AppComponent implements OnInit, OnDestroy {
   }
 
   logout() {
+    this.hapticsService.impact();
     this.loggingOut = true;
     this.detenerKeepAlive();
     this.socketService.disconnect();

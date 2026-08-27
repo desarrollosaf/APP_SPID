@@ -178,8 +178,19 @@
               </div>
             }
 
+            @if (errorDetalle && !cargandoDetalle) {
+              <div class="detalle-error">
+                <ion-icon name="cloud-offline-outline"></ion-icon>
+                <span>No se pudo cargar la información. Verifica tu conexión.</span>
+                <ion-button size="small" fill="outline" (click)="reintentarDetalle()">
+                  <ion-icon name="refresh-outline" slot="start"></ion-icon>
+                  Reintentar
+                </ion-button>
+              </div>
+            }
+
             <!-- ORDEN DEL DÍA -->
-            @if (vistaDetalle === 'orden' && !cargandoDetalle) {
+            @if (vistaDetalle === 'orden' && !cargandoDetalle && !errorDetalle) {
               @if (ordenDelDia.length === 0) {
                 <div class="detalle-empty">
                   <ion-icon name="document-outline"></ion-icon>
@@ -195,7 +206,7 @@
             }
 
             <!-- MIS VOTOS -->
-            @if (vistaDetalle === 'votos' && !cargandoDetalle) {
+            @if (vistaDetalle === 'votos' && !cargandoDetalle && !errorDetalle) {
               @if (misVotos.length === 0) {
                 <div class="detalle-empty">
                   <ion-icon name="ballot-outline"></ion-icon>
@@ -234,22 +245,5 @@
 
   </div>
 
-
-  <!-- ══ MODAL PDF ══ -->
-  <ion-modal [isOpen]="isModalOpen">
-    <ng-template>
-      <ion-header>
-        <ion-toolbar>
-          <ion-title>Documento</ion-title>
-          <ion-buttons slot="end">
-            <ion-button (click)="setOpen(false)">Cerrar</ion-button>
-          </ion-buttons>
-        </ion-toolbar>
-      </ion-header>
-      <ion-content>
-        <iframe [src]="pdfUrl" style="width:100%;height:100%;border:none;"></iframe>
-      </ion-content>
-    </ng-template>
-  </ion-modal>
 
 </ion-content>

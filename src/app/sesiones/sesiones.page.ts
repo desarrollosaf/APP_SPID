@@ -1,9 +1,9 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
-import { ViewWillEnter, ViewWillLeave } from '@ionic/angular';
-import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
+import { ViewWillEnter, ViewWillLeave, AlertController } from '@ionic/angular';
 import { Eventos } from '../service/eventos';
 import { SocketService } from '../service/socket.service';
 import { User } from '../service/user';
+import { HapticsService } from '../service/haptics.service';
 import { EstadoPanel } from '../interface/user';
 
 const SENTIDO: Record<string, number> = { FAVOR: 1, ABSTENCION: 2, CONTRA: 3, 'SIN REGISTRO': 0 };
@@ -15,9 +15,6 @@ const SENTIDO: Record<string, number> = { FAVOR: 1, ABSTENCION: 2, CONTRA: 3, 'S
   standalone: false,
 })
 export class SesionesPage implements OnInit, OnDestroy, ViewWillEnter, ViewWillLeave {
-
-  isModalOpen = false;
-  pdfUrl!: SafeResourceUrl;
 
   // Estado del evento: 0=nada, 2=asistencia, 3=votación
   evento: number = 0;
@@ -38,6 +35,7 @@ export class SesionesPage implements OnInit, OnDestroy, ViewWillEnter, ViewWillL
   ordenDelDia: any[] = [];
   misVotos: any[] = [];
   cargandoDetalle = false;
+  errorDetalle = false;
 
   private sesionIdAgenda: string = '';
   private misComisionIds = new Set<string>();
@@ -47,10 +45,11 @@ export class SesionesPage implements OnInit, OnDestroy, ViewWillEnter, ViewWillL
   private idComisionActual: string = '';
 
   constructor(
-    private sanitizer: DomSanitizer,
     private eventosService: Eventos,
     private socketService: SocketService,
-    private userService: User
+    private userService: User,
+    private alertCtrl: AlertController,
+    private hapticsService: HapticsService
   ) {}
 
   ngOnInit() {}
@@ -287,6 +286,7 @@ export class SesionesPage implements OnInit, OnDestroy, ViewWillEnter, ViewWillL
   }
 
   votar(tipo: string) {
+    this.hapticsService.impact();
     const prevVoto = this.miVoto;
     this.miVoto = tipo;
     // Sesiones plenarias: no mandar id_comision (VotosPunto.id_comision_dip es NULL para plenarias)
@@ -298,12 +298,17 @@ export class SesionesPage implements OnInit, OnDestroy, ViewWillEnter, ViewWillL
       error: (err: any) => {
         console.error('Error al registrar votación', err);
         this.miVoto = prevVoto;
-        alert('No se pudo registrar el voto. La votación puede haber sido cerrada o el servidor reiniciado. Intenta de nuevo.');
+        this.hapticsService.error();
+        this.mostrarErrorConReintento(
+          'No se pudo registrar el voto. La votación puede haber sido cerrada o el servidor reiniciado.',
+          () => this.votar(tipo)
+        );
       }
     });
   }
 
   registrarAsistencia() {
+    this.hapticsService.impact();
     // Sesiones plenarias: nunca mandar id_comision porque AsistenciaVoto.comision_dip_id es NULL
     this.eventosService.registrarAsistencia({ id_agenda: this.idAgendaActual }).subscribe({
       next: (r: any) => {
@@ -312,45 +317,67 @@ export class SesionesPage implements OnInit, OnDestroy, ViewWillEnter, ViewWillL
       },
       error: (err: any) => {
         console.error('Error al registrar asistencia', err);
-        alert('No se pudo registrar la asistencia. Intenta de nuevo o contacta al administrador.');
+        this.hapticsService.error();
+        this.mostrarErrorConReintento(
+          'No se pudo registrar la asistencia. Intenta de nuevo o contacta al administrador.',
+          () => this.registrarAsistencia()
+        );
       }
     });
+  }
+
+  private async mostrarErrorConReintento(message: string, reintentar: () => void) {
+    const alert = await this.alertCtrl.create({
+      header: 'Error',
+      message,
+      buttons: [
+        { text: 'Cerrar', role: 'cancel' },
+        { text: 'Reintentar', handler: reintentar },
+      ],
+    });
+    await alert.present();
   }
 
  verOrden() {
   if (this.vistaDetalle === 'orden') { this.vistaDetalle = 'none'; return;}
   this.vistaDetalle = 'orden';
   if (!this.sesionIdAgenda) return;
-  this.cargandoDetalle = true;
-  this.eventosService.getOrdenDelDia(this.sesionIdAgenda).subscribe({
-    next: (r) => {
-      this.ordenDelDia = r.puntos;
-      this.cargandoDetalle = false;
-    },
-    error: () => {
-      this.cargandoDetalle = false;
-    }
-  });
+  this.cargarOrdenDelDia();
 }
+
+  private cargarOrdenDelDia() {
+    this.cargandoDetalle = true;
+    this.errorDetalle = false;
+    this.eventosService.getOrdenDelDia(this.sesionIdAgenda).subscribe({
+      next: (r) => {
+        this.ordenDelDia = r.puntos;
+        this.cargandoDetalle = false;
+      },
+      error: () => {
+        this.cargandoDetalle = false;
+        this.errorDetalle = true;
+      }
+    });
+  }
 
   verVotos() {
     if (this.vistaDetalle === 'votos') { this.vistaDetalle = 'none'; return; }
     this.vistaDetalle = 'votos';
+    this.cargarMisVotos();
+  }
+
+  private cargarMisVotos() {
     this.cargandoDetalle = true;
+    this.errorDetalle = false;
     this.eventosService.getMisVotos(this.sesionIdAgenda).subscribe({
       next: (r) => { this.misVotos = r.votos; this.cargandoDetalle = false; },
-      error: () => { this.cargandoDetalle = false; }
+      error: () => { this.cargandoDetalle = false; this.errorDetalle = true; }
     });
   }
 
-  openPdf(url: string) {
-    this.pdfUrl = this.sanitizer.bypassSecurityTrustResourceUrl(url);
-    this.isModalOpen = true;
-  }
-
-  setOpen(isOpen: boolean) {
-    this.pdfUrl = this.sanitizer.bypassSecurityTrustResourceUrl('assets/OD-DELIBERANTE-DIP.PER-22ENERO2026.pdf');
-    this.isModalOpen = isOpen;
+  reintentarDetalle() {
+    if (this.vistaDetalle === 'orden') this.cargarOrdenDelDia();
+    else if (this.vistaDetalle === 'votos') this.cargarMisVotos();
   }
 
   get miVotoLabel(): string {
