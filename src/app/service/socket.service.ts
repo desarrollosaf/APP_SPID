@@ -23,9 +23,16 @@ export class SocketService {
   private verificarConexionAlVolver(): void {
     if (!this.socket) return;
     this.socket.auth = { token: localStorage.getItem('authToken') };
-    if (!this.socket.connected) {
-      this.socket.connect();
-    }
+    // No hay que confiar en que `connected` refleje la realidad tras una
+    // pausa larga: si el JS estuvo congelado, el propio socket.io pudo no
+    // haberse enterado de la caída. Se fuerza un ciclo limpio de
+    // desconexión/reconexión y se resincroniza de una vez, sin esperar a
+    // que dispare el evento interno 'reconnect' (que depende de que el
+    // manager haya detectado la caída por su cuenta).
+    if (this.socket.connected) this.socket.disconnect();
+    this.socket.connect();
+    this.joinHandler?.();
+    this.reconnectHandler?.();
   }
 
   private ensureConnected(): Socket {
