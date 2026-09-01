@@ -1,12 +1,32 @@
 import { Injectable } from '@angular/core';
 import { io, Socket } from 'socket.io-client';
 import { environment } from '../../environments/environment';
+import { App } from '@capacitor/app';
 
 @Injectable({ providedIn: 'root' })
 export class SocketService {
   private socket?: Socket;
   private joinHandler?: () => void;
   private reconnectHandler?: () => void;
+
+  constructor() {
+    // Al volver de segundo plano (app suspendida por el SO, o pestaña oculta
+    // en la versión web) el JS pudo haber estado congelado y el socket queda
+    // "zombie": parece conectado pero nunca detectó la caída. Al reactivarse
+    // se revisa y, si hace falta, se reconecta con el token vigente (por si
+    // expiró mientras la app estaba en pausa).
+    App.addListener('appStateChange', ({ isActive }) => {
+      if (isActive) this.verificarConexionAlVolver();
+    });
+  }
+
+  private verificarConexionAlVolver(): void {
+    if (!this.socket) return;
+    this.socket.auth = { token: localStorage.getItem('authToken') };
+    if (!this.socket.connected) {
+      this.socket.connect();
+    }
+  }
 
   private ensureConnected(): Socket {
     if (!this.socket) {
@@ -16,6 +36,8 @@ export class SocketService {
         transports: ['websocket', 'polling'],
         auth: { token }
       });
+      this.socket.on('connect_error', (err) => console.warn('Socket connect_error:', err.message));
+      this.socket.on('disconnect', (reason) => console.warn('Socket desconectado:', reason));
     }
     return this.socket;
   }
