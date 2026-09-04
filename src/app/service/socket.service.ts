@@ -9,6 +9,15 @@ export class SocketService {
   private joinHandler?: () => void;
   private reconnectHandler?: () => void;
 
+  // `appStateChange` (basado en document.visibilitychange) también se dispara
+  // con solo cambiar de ventana un instante (p. ej. Chrome en Mac marca la
+  // pestaña como oculta al perder el foco del SO), no solo al regresar de una
+  // pausa larga real. Se guarda desde cuándo quedó oculta para distinguir un
+  // parpadeo corto (el socket sigue vivo, no tocar nada) de una pausa larga
+  // real (donde si vale la pena forzar un ciclo limpio de reconexión).
+  private ocultoDesde?: number;
+  private static readonly UMBRAL_PAUSA_LARGA_MS = 10000;
+
   constructor() {
     // Al volver de segundo plano (app suspendida por el SO, o pestaña oculta
     // en la versión web) el JS pudo haber estado congelado y el socket queda
@@ -17,18 +26,33 @@ export class SocketService {
     // expiró mientras la app estaba en pausa).
     App.addListener('appStateChange', ({ isActive }) => {
       if (isActive) this.verificarConexionAlVolver();
+      else this.ocultoDesde = Date.now();
     });
   }
 
   private verificarConexionAlVolver(): void {
     if (!this.socket) return;
+
+    const pausaLarga = this.ocultoDesde !== undefined
+      && (Date.now() - this.ocultoDesde) >= SocketService.UMBRAL_PAUSA_LARGA_MS;
+    this.ocultoDesde = undefined;
+
     this.socket.auth = { token: localStorage.getItem('authToken') };
-    // No hay que confiar en que `connected` refleje la realidad tras una
-    // pausa larga: si el JS estuvo congelado, el propio socket.io pudo no
-    // haberse enterado de la caída. Se fuerza un ciclo limpio de
-    // desconexión/reconexión y se resincroniza de una vez, sin esperar a
-    // que dispare el evento interno 'reconnect' (que depende de que el
-    // manager haya detectado la caída por su cuenta).
+
+    if (!pausaLarga) {
+      // Parpadeo corto (p. ej. cambiar de ventana un momento): el socket casi
+      // seguro sigue vivo. Forzar un disconnect/connect aquí solo arriesga
+      // perder eventos en tránsito durante el ciclo de reconexión.
+      if (!this.socket.connected) this.socket.connect();
+      return;
+    }
+
+    // Pausa larga real: no hay que confiar en que `connected` refleje la
+    // realidad, el JS pudo haber estado congelado y el socket queda
+    // "zombie". Se fuerza un ciclo limpio de desconexión/reconexión y se
+    // resincroniza de una vez, sin esperar a que dispare el evento interno
+    // 'reconnect' (que depende de que el manager haya detectado la caída
+    // por su cuenta).
     if (this.socket.connected) this.socket.disconnect();
     this.socket.connect();
     this.joinHandler?.();
