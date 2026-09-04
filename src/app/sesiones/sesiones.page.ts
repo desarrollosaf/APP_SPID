@@ -25,6 +25,7 @@ export class SesionesPage implements OnInit, OnDestroy, ViewWillEnter, ViewWillL
   miVoto: string = '';
   nombreDiputado: string = '';
   asistenciaRegistrada: boolean = false;
+  registrandoAsistencia: boolean = false;
 
   // Sesión plenaria activa
   sesionActiva: boolean = false;
@@ -308,14 +309,25 @@ export class SesionesPage implements OnInit, OnDestroy, ViewWillEnter, ViewWillL
   }
 
   registrarAsistencia() {
+    if (this.registrandoAsistencia || this.asistenciaRegistrada) return;
+    this.registrandoAsistencia = true;
     this.hapticsService.impact();
+    // Optimista, igual que votar(): se marca de inmediato y solo se revierte si falla.
+    this.asistenciaRegistrada = true;
     // Sesiones plenarias: nunca mandar id_comision porque AsistenciaVoto.comision_dip_id es NULL
     this.eventosService.registrarAsistencia({ id_agenda: this.idAgendaActual }).subscribe({
       next: (r: any) => {
-        this.asistenciaRegistrada = true;
+        this.registrandoAsistencia = false;
         console.log('Asistencia registrada:', r);
       },
       error: (err: any) => {
+        this.registrandoAsistencia = false;
+        // 409 = ya se había registrado (p. ej. doble clic mientras la primera
+        // petición seguía en curso): no es un error real, ya quedó guardada.
+        if (err?.status === 409) {
+          return;
+        }
+        this.asistenciaRegistrada = false;
         console.error('Error al registrar asistencia', err);
         this.hapticsService.error();
         this.mostrarErrorConReintento(
