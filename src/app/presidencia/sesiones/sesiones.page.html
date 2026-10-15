@@ -1,0 +1,82 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/tabs/presidencia" text="" icon="arrow-back-outline"></ion-back-button>
+    </ion-buttons>
+    <ion-title>Sesiones</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <ion-refresher slot="fixed" (ionRefresh)="refrescar($event)">
+    <ion-refresher-content></ion-refresher-content>
+  </ion-refresher>
+
+  <div class="page-pad pres-wrap">
+
+    <div class="intro">
+      <h1 class="intro-title">Sesiones del Pleno</h1>
+      <p class="intro-sub">Consulta el orden del día, la grabación de cada punto y cómo votó cada diputado.</p>
+    </div>
+
+    <!-- Buscador por fecha -->
+    <div class="date-row">
+      <label class="date-field" [class.date-field--on]="fecha">
+        <ion-icon name="calendar-outline"></ion-icon>
+        <span>{{ etiquetaFecha }}</span>
+        <input type="date" [(ngModel)]="fecha" (change)="buscar()" aria-label="Buscar por fecha" />
+      </label>
+      @if (fecha) {
+        <button type="button" class="date-clear" (click)="cargarUltimas()" aria-label="Ver últimas sesiones">
+          <ion-icon name="close"></ion-icon>
+        </button>
+      }
+    </div>
+
+    <div class="list-hdr">
+      <span>{{ fecha ? 'Resultados' : 'Últimas sesiones' }}</span>
+      @if (!cargando && !error) { <span class="list-count">{{ sesiones.length }}</span> }
+    </div>
+
+    @if (cargando) {
+      <div class="skeleton-list">
+        @for (i of [1, 2, 3, 4]; track i) { <div class="skeleton"></div> }
+      </div>
+    } @else if (error) {
+      <div class="state">
+        <ion-icon name="cloud-offline-outline"></ion-icon>
+        <span>No se pudieron cargar las sesiones.</span>
+        <button class="btn-ghost" type="button" (click)="buscar()">
+          <ion-icon name="refresh-outline"></ion-icon> Reintentar
+        </button>
+      </div>
+    } @else {
+      <div class="ses-list">
+        @for (s of sesiones; track s.id; let i = $index) {
+          @if (mostrarMes(i)) { <div class="ses-month">{{ mesLargo(s.fecha) }}</div> }
+          <a class="ses" [routerLink]="[s.id]">
+            <div class="ses-date" [class.ses-date--hoy]="esHoy(s.fecha)">
+              <span class="sd-mes">{{ mes(s.fecha) }}</span>
+              <span class="sd-dia">{{ dia(s.fecha) }}</span>
+            </div>
+            <div class="ses-info">
+              <div class="ses-title">{{ s.descripcion?.trim() || 'Sesión sin descripción' }}</div>
+              <div class="ses-meta">
+                @if (esHoy(s.fecha)) { <span class="ses-today">Hoy</span> }
+                @else { <span>{{ diaSemana(s.fecha) }}</span> }
+                @if (s.tipoevento) { <span class="ses-type">{{ s.tipoevento }}</span> }
+              </div>
+            </div>
+            <ion-icon name="chevron-forward" class="ses-chev"></ion-icon>
+          </a>
+        } @empty {
+          <div class="state">
+            <ion-icon name="calendar-clear-outline"></ion-icon>
+            <span>No hay sesiones {{ fecha ? 'en esa fecha' : 'para mostrar' }}.</span>
+          </div>
+        }
+      </div>
+    }
+
+  </div>
+</ion-content>

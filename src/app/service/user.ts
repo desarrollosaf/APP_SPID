@@ -85,8 +85,21 @@ export class User {
     return u?.nombreCompleto ?? u?.name ?? '';
   }
 
+  /** Acceso al módulo de Presidencia: el usuario está en environment.presidencia.usuarios (correo o nombre). */
+  get esPresidente(): boolean {
+    const u = this.currentUserValue?.user;
+    if (!u) return false;
+    const propios = [u.email, u.name, u.nombreCompleto].filter(Boolean).map(t => normalizar(t!));
+    return environment.presidencia.usuarios.some(p => propios.includes(normalizar(p)));
+  }
+
   setCurrentUser(user: Users) {
     this.currentUserSubject.next(user);
     localStorage.setItem('currentUser', JSON.stringify(user));
   }
+}
+
+/** Minúsculas, sin acentos y con espacios simples, para comparar nombres y correos. */
+function normalizar(texto: string): string {
+  return texto.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/\s+/g, ' ').trim();
 }

@@ -1,0 +1,173 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/tabs/presidencia/sesiones" text="" icon="arrow-back-outline"></ion-back-button>
+    </ion-buttons>
+    <ion-title>Sesión</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <div class="page-pad pres-wrap">
+
+    @if (cargando) {
+      <div class="skeleton skeleton--hero"></div>
+      <div class="skeleton-list">
+        @for (i of [1, 2, 3]; track i) { <div class="skeleton"></div> }
+      </div>
+    } @else if (error || !sesion) {
+      <div class="state">
+        <ion-icon name="cloud-offline-outline"></ion-icon>
+        <span>No se pudo cargar la sesión.</span>
+        <button class="btn-ghost" type="button" (click)="cargar()">
+          <ion-icon name="refresh-outline"></ion-icon> Reintentar
+        </button>
+      </div>
+    } @else {
+
+      <!-- ══ Encabezado ══ -->
+      <section class="s-hero">
+        <span class="s-chip"><ion-icon name="library"></ion-icon> Pleno</span>
+        <h1 class="s-title">{{ sesion.descripcion?.trim() || 'Sesión' }}</h1>
+        <div class="s-meta">
+          @if (fechaLarga) {
+            <span><ion-icon name="calendar"></ion-icon>{{ fechaLarga }}</span>
+          }
+          @if (sesion.hora) {
+            <span><ion-icon name="time"></ion-icon>{{ sesion.hora }}</span>
+          }
+        </div>
+        <div class="s-stats">
+          <div><strong>{{ sesion.puntos.length }}</strong><span>Puntos</span></div>
+          <div><strong>{{ conVideo }}</strong><span>Con video</span></div>
+        </div>
+      </section>
+
+      <!-- ══ Orden del día ══ -->
+      <div class="od-hdr">
+        <h2>Orden del día</h2>
+      </div>
+
+      <div class="chips">
+        <button type="button" [class.chip-on]="filtro === 'todos'" (click)="filtro = 'todos'">Todos <b>{{ sesion.puntos.length }}</b></button>
+        <button type="button" [class.chip-on]="filtro === 'video'" (click)="filtro = 'video'">Con video <b>{{ conVideo }}</b></button>
+        <button type="button" [class.chip-on]="filtro === 'sin-video'" (click)="filtro = 'sin-video'">Sin video <b>{{ sesion.puntos.length - conVideo }}</b></button>
+      </div>
+
+      <div class="puntos">
+        @for (p of puntos; track p.id) {
+          <article class="pt" [class.pt--open]="videoAbierto === p.id || votosAbierto === p.id">
+            <div class="pt-head">
+              <span class="pt-num">{{ p.nopunto ?? '—' }}</span>
+              <div class="pt-body">
+                <p class="pt-text" [class.pt-text--full]="textoAbierto.has(p.id)" (click)="alternarTexto(p)">{{ p.punto }}</p>
+                @if (p.punto.length > 140) {
+                  <button type="button" class="pt-more" (click)="alternarTexto(p)">
+                    {{ textoAbierto.has(p.id) ? 'Ver menos' : 'Ver más' }}
+                  </button>
+                }
+              </div>
+            </div>
+
+            <div class="pt-actions">
+              <button type="button" class="pa" [class.pa--on]="votosAbierto === p.id" (click)="alternarVotos(p)">
+                <ion-icon name="stats-chart"></ion-icon> Votos
+              </button>
+              @if (p.video_url) {
+                <button type="button" class="pa" [class.pa--on]="videoAbierto === p.id" (click)="alternarVideo(p)">
+                  <ion-icon name="play"></ion-icon> Grabación
+                </button>
+              } @else {
+                <span class="pa pa--off"><ion-icon name="videocam-off-outline"></ion-icon> Sin video</span>
+              }
+            </div>
+
+            <!-- Video -->
+            @if (videoAbierto === p.id && p.video_url) {
+              <div class="pt-video">
+                <video [src]="p.video_url" controls playsinline preload="metadata"></video>
+              </div>
+            }
+
+            <!-- Votos -->
+            @if (votosAbierto === p.id) {
+              <div class="pt-votos">
+                @if (cargandoVotos === p.id) {
+                  <div class="vt-loading"><ion-spinner name="crescent"></ion-spinner></div>
+                } @else if (errorVotos === p.id) {
+                  <div class="vt-empty">
+                    No se pudieron cargar los votos.
+                    <button class="btn-ghost" type="button" (click)="cargarVotos(p.id)">Reintentar</button>
+                  </div>
+                } @else if (conteos[p.id]; as c) {
+                  @if (c.total === 0) {
+                    <div class="vt-empty">Todavía no hay votos registrados.</div>
+                  } @else {
+
+                    <div class="vt-head">
+                      <span>{{ c.favor + c.contra + c.abst }} de {{ c.total }} votos emitidos</span>
+                    </div>
+                    <div class="vt-bar">
+                      <span class="vb-favor" [style.width.%]="pct(c.favor, c.total)"></span>
+                      <span class="vb-contra" [style.width.%]="pct(c.contra, c.total)"></span>
+                      <span class="vb-abst" [style.width.%]="pct(c.abst, c.total)"></span>
+                      <span class="vb-pend" [style.width.%]="pct(c.pendiente, c.total)"></span>
+                    </div>
+
+                    <div class="vt-grid">
+                      <div class="vt vt--favor"><strong>{{ c.favor }}</strong><span>A favor</span><em>{{ pct(c.favor, c.total) | number: '0.0-1' }}%</em></div>
+                      <div class="vt vt--contra"><strong>{{ c.contra }}</strong><span>En contra</span><em>{{ pct(c.contra, c.total) | number: '0.0-1' }}%</em></div>
+                      <div class="vt vt--abst"><strong>{{ c.abst }}</strong><span>Abstención</span><em>{{ pct(c.abst, c.total) | number: '0.0-1' }}%</em></div>
+                      <div class="vt vt--pend"><strong>{{ c.pendiente }}</strong><span>Pendientes</span><em>{{ pct(c.pendiente, c.total) | number: '0.0-1' }}%</em></div>
+                    </div>
+
+                    <button type="button" class="vt-toggle" (click)="alternarDetalle(p.id)">
+                      <ion-icon name="people-outline"></ion-icon>
+                      {{ detalleAbierto === p.id ? 'Ocultar detalle por diputado' : 'Ver detalle por diputado' }}
+                      <ion-icon [name]="detalleAbierto === p.id ? 'chevron-up' : 'chevron-down'"></ion-icon>
+                    </button>
+
+                    @if (detalleAbierto === p.id) {
+                      <div class="dip">
+                        <div class="search search--sm">
+                          <ion-icon name="search"></ion-icon>
+                          <input type="search" placeholder="Buscar diputado o partido" [(ngModel)]="busquedaDiputado" />
+                        </div>
+                        <div class="dip-filters">
+                          <button type="button" [class.on]="filtroSentido === 'todos'" (click)="filtroSentido = 'todos'">Todos</button>
+                          <button type="button" data-s="favor" [class.on]="filtroSentido === 'favor'" (click)="filtroSentido = 'favor'">A favor</button>
+                          <button type="button" data-s="contra" [class.on]="filtroSentido === 'contra'" (click)="filtroSentido = 'contra'">En contra</button>
+                          <button type="button" data-s="abst" [class.on]="filtroSentido === 'abst'" (click)="filtroSentido = 'abst'">Abstención</button>
+                          <button type="button" data-s="pendiente" [class.on]="filtroSentido === 'pendiente'" (click)="filtroSentido = 'pendiente'">Pendiente</button>
+                        </div>
+                        <div class="dip-list">
+                          @for (v of diputados(p.id); track $index) {
+                            <div class="dip-row">
+                              <div class="dip-info">
+                                <span class="dip-name">{{ v.diputado }}</span>
+                                @if (v.partido) { <span class="dip-party">{{ v.partido }}</span> }
+                              </div>
+                              <span class="dip-vote" [attr.data-s]="v.sentido">{{ v.etiqueta }}</span>
+                            </div>
+                          } @empty {
+                            <div class="vt-empty">Ningún diputado coincide.</div>
+                          }
+                        </div>
+                      </div>
+                    }
+                  }
+                }
+              </div>
+            }
+          </article>
+        } @empty {
+          <div class="state">
+            <ion-icon name="document-outline"></ion-icon>
+            <span>{{ sesion.puntos.length ? 'No hay puntos con este filtro.' : 'Esta sesión todavía no tiene puntos capturados.' }}</span>
+          </div>
+        }
+      </div>
+    }
+
+  </div>
+</ion-content>

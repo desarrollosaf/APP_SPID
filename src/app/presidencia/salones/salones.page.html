@@ -1,0 +1,186 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/tabs/presidencia" text="" icon="arrow-back-outline"></ion-back-button>
+    </ion-buttons>
+    <ion-title>Salones</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <ion-refresher slot="fixed" (ionRefresh)="refrescar($event)">
+    <ion-refresher-content></ion-refresher-content>
+  </ion-refresher>
+
+  <div class="page-pad pres-wrap">
+
+    <!-- Indicadores en vivo -->
+    <div class="live-stats">
+      <button type="button" class="ls ls--bad" [class.ls--on]="filtroEstado === 'en-evento'" (click)="filtrar('en-evento')">
+        <span class="ls-num">{{ cargando ? '–' : totales.enEvento }}</span>
+        <span class="ls-lbl"><span class="live-dot"></span>En evento</span>
+      </button>
+      <button type="button" class="ls ls--accent" [class.ls--on]="filtroEstado === 'proximamente'" (click)="filtrar('proximamente')">
+        <span class="ls-num">{{ cargando ? '–' : totales.proximamente }}</span>
+        <span class="ls-lbl">Próxima hora</span>
+      </button>
+      <button type="button" class="ls ls--ok" [class.ls--on]="filtroEstado === 'disponible'" (click)="filtrar('disponible')">
+        <span class="ls-num">{{ cargando ? '–' : totales.disponibles }}</span>
+        <span class="ls-lbl">Disponibles</span>
+      </button>
+    </div>
+
+    @if (filtroEstado !== 'todos') {
+      <div class="filter-on">
+        <span><ion-icon name="funnel"></ion-icon>{{ etiquetaFiltro }} · {{ salonesFiltrados.length }}</span>
+        <button type="button" (click)="filtroEstado = 'todos'">Quitar filtro <ion-icon name="close"></ion-icon></button>
+      </div>
+    }
+
+    <div class="seg">
+      <button type="button" [class.seg-on]="segmento === 'dia'" (click)="segmento = 'dia'">Por día</button>
+      <button type="button" [class.seg-on]="segmento === 'semana'" (click)="segmento = 'semana'">Semana</button>
+      <button type="button" [class.seg-on]="segmento === 'mes'" (click)="segmento = 'mes'">Mes</button>
+    </div>
+
+    @if (segmento === 'dia') {
+      <div class="day-nav">
+        <button type="button" (click)="moverDia(-1)" aria-label="Día anterior"><ion-icon name="chevron-back"></ion-icon></button>
+        <label class="day-label">
+          <ion-icon name="calendar-outline"></ion-icon>
+          {{ etiquetaFecha }}
+          <input type="date" [(ngModel)]="fecha" aria-label="Elegir fecha" />
+        </label>
+        <button type="button" (click)="moverDia(1)" aria-label="Día siguiente"><ion-icon name="chevron-forward"></ion-icon></button>
+      </div>
+    }
+
+    <div class="search">
+      <ion-icon name="search"></ion-icon>
+      <input type="search" placeholder="Buscar salón" [(ngModel)]="busqueda" />
+    </div>
+
+    @if (cargando) {
+      <div class="skeleton-list">
+        @for (i of [1, 2, 3, 4]; track i) { <div class="skeleton"></div> }
+      </div>
+    } @else if (error) {
+      <div class="state">
+        <ion-icon name="cloud-offline-outline"></ion-icon>
+        <span>No se pudo cargar la ocupación de los salones.</span>
+        <button class="btn-ghost" type="button" (click)="cargar(true)">
+          <ion-icon name="refresh-outline"></ion-icon> Reintentar
+        </button>
+      </div>
+    } @else if (segmento === 'dia') {
+
+      <!-- ══ Por día: tarjeta por salón con línea de tiempo ══ -->
+      <div class="salones">
+        @for (s of salonesFiltrados; track s.id) {
+          <div class="salon" [style.--sc]="s.color">
+            <div class="salon-head">
+              <span class="salon-dot"></span>
+              <span class="salon-name">{{ s.nombre }}</span>
+              @if (fecha === hoy) {
+                <span class="salon-state" [attr.data-state]="estado(s)">
+                  @if (estado(s) === 'en-evento') { <span class="live-dot"></span> }
+                  {{ etiquetaEstado(s) }}
+                </span>
+              }
+            </div>
+
+            <div class="track">
+              @for (e of eventosDelDia(s); track e.id) {
+                <button type="button" class="track-bar"
+                        [style.left.%]="barra(e).left" [style.width.%]="barra(e).width"
+                        (click)="abrir(e, s)" [attr.aria-label]="e.titulo"></button>
+              }
+              @if (posicionAhora !== null) {
+                <span class="track-now" [style.left.%]="posicionAhora"></span>
+              }
+            </div>
+            <div class="track-scale">
+              @for (h of escala; track h) { <span>{{ h }}:00</span> }
+            </div>
+
+            @if (eventosDelDia(s).length) {
+              <div class="salon-events">
+                @for (e of eventosDelDia(s); track e.id) {
+                  <button type="button" class="se" [attr.data-estado]="estadoEv(e)" (click)="abrir(e, s)">
+                    <span class="se-time">{{ rango(e) }}</span>
+                    <span class="se-title">
+                      @if (estadoEv(e) === 'en-curso') { <span class="se-now"><span class="live-dot"></span>Ahora</span> }
+                      {{ e.titulo }}
+                    </span>
+                    <ion-icon name="chevron-forward"></ion-icon>
+                  </button>
+                }
+              </div>
+            } @else {
+              <div class="salon-free">Sin eventos este día</div>
+            }
+          </div>
+        } @empty {
+          <div class="state">
+            <ion-icon name="search-outline"></ion-icon>
+            <span>Ningún salón coincide con el filtro.</span>
+          </div>
+        }
+      </div>
+
+    } @else {
+
+      <!-- ══ Semana / mes ══ -->
+      <div class="list-hdr">
+        <span>{{ segmento === 'semana' ? 'Esta semana' : 'Próximos 30 días' }}</span>
+        <span class="list-count">{{ eventosPeriodo.length }}</span>
+      </div>
+      <div class="events">
+        @for (e of eventosPeriodo; track e.salonNombre + e.id; let i = $index) {
+          @if (mostrarFecha(i)) {
+            <div class="ev-day">{{ fechaDia(e.fecha) }}</div>
+          }
+          <button type="button" class="ev ev--btn" [attr.data-color]="e.color" (click)="ver(e)">
+            <div class="ev-time">
+              <span class="ev-hi">{{ e.horaInicio }}</span>
+              @if (e.horaFin) { <span class="ev-hf">{{ e.horaFin }}</span> }
+            </div>
+            <div class="ev-body">
+              <div class="ev-title">{{ e.titulo }}</div>
+              <div class="ev-place"><span class="mini-dot" [style.background]="e.salonColor"></span>{{ e.salonNombre }}</div>
+            </div>
+          </button>
+        } @empty {
+          <div class="state">
+            <ion-icon name="calendar-clear-outline"></ion-icon>
+            <span>No hay eventos programados en este periodo.</span>
+          </div>
+        }
+      </div>
+    }
+
+  </div>
+
+  <!-- ══ Detalle del evento ══ -->
+  <ion-modal class="pres-sheet" [class.pres-sheet--centro]="hojaCentrada" [isOpen]="detalleAbierto" [initialBreakpoint]="hojaCentrada ? undefined : 1" [breakpoints]="hojaCentrada ? undefined : [0, 1]" (didDismiss)="detalleAbierto = false">
+    <ng-template>
+      @if (seleccionado; as sel) {
+        <div class="sheet">
+          <span class="det-salon" [style.--sc]="sel.salonColor">
+            <span class="salon-dot"></span>{{ sel.salonNombre }}
+          </span>
+          <h3 class="sheet-title">{{ sel.titulo }}</h3>
+          @if (sel.descripcion) {
+            <p class="sheet-sub">{{ sel.descripcion }}</p>
+          }
+          <div class="det-rows">
+            <div class="det-row"><ion-icon name="calendar-outline"></ion-icon>{{ fechaDia(sel.fecha) }}</div>
+            <div class="det-row"><ion-icon name="time-outline"></ion-icon>{{ rango(sel) }} h</div>
+            <div class="det-row"><ion-icon name="pricetag-outline"></ion-icon>{{ sel.tipo }}</div>
+          </div>
+          <button class="sheet-cancel" type="button" (click)="detalleAbierto = false">Cerrar</button>
+        </div>
+      }
+    </ng-template>
+  </ion-modal>
+</ion-content>

@@ -3,6 +3,7 @@ import { HttpRequest, HttpHandler, HttpEvent, HttpInterceptor, HttpErrorResponse
 import { Observable, throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import { Router } from '@angular/router';
+import { environment } from '../../environments/environment';
 
 @Injectable()
 export class AuthInterceptor implements HttpInterceptor {
@@ -10,6 +11,12 @@ export class AuthInterceptor implements HttpInterceptor {
   constructor(private router: Router) {}
 
   intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
+    // Solo la API de SPID lleva este token; otros servicios (p. ej. la agenda pública) no deben recibirlo
+    // y un 401 de esos servicios no debe cerrar la sesión de SPID.
+    if (!req.url.startsWith(environment.apiUrl)) {
+      return next.handle(req);
+    }
+
     const raw = localStorage.getItem('authToken');
     const token = raw && raw !== 'undefined' && raw !== 'null' && raw.length > 20 ? raw : null;
 

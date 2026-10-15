@@ -19,9 +19,9 @@
       <div class="session-banner">
         <div class="banner-left">
           <span class="pulse-dot"></span>
-          <div>
-            <div class="banner-status">EN VIVO</div>
-            <div class="banner-org">{{ sesionNombre || 'Sesión en Curso' }}</div>
+          <div class="banner-text">
+            <div class="banner-status">En vivo</div>
+            <div class="banner-org">{{ sesionNombre || 'Sesión en curso' }}</div>
           </div>
         </div>
         <div class="banner-right">
@@ -43,28 +43,28 @@
         <div class="attend-card">
 
           <div class="attend-header">
-            <ion-icon name="people-outline" class="attend-header-ico"></ion-icon>
-            <div class="attend-header-label">REGISTRO DE ASISTENCIA</div>
+            <div class="attend-header-ico"><ion-icon name="people"></ion-icon></div>
+            <div class="attend-header-label">Registro de asistencia</div>
             <div class="attend-header-sub">{{ sesionNombre || 'Sesión Plenaria' }}</div>
           </div>
 
           <div class="attend-body">
             @if (nombreDiputado) {
               <div class="deputy-chip">
-                <ion-icon name="person-circle-outline"></ion-icon>
+                <ion-icon name="person-circle"></ion-icon>
                 <span>{{ nombreDiputado }}</span>
               </div>
             }
 
             @if (!asistenciaRegistrada) {
-              <ion-button expand="block" class="btn-attend" (click)="registrarAsistencia()">
-                <ion-icon slot="start" name="finger-print-outline"></ion-icon>
-                Registrar Asistencia
-              </ion-button>
+              <button class="btn-primary" type="button" (click)="registrarAsistencia()">
+                <ion-icon name="finger-print"></ion-icon>
+                Registrar asistencia
+              </button>
             } @else {
               <div class="attend-success">
-                <ion-icon name="checkmark-circle-outline" class="success-ico"></ion-icon>
-                <div class="attend-success-title">Asistencia Registrada</div>
+                <div class="success-ico"><ion-icon name="checkmark"></ion-icon></div>
+                <div class="attend-success-title">Asistencia registrada</div>
                 <div class="attend-success-sub">Tu asistencia ha sido confirmada</div>
               </div>
             }
@@ -90,7 +90,7 @@
                 <span class="vote-tipo-badge">{{ tipoPuntoVotacion }}</span>
               }
               @if (!noPuntoVotacion && !tipoPuntoVotacion) {
-                <span class="vote-label-tag">VOTACIÓN EN CURSO</span>
+                <span class="vote-label-tag">Votación en curso</span>
               }
             </div>
             <div class="vote-topic">
@@ -102,7 +102,6 @@
                 <button class="vote-mas-btn" (click)="textoExpandido = false"> ver menos</button>
               }
             </div>
-            <div class="vote-gold-line"></div>
           </div>
 
           @if (miVoto) {
@@ -116,22 +115,28 @@
             </div>
           }
 
-          <div class="ses-vote-row">
+          <div class="vote-prompt">Emite tu voto</div>
+
+          <div class="ses-vote-grid">
             <button class="sv-btn sv-favor" [class.sv-active]="miVoto === 'FAVOR'"
-                    (click)="votar('FAVOR')" title="A Favor">
-              <ion-icon name="thumbs-up-outline"></ion-icon>
+                    (click)="votar('FAVOR')">
+              <span class="sv-ico"><ion-icon name="thumbs-up"></ion-icon></span>
+              <span class="sv-lbl">A favor</span>
             </button>
             <button class="sv-btn sv-contra" [class.sv-active]="miVoto === 'CONTRA'"
-                    (click)="votar('CONTRA')" title="En Contra">
-              <ion-icon name="thumbs-down-outline"></ion-icon>
+                    (click)="votar('CONTRA')">
+              <span class="sv-ico"><ion-icon name="thumbs-down"></ion-icon></span>
+              <span class="sv-lbl">En contra</span>
             </button>
             <button class="sv-btn sv-abs" [class.sv-active]="miVoto === 'ABSTENCION'"
-                    (click)="votar('ABSTENCION')" title="Abstención">
-              <ion-icon name="remove-circle-outline"></ion-icon>
+                    (click)="votar('ABSTENCION')">
+              <span class="sv-ico"><ion-icon name="remove-circle"></ion-icon></span>
+              <span class="sv-lbl">Abstención</span>
             </button>
             <button class="sv-btn sv-sin" [class.sv-active]="miVoto === 'SIN REGISTRO'"
-                    (click)="votar('SIN REGISTRO')" title="Sin Registro">
-              <ion-icon name="ellipsis-horizontal-circle-outline"></ion-icon>
+                    (click)="votar('SIN REGISTRO')">
+              <span class="sv-ico"><ion-icon name="ellipsis-horizontal-circle"></ion-icon></span>
+              <span class="sv-lbl">Sin registro</span>
             </button>
           </div>
 
@@ -144,7 +149,6 @@
     ══════════════════════════════════════════ -->
     @else {
       @if (sesionActiva) {
-        
 
         <!-- Botones de consulta -->
         <div class="detalle-btns">
@@ -158,16 +162,18 @@
           </button>
         </div>
 
-        <!-- Estado de espera + badge asistencia -->
-         @if (!vistaDetalle || vistaDetalle === 'none') {
+        <!-- Estado de espera -->
+        @if (!vistaDetalle || vistaDetalle === 'none') {
           <div class="no-event-wrap">
             <div class="no-event-seal">
               <ion-icon name="hourglass-outline"></ion-icon>
             </div>
             <div class="no-event-org">{{ sesionNombre }}</div>
             <div class="no-event-title">Sesión en curso</div>
+            <div class="no-event-sub">Aquí aparecerán la asistencia y las votaciones en cuanto se abran.</div>
           </div>
-         }
+        }
+
         <!-- Panel de detalle -->
         @if (vistaDetalle !== 'none') {
           <div class="detalle-panel">
@@ -182,10 +188,10 @@
               <div class="detalle-error">
                 <ion-icon name="cloud-offline-outline"></ion-icon>
                 <span>No se pudo cargar la información. Verifica tu conexión.</span>
-                <ion-button size="small" fill="outline" (click)="reintentarDetalle()">
-                  <ion-icon name="refresh-outline" slot="start"></ion-icon>
+                <button class="btn-ghost" type="button" (click)="reintentarDetalle()">
+                  <ion-icon name="refresh-outline"></ion-icon>
                   Reintentar
-                </ion-button>
+                </button>
               </div>
             }
 
@@ -209,7 +215,7 @@
             @if (vistaDetalle === 'votos' && !cargandoDetalle && !errorDetalle) {
               @if (misVotos.length === 0) {
                 <div class="detalle-empty">
-                  <ion-icon name="ballot-outline"></ion-icon>
+                  <ion-icon name="file-tray-outline"></ion-icon>
                   <span>Aún no has participado en votaciones</span>
                 </div>
               }
@@ -222,7 +228,7 @@
                          [class.vs-favor]="voto.sentido === 1"
                          [class.vs-abstencion]="voto.sentido === 2"
                          [class.vs-contra]="voto.sentido === 3">
-                      <ion-icon [name]="voto.sentido === 1 ? 'thumbs-up-outline' : voto.sentido === 3 ? 'thumbs-down-outline' : 'remove-circle-outline'"></ion-icon>
+                      <ion-icon [name]="voto.sentido === 1 ? 'thumbs-up' : voto.sentido === 3 ? 'thumbs-down' : 'remove-circle'"></ion-icon>
                       {{ voto.mensaje }}
                     </div>
                   </div>
@@ -235,15 +241,14 @@
       } @else {
         <div class="no-event-wrap">
           <div class="no-event-seal">
-            <ion-icon name="shield-checkmark-outline"></ion-icon>
+            <ion-icon name="calendar-clear-outline"></ion-icon>
           </div>
-          <div class="no-event-org">Congreso del Estado de México</div>
-          <div class="no-event-title">Sin evento activo</div>
+          <div class="no-event-title">Sin sesión activa</div>
+          <div class="no-event-sub">Cuando inicie una sesión del Pleno la verás aquí automáticamente.</div>
         </div>
       }
     }
 
   </div>
-
 
 </ion-content>

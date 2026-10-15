@@ -685,7 +685,7 @@ export class ComisionesPage implements OnInit, OnDestroy, ViewWillLeave {
 
   rolIcono(cargo: string): string {
     const c = (cargo ?? '').toLowerCase();
-    if (c.includes('president')) return 'crown-outline';
+    if (c.includes('presiden')) return 'ribbon-outline';
     if (c.includes('secretar'))  return 'document-text-outline';
     return 'person-outline';
   }
@@ -694,7 +694,7 @@ export class ComisionesPage implements OnInit, OnDestroy, ViewWillLeave {
   esSecretario(cargo: string): boolean { return (cargo ?? '').toLowerCase().includes('secretar'); }
   esVocal(cargo: string): boolean {
     const c = (cargo ?? '').toLowerCase();
-    return !c.includes('president') && !c.includes('secretar');
+    return !c.includes('presiden') && !c.includes('secretar');
   }
 
   get miVotoLabel(): string {

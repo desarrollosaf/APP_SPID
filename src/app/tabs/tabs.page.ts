@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import { User } from '../service/user';
 
 @Component({
   selector: 'app-tabs',
@@ -6,4 +7,10 @@ import { Component } from '@angular/core';
   styleUrls: ['./tabs.page.scss'],
   standalone: false,
 })
-export class TabsPage {}
+export class TabsPage {
+  constructor(private userService: User) {}
+
+  get esPresidente(): boolean {
+    return this.userService.esPresidente;
+  }
+}

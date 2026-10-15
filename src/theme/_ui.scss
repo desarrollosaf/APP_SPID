@@ -1,0 +1,595 @@
+// ══════════════════════════════════════════════════════════════════════
+// Componentes compartidos por Sesión y Comisiones.
+// Se incluye con `@use '../../theme/ui';` en el SCSS de cada página.
+// ══════════════════════════════════════════════════════════════════════
+
+.page-pad     { padding: 8px 16px 24px; }
+.event-center { display: flex; flex-direction: column; align-items: center; }
+
+// ── Etiqueta de sección ───────────────────────────────────────────────
+.section-label {
+  font-size: 17px;
+  font-weight: 800;
+  letter-spacing: -0.3px;
+  color: var(--text);
+  margin: 4px 4px 12px;
+}
+
+// ── Punto "en vivo" ───────────────────────────────────────────────────
+@keyframes ui-live-pulse {
+  0%   { box-shadow: 0 0 0 0 rgba(var(--bad-rgb), 0.55); }
+  70%  { box-shadow: 0 0 0 7px rgba(var(--bad-rgb), 0); }
+  100% { box-shadow: 0 0 0 0 rgba(var(--bad-rgb), 0); }
+}
+
+.live-dot,
+.pulse-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--bad);
+  flex-shrink: 0;
+  animation: ui-live-pulse 1.6s ease-in-out infinite;
+}
+
+// ── Botones ───────────────────────────────────────────────────────────
+.btn-primary {
+  width: 100%;
+  height: 56px;
+  border: none;
+  border-radius: var(--r-md);
+  background: var(--brand-grad);
+  color: #fff;
+  font-family: var(--font);
+  font-size: 16px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  cursor: pointer;
+  box-shadow: var(--shadow-brand);
+  transition: transform 0.12s ease;
+
+  ion-icon { font-size: 22px; }
+  &:active { transform: scale(0.98); }
+
+  &.btn-sm {
+    height: 46px;
+    font-size: 14px;
+    border-radius: 14px;
+    ion-icon { font-size: 18px; }
+  }
+}
+
+.btn-ghost {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 38px;
+  padding: 0 16px;
+  border: 1.5px solid var(--border);
+  border-radius: 999px;
+  background: var(--surface);
+  color: var(--text);
+  font-family: var(--font);
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+
+  ion-icon { font-size: 16px; }
+  &:active { background: var(--surface-2); }
+}
+
+// ── Banner de sesión en vivo ──────────────────────────────────────────
+.session-banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  background: var(--surface);
+  border-radius: var(--r-lg);
+  box-shadow: var(--shadow-sm);
+  padding: 14px 16px;
+  margin-bottom: 16px;
+
+  .banner-left {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    min-width: 0;
+  }
+
+  .banner-text { min-width: 0; }
+
+  .banner-status {
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--bad);
+  }
+
+  .banner-org {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--text);
+    margin-top: 2px;
+    line-height: 1.3;
+  }
+
+  .banner-right { flex-shrink: 0; }
+
+  .asistencia-badge {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    background: rgba(var(--ok-rgb), 0.10);
+    color: var(--ok);
+    border-radius: 999px;
+    padding: 5px 10px;
+    font-size: 12px;
+    font-weight: 700;
+
+    .badge-ico { font-size: 15px; }
+  }
+}
+
+// ── Tarjeta de asistencia ─────────────────────────────────────────────
+.attend-card {
+  width: 100%;
+  max-width: 460px;
+  background: var(--surface);
+  border-radius: var(--r-xl);
+  box-shadow: var(--shadow-md);
+  overflow: hidden;
+}
+
+.attend-header {
+  position: relative;
+  overflow: hidden;
+  background: var(--brand-grad);
+  padding: 28px 22px 26px;
+  text-align: center;
+  color: #fff;
+
+  &::before {
+    content: '';
+    position: absolute;
+    width: 200px; height: 200px;
+    top: -110px; right: -60px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.10);
+  }
+
+  .attend-header-ico {
+    position: relative;
+    width: 64px;
+    height: 64px;
+    margin: 0 auto 14px;
+    border-radius: 20px;
+    background: rgba(255, 255, 255, 0.16);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    ion-icon { font-size: 32px; }
+  }
+
+  .attend-header-label {
+    position: relative;
+    font-size: 20px;
+    font-weight: 800;
+    letter-spacing: -0.4px;
+    margin-bottom: 4px;
+  }
+
+  .attend-header-sub {
+    position: relative;
+    font-size: 14px;
+    color: rgba(255, 255, 255, 0.78);
+    line-height: 1.35;
+  }
+}
+
+.attend-body { padding: 20px; }
+
+.deputy-chip {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: var(--surface-2);
+  border-radius: var(--r-md);
+  padding: 12px 14px;
+  margin-bottom: 16px;
+
+  ion-icon { font-size: 28px; color: var(--brand); flex-shrink: 0; }
+  span { font-size: 15px; font-weight: 700; color: var(--text); }
+}
+
+@keyframes ui-pop {
+  0%   { transform: scale(0.5); opacity: 0; }
+  70%  { transform: scale(1.08); opacity: 1; }
+  100% { transform: scale(1); }
+}
+
+.attend-success {
+  text-align: center;
+  padding: 8px 0 4px;
+
+  .success-ico {
+    width: 72px;
+    height: 72px;
+    margin: 0 auto 14px;
+    border-radius: 50%;
+    background: rgba(var(--ok-rgb), 0.12);
+    color: var(--ok);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    animation: ui-pop 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
+
+    ion-icon { font-size: 38px; }
+  }
+
+  .attend-success-title {
+    font-size: 18px;
+    font-weight: 800;
+    color: var(--text);
+    margin-bottom: 4px;
+  }
+
+  .attend-success-sub {
+    font-size: 14px;
+    color: var(--text-2);
+  }
+}
+
+// ── Tarjeta de votación ───────────────────────────────────────────────
+.vote-card {
+  width: 100%;
+  max-width: 520px;
+  background: var(--surface);
+  border-radius: var(--r-xl);
+  box-shadow: var(--shadow-md);
+  overflow: hidden;
+}
+
+.vote-header {
+  padding: 22px 20px 18px;
+  border-bottom: 1px solid var(--border);
+}
+
+.vote-meta-row,
+.ev-voto-meta {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 12px;
+}
+
+.vote-num-badge,
+.vote-tipo-badge,
+.vote-label-tag {
+  font-size: 12px;
+  font-weight: 700;
+  border-radius: 999px;
+  padding: 5px 11px;
+}
+
+.vote-num-badge  { background: var(--brand); color: #fff; }
+.vote-tipo-badge { background: rgba(var(--accent-rgb), 0.16); color: #8A6A32; }
+.vote-label-tag  { background: var(--brand-50); color: var(--brand); }
+
+.vote-topic,
+.ev-voto-tema {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text);
+  line-height: 1.5;
+  word-break: break-word;
+}
+
+.vote-mas-btn {
+  background: none;
+  border: none;
+  color: var(--brand);
+  font-family: var(--font);
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  padding: 0;
+}
+
+.vote-status-bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 16px 20px 0;
+  padding: 12px 14px;
+  border-radius: var(--r-md);
+  font-size: 14px;
+
+  ion-icon { font-size: 20px; }
+
+  &.vs-favor        { color: var(--ok);      background: rgba(var(--ok-rgb), 0.10); }
+  &.vs-contra       { color: var(--bad);     background: rgba(var(--bad-rgb), 0.08); }
+  &.vs-abstencion   { color: #B45309;        background: rgba(var(--warn-rgb), 0.12); }
+  &.vs-sin-registro { color: var(--text-2);  background: rgba(var(--neutral-rgb), 0.12); }
+}
+
+.vote-prompt {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text-3);
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  padding: 18px 20px 10px;
+}
+
+// ── Botones de voto (con texto) ───────────────────────────────────────
+.ses-vote-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  padding: 0 20px 22px;
+}
+
+.sv-btn,
+.mv-btn {
+  --c: var(--neutral);
+  --c-rgb: var(--neutral-rgb);
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border: 1.5px solid rgba(var(--c-rgb), 0.22);
+  background: rgba(var(--c-rgb), 0.06);
+  color: var(--c);
+  font-family: var(--font);
+  cursor: pointer;
+  outline: none;
+  transition: transform 0.12s ease, background 0.15s ease, box-shadow 0.15s ease, color 0.15s ease;
+
+  &:active { transform: scale(0.96); }
+
+  &.sv-favor,  &.mv-favor  { --c: var(--ok);   --c-rgb: var(--ok-rgb); }
+  &.sv-contra, &.mv-contra { --c: var(--bad);  --c-rgb: var(--bad-rgb); }
+  &.sv-abs,    &.mv-abs    { --c: #D97706;     --c-rgb: var(--warn-rgb); }
+  &.sv-sin,    &.mv-sin    { --c: var(--neutral); --c-rgb: var(--neutral-rgb); }
+
+  &.sv-active,
+  &.mv-active {
+    background: var(--c);
+    border-color: var(--c);
+    color: #fff;
+    box-shadow: 0 10px 24px -10px rgba(var(--c-rgb), 0.8);
+
+    .sv-ico, .mv-ico { background: rgba(255, 255, 255, 0.2); }
+  }
+}
+
+.sv-btn {
+  min-height: 108px;
+  border-radius: var(--r-lg);
+
+  .sv-ico {
+    width: 46px;
+    height: 46px;
+    border-radius: 50%;
+    background: rgba(var(--c-rgb), 0.12);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    ion-icon { font-size: 24px; }
+  }
+
+  .sv-lbl {
+    font-size: 14px;
+    font-weight: 700;
+  }
+}
+
+// ── Estado vacío / espera ─────────────────────────────────────────────
+.no-event-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 48px 28px;
+  text-align: center;
+
+  .no-event-seal {
+    width: 88px;
+    height: 88px;
+    border-radius: 28px;
+    background: var(--surface);
+    box-shadow: var(--shadow-md);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 22px;
+
+    ion-icon { font-size: 40px; color: var(--brand); }
+  }
+
+  .no-event-seal-error ion-icon { color: var(--bad); }
+
+  .no-event-org {
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--brand);
+    background: var(--brand-50);
+    border-radius: 999px;
+    padding: 5px 12px;
+    margin-bottom: 12px;
+    max-width: 100%;
+  }
+
+  .no-event-title {
+    font-size: 20px;
+    font-weight: 800;
+    letter-spacing: -0.4px;
+    color: var(--text);
+    margin-bottom: 6px;
+  }
+
+  .no-event-sub {
+    font-size: 14px;
+    color: var(--text-2);
+    line-height: 1.5;
+    max-width: 300px;
+  }
+}
+
+// ── Control segmentado (Orden del día / Mis votos) ────────────────────
+.detalle-btns,
+.ev-detalle-btns {
+  display: flex;
+  gap: 4px;
+  padding: 4px;
+  margin-bottom: 14px;
+  background: rgba(21, 21, 28, 0.05);
+  border-radius: var(--r-md);
+}
+
+.detalle-btn,
+.ev-detalle-btn {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  height: 42px;
+  border: none;
+  border-radius: 12px;
+  background: transparent;
+  color: var(--text-2);
+  font-family: var(--font);
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s ease, color 0.2s ease, box-shadow 0.2s ease;
+
+  ion-icon { font-size: 17px; }
+
+  &.detalle-btn-active,
+  &.ev-detalle-btn-active {
+    background: var(--surface);
+    color: var(--brand);
+    font-weight: 700;
+    box-shadow: var(--shadow-sm);
+  }
+}
+
+// ── Panel de detalle (listas) ─────────────────────────────────────────
+.detalle-panel,
+.ev-detalle-panel {
+  background: var(--surface);
+  border-radius: var(--r-lg);
+  box-shadow: var(--shadow-sm);
+  overflow: hidden;
+  margin-bottom: 14px;
+}
+
+.detalle-loading,
+.ev-detalle-loading {
+  display: flex;
+  justify-content: center;
+  padding: 28px;
+}
+
+.detalle-empty,
+.ev-detalle-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 32px 16px;
+  color: var(--text-3);
+  font-size: 14px;
+
+  ion-icon { font-size: 32px; }
+}
+
+.detalle-error,
+.ev-detalle-error,
+.ci-error {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  padding: 28px 16px;
+  color: var(--bad);
+  font-size: 14px;
+  text-align: center;
+
+  ion-icon { font-size: 30px; }
+}
+
+.punto-item,
+.ev-punto-item,
+.voto-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 14px 16px;
+
+  & + & { border-top: 1px solid var(--border); }
+}
+
+.punto-num,
+.ev-punto-num,
+.voto-num {
+  min-width: 30px;
+  height: 30px;
+  border-radius: 10px;
+  background: var(--brand-50);
+  color: var(--brand);
+  font-size: 13px;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.punto-texto,
+.ev-punto-texto {
+  flex: 1;
+  font-size: 14px;
+  color: var(--text);
+  line-height: 1.5;
+  padding-top: 4px;
+}
+
+.voto-info { flex: 1; min-width: 0; }
+
+.voto-punto {
+  font-size: 14px;
+  color: var(--text);
+  line-height: 1.45;
+  margin: 4px 0 8px;
+}
+
+.voto-sentido {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 12px;
+  font-weight: 700;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: rgba(var(--neutral-rgb), 0.12);
+  color: var(--text-2);
+
+  ion-icon { font-size: 14px; }
+
+  &.vs-favor      { background: rgba(var(--ok-rgb), 0.10);   color: var(--ok); }
+  &.vs-abstencion { background: rgba(var(--warn-rgb), 0.14); color: #B45309; }
+  &.vs-contra     { background: rgba(var(--bad-rgb), 0.08);  color: var(--bad); }
+}

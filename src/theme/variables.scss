@@ -1,86 +1,118 @@
-// Tema Institucional — Congreso del Estado de México
-// Guinda #96134B  ·  Dorado #BB945C
+// Tema SPID — moderno y limpio
+// Guinda del logo como acento, neutros fríos como base.
 
 :root {
-  /** primary — Guinda Institucional **/
-  --ion-color-primary: #96134B;
-  --ion-color-primary-rgb: 150, 19, 75;
+  // ── Tokens de diseño (usar en todas las páginas) ────────────────────
+  --brand:        #9B1450;
+  --brand-rgb:    155, 20, 80;
+  --brand-600:    #82103F;
+  --brand-700:    #5E0B2E;
+  --brand-50:     #FDF2F6;
+  --brand-100:    #FAE3EC;
+  --brand-grad:   linear-gradient(135deg, #B3205F 0%, #9B1450 45%, #6A0C34 100%);
+
+  --accent:       #C9A15F;
+  --accent-rgb:   201, 161, 95;
+
+  --bg:           #F4F4F7;
+  --surface:      #FFFFFF;
+  --surface-2:    #F8F8FB;
+  --border:       #ECECF2;
+
+  --text:         #15151C;
+  --text-2:       #5D5D6E;
+  --text-3:       #9B9BAB;
+
+  --ok:           #16A34A;
+  --ok-rgb:       22, 163, 74;
+  --bad:          #E11D48;
+  --bad-rgb:      225, 29, 72;
+  --warn:         #F59E0B;
+  --warn-rgb:     245, 158, 11;
+  --neutral:      #8A8FA3;
+  --neutral-rgb:  138, 143, 163;
+  --info:         #4F6BED;
+  --info-rgb:     79, 107, 237;
+
+  --r-xl: 28px;
+  --r-lg: 22px;
+  --r-md: 16px;
+  --r-sm: 12px;
+
+  --shadow-sm:    0 1px 2px rgba(21, 21, 28, 0.04), 0 2px 8px rgba(21, 21, 28, 0.04);
+  --shadow-md:    0 1px 2px rgba(21, 21, 28, 0.04), 0 8px 28px -8px rgba(21, 21, 28, 0.12);
+  --shadow-brand: 0 14px 34px -12px rgba(155, 20, 80, 0.55);
+
+  --font: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+
+  // ── Ionic ───────────────────────────────────────────────────────────
+  --ion-font-family: var(--font);
+
+  --ion-color-primary: #9B1450;
+  --ion-color-primary-rgb: 155, 20, 80;
   --ion-color-primary-contrast: #ffffff;
   --ion-color-primary-contrast-rgb: 255, 255, 255;
-  --ion-color-primary-shade: #841142;
-  --ion-color-primary-tint: #A02B5D;
+  --ion-color-primary-shade: #881246;
+  --ion-color-primary-tint: #A52C62;
 
-  /** secondary — Dorado Institucional **/
-  --ion-color-secondary: #BB945C;
-  --ion-color-secondary-rgb: 187, 148, 92;
+  --ion-color-secondary: #C9A15F;
+  --ion-color-secondary-rgb: 201, 161, 95;
   --ion-color-secondary-contrast: #ffffff;
   --ion-color-secondary-contrast-rgb: 255, 255, 255;
-  --ion-color-secondary-shade: #A58251;
-  --ion-color-secondary-tint: #C29F6C;
+  --ion-color-secondary-shade: #B18E54;
+  --ion-color-secondary-tint: #CEAA6F;
 
-  /** tertiary **/
-  --ion-color-tertiary: #7A1040;
-  --ion-color-tertiary-rgb: 122, 16, 64;
+  --ion-color-tertiary: #5E0B2E;
+  --ion-color-tertiary-rgb: 94, 11, 46;
   --ion-color-tertiary-contrast: #ffffff;
   --ion-color-tertiary-contrast-rgb: 255, 255, 255;
-  --ion-color-tertiary-shade: #6B0E38;
-  --ion-color-tertiary-tint: #872153;
+  --ion-color-tertiary-shade: #530A28;
+  --ion-color-tertiary-tint: #6E2343;
 
-  /** success **/
-  --ion-color-success: #27AE60;
-  --ion-color-success-rgb: 39, 174, 96;
+  --ion-color-success: #16A34A;
+  --ion-color-success-rgb: 22, 163, 74;
   --ion-color-success-contrast: #ffffff;
   --ion-color-success-contrast-rgb: 255, 255, 255;
-  --ion-color-success-shade: #229950;
-  --ion-color-success-tint: #3DB670;
+  --ion-color-success-shade: #138F41;
+  --ion-color-success-tint: #2DAC5C;
 
-  /** warning **/
-  --ion-color-warning: #E67E22;
-  --ion-color-warning-rgb: 230, 126, 34;
-  --ion-color-warning-contrast: #ffffff;
-  --ion-color-warning-contrast-rgb: 255, 255, 255;
-  --ion-color-warning-shade: #CA6E1D;
-  --ion-color-warning-tint: #E98B38;
+  --ion-color-warning: #F59E0B;
+  --ion-color-warning-rgb: 245, 158, 11;
+  --ion-color-warning-contrast: #000000;
+  --ion-color-warning-contrast-rgb: 0, 0, 0;
+  --ion-color-warning-shade: #D88B0A;
+  --ion-color-warning-tint: #F6A823;
 
-  /** danger **/
-  --ion-color-danger: #C0392B;
-  --ion-color-danger-rgb: 192, 57, 43;
+  --ion-color-danger: #E11D48;
+  --ion-color-danger-rgb: 225, 29, 72;
   --ion-color-danger-contrast: #ffffff;
   --ion-color-danger-contrast-rgb: 255, 255, 255;
-  --ion-color-danger-shade: #A93224;
-  --ion-color-danger-tint: #C64A3D;
+  --ion-color-danger-shade: #C61A3F;
+  --ion-color-danger-tint: #E4345A;
 
-  /** medium **/
-  --ion-color-medium: #8C9BA5;
-  --ion-color-medium-rgb: 140, 155, 165;
+  --ion-color-medium: #8A8FA3;
+  --ion-color-medium-rgb: 138, 143, 163;
   --ion-color-medium-contrast: #ffffff;
   --ion-color-medium-contrast-rgb: 255, 255, 255;
-  --ion-color-medium-shade: #7B888F;
-  --ion-color-medium-tint: #98A5AE;
+  --ion-color-medium-shade: #797E8F;
+  --ion-color-medium-tint: #969AAC;
 
-  /** light **/
-  --ion-color-light: #F5F0F2;
-  --ion-color-light-rgb: 245, 240, 242;
-  --ion-color-light-contrast: #96134B;
-  --ion-color-light-contrast-rgb: 150, 19, 75;
-  --ion-color-light-shade: #E0D8DB;
-  --ion-color-light-tint: #F7F2F4;
+  --ion-color-light: #F4F4F7;
+  --ion-color-light-rgb: 244, 244, 247;
+  --ion-color-light-contrast: #15151C;
+  --ion-color-light-contrast-rgb: 21, 21, 28;
+  --ion-color-light-shade: #D7D7D9;
+  --ion-color-light-tint: #F5F5F8;
 
-  /** fondo y texto global **/
-  --ion-background-color: #F6F3F4;
-  --ion-background-color-rgb: 246, 243, 244;
-  --ion-text-color: #1A1014;
-  --ion-text-color-rgb: 26, 16, 20;
+  --ion-background-color: #F4F4F7;
+  --ion-background-color-rgb: 244, 244, 247;
+  --ion-text-color: #15151C;
+  --ion-text-color-rgb: 21, 21, 28;
 
-  /** toolbar — Guinda con acento Dorado **/
-  --ion-toolbar-background: #96134B;
-  --ion-toolbar-color: #ffffff;
-  --ion-toolbar-segment-color: rgba(255, 255, 255, 0.7);
-  --ion-toolbar-segment-color-checked: #ffffff;
-  --ion-toolbar-segment-background: rgba(255, 255, 255, 0.1);
-  --ion-toolbar-segment-background-checked: #BB945C;
-  --ion-toolbar-border-color: rgba(187, 148, 92, 0.35);
+  // Toolbar claro, sin borde
+  --ion-toolbar-background: #F4F4F7;
+  --ion-toolbar-color: #15151C;
+  --ion-toolbar-border-color: transparent;
 
-  /** item **/
   --ion-item-background: #ffffff;
 }

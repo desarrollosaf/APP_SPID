@@ -1,0 +1,251 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-menu-button></ion-menu-button>
+    </ion-buttons>
+    <div class="toolbar-name-block">
+      <span class="tnb-greeting">Presidencia</span>
+      <span class="tnb-name">{{ nombre }}</span>
+    </div>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <ion-refresher slot="fixed" (ionRefresh)="refrescar($event)">
+    <ion-refresher-content></ion-refresher-content>
+  </ion-refresher>
+
+  <div class="page-pad pres-wrap">
+
+    <!-- ══ Hero con reloj ══ -->
+    <section class="hero">
+      <div class="hero-top">
+        <span class="hero-chip"><ion-icon name="ribbon"></ion-icon> Presidencia</span>
+        <span class="hero-fecha">{{ fechaLarga }}</span>
+      </div>
+      <div class="hero-saludo">{{ saludo }},</div>
+      <div class="hero-nombre">{{ nombre }}</div>
+      <div class="hero-reloj">
+        <span class="hr-hm">{{ hora }}</span><span class="hr-s">:{{ segundos }}</span>
+      </div>
+    </section>
+
+    <!-- ══ Notificar al congreso ══ -->
+    <div class="notify-wrap">
+      <button class="notify" type="button" [class.notify--sending]="enviando" [disabled]="enviando" (click)="notificar()">
+        <span class="notify-ico">
+          <span class="notify-wave"></span>
+          <ion-icon name="volume-high"></ion-icon>
+        </span>
+        <span class="notify-text">
+          <span class="notify-title">{{ enviando ? 'Enviando aviso…' : 'Notificar al congreso' }}</span>
+          <span class="notify-sub">
+            @if (!enviando) { <span class="p6-dot" [attr.data-p6]="p6"></span> }
+            {{ subtituloNotificar }}
+          </span>
+        </span>
+        <span class="notify-go">
+          @if (enviando) { <ion-spinner name="crescent"></ion-spinner> }
+          @else { <ion-icon name="arrow-forward"></ion-icon> }
+        </span>
+      </button>
+      @if (!enviando) {
+        <div class="notify-foot">
+          <button type="button" (click)="consultarP6()"><ion-icon name="refresh"></ion-icon> Revisar estado del P-6</button>
+        </div>
+      }
+    </div>
+
+    <!-- ══ Ahora en el Congreso ══ -->
+    @if (!cargando && !errorAgenda) {
+      <section class="now">
+        <div class="now-hdr">
+          <span class="now-title">Ahora en el Congreso</span>
+          @if (enCurso.length) {
+            <span class="now-live"><span class="live-dot"></span>{{ enCurso.length }} en curso</span>
+          }
+        </div>
+
+        @for (e of enCurso; track e.id) {
+          <div class="now-ev">
+            <div class="now-ev-top">
+              <span class="now-time">{{ e.horaInicio }} – {{ e.horaFin ?? '…' }}</span>
+            </div>
+            <div class="now-ev-title">{{ e.titulo }}</div>
+            <div class="now-place"><ion-icon name="location"></ion-icon>{{ e.ubicacion }}</div>
+            <div class="now-bar"><span [style.width.%]="avance(e)"></span></div>
+          </div>
+        } @empty {
+          <div class="now-empty">
+            <ion-icon name="cafe-outline"></ion-icon>
+            No hay eventos en curso en este momento.
+          </div>
+        }
+
+        @if (siguiente; as sig) {
+          <div class="now-next">
+            <span class="now-next-ico"><ion-icon name="arrow-forward"></ion-icon></span>
+            <div class="now-next-body">
+              <span class="now-next-when">Siguiente · {{ cuando(sig) }}</span>
+              <span class="now-next-title">{{ sig.titulo }}</span>
+              <span class="now-next-place">{{ sig.ubicacion }}</span>
+            </div>
+          </div>
+        }
+      </section>
+    }
+
+    <!-- ══ Indicadores ══ -->
+    <div class="stats">
+      <button type="button" class="stat stat--link" (click)="elegir(diasTira[0].iso)">
+        <span class="stat-ico stat-ico--brand"><ion-icon name="calendar"></ion-icon></span>
+        <span class="stat-num">{{ resumen?.totales?.eventosHoy ?? '–' }}</span>
+        <span class="stat-lbl">Eventos hoy</span>
+      </button>
+      <button type="button" class="stat stat--link" (click)="elegir('todos')">
+        <span class="stat-ico stat-ico--accent"><ion-icon name="time"></ion-icon></span>
+        <span class="stat-num">{{ resumen?.totales?.proximosEventos ?? '–' }}</span>
+        <span class="stat-lbl">Próx. 7 días</span>
+      </button>
+      <a class="stat stat--link" routerLink="salones">
+        <span class="stat-ico stat-ico--ok"><ion-icon name="business"></ion-icon></span>
+        <span class="stat-num">{{ resumen?.totales?.salonesOcupados ?? '–' }}<small>/{{ resumen?.totales?.salonesDisponibles ?? '–' }}</small></span>
+        <span class="stat-lbl">Salones ocupados</span>
+      </a>
+    </div>
+
+    <!-- ══ Accesos ══ -->
+    <div class="links">
+      <a class="link-card" routerLink="sesiones">
+        <span class="link-ico link-ico--brand"><ion-icon name="play-circle"></ion-icon></span>
+        <span class="link-text">
+          <span class="link-title">Sesiones</span>
+          <span class="link-sub">Orden del día, videos y votos</span>
+        </span>
+        <ion-icon name="chevron-forward" class="link-chev"></ion-icon>
+      </a>
+      <a class="link-card" routerLink="salones">
+        <span class="link-ico link-ico--ok"><ion-icon name="business"></ion-icon></span>
+        <span class="link-text">
+          <span class="link-title">Salones</span>
+          <span class="link-sub">Ocupación en tiempo real</span>
+        </span>
+        <ion-icon name="chevron-forward" class="link-chev"></ion-icon>
+      </a>
+    </div>
+
+    <!-- ══ Agenda ══ -->
+    <div class="agenda-hdr">
+      <h2 class="agenda-title">Agenda</h2>
+      <button class="cal-toggle" type="button" [class.cal-toggle--on]="calendarioAbierto" (click)="calendarioAbierto = !calendarioAbierto" aria-label="Calendario del mes">
+        <ion-icon name="calendar-outline"></ion-icon>
+      </button>
+    </div>
+
+    @if (calendarioAbierto) {
+      <div class="cal">
+        <div class="cal-head">
+          <button type="button" (click)="cambiarMes(-1)" aria-label="Mes anterior"><ion-icon name="chevron-back"></ion-icon></button>
+          <span>{{ etiquetaMes }}</span>
+          <button type="button" (click)="cambiarMes(1)" aria-label="Mes siguiente"><ion-icon name="chevron-forward"></ion-icon></button>
+        </div>
+        <div class="cal-semana">
+          @for (d of diasSemana; track $index) { <span>{{ d }}</span> }
+        </div>
+        <div class="cal-grid">
+          @for (dia of diasDelMes; track $index) {
+            @if (dia) {
+              <button type="button" class="cal-dia"
+                      [class.cal-dia--hoy]="esHoy(dia)"
+                      [class.cal-dia--sel]="esSeleccionado(dia)"
+                      [class.cal-dia--ev]="tieneEvento(dia)"
+                      (click)="elegirDia(dia)">
+                {{ dia.getDate() }}
+              </button>
+            } @else {
+              <span></span>
+            }
+          }
+        </div>
+      </div>
+    }
+
+    <!-- Tira de días -->
+    <div class="strip">
+      @for (d of diasTira; track d.iso) {
+        <button type="button" class="strip-day" [class.strip-day--on]="seleccion === d.iso" (click)="elegir(d.iso)">
+          <span class="sd-letra">{{ d.hoy ? 'Hoy' : d.letra }}</span>
+          <span class="sd-num">{{ d.dia }}</span>
+          <span class="sd-dots">
+            @for (p of puntos(d.eventos); track $index) { <i></i> }
+          </span>
+        </button>
+      }
+      <button type="button" class="strip-day strip-day--all" [class.strip-day--on]="seleccion === 'todos'" (click)="elegir('todos')">
+        <ion-icon name="list"></ion-icon>
+        <span class="sd-letra">Todo</span>
+      </button>
+    </div>
+
+    <div class="search">
+      <ion-icon name="search"></ion-icon>
+      <input type="search" placeholder="Buscar evento o sede" [(ngModel)]="busqueda" />
+    </div>
+
+    <div class="list-hdr">
+      <span>{{ tituloLista }}</span>
+      @if (!cargando) { <span class="list-count">{{ eventos.length }}</span> }
+    </div>
+
+    @if (cargando) {
+      <div class="skeleton-list">
+        @for (i of [1, 2, 3]; track i) { <div class="skeleton"></div> }
+      </div>
+    } @else if (errorAgenda) {
+      <div class="state">
+        <ion-icon name="cloud-offline-outline"></ion-icon>
+        <span>No se pudo cargar la agenda.</span>
+        <button class="btn-ghost" type="button" (click)="cargar(true)">
+          <ion-icon name="refresh-outline"></ion-icon> Reintentar
+        </button>
+      </div>
+    } @else {
+      <!-- Línea de tiempo -->
+      <div class="tl">
+        @for (ev of eventos; track ev.id; let i = $index) {
+          @if (mostrarFecha(i)) {
+            <div class="tl-day">{{ fechaDia(ev.fecha) }}</div>
+          }
+          <div class="tl-item" [attr.data-estado]="estado(ev)" [attr.data-color]="ev.color">
+            <div class="tl-time">
+              <span class="tl-hi">{{ ev.horaInicio }}</span>
+              @if (ev.horaFin) { <span class="tl-hf">{{ ev.horaFin }}</span> }
+            </div>
+            <div class="tl-rail"><span class="tl-dot"></span></div>
+            <div class="tl-card">
+              @if (estado(ev) === 'en-curso') {
+                <span class="tl-live"><span class="live-dot"></span>En curso</span>
+              }
+              <div class="tl-title">{{ ev.titulo }}</div>
+              <div class="tl-place"><ion-icon name="location-outline"></ion-icon>{{ ev.ubicacion }}</div>
+              <div class="tl-foot">
+                <span class="tl-tag">{{ ev.tipo }}</span>
+                @if (estado(ev) === 'pasado') { <span class="tl-done"><ion-icon name="checkmark"></ion-icon>Terminado</span> }
+              </div>
+              @if (estado(ev) === 'en-curso') {
+                <div class="tl-bar"><span [style.width.%]="avance(ev)"></span></div>
+              }
+            </div>
+          </div>
+        } @empty {
+          <div class="state">
+            <ion-icon name="calendar-clear-outline"></ion-icon>
+            <span>{{ busqueda ? 'Ningún evento coincide con la búsqueda.' : 'No hay eventos este día.' }}</span>
+          </div>
+        }
+      </div>
+    }
+
+  </div>
+
+</ion-content>

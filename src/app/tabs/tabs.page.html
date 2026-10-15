@@ -13,9 +13,16 @@
     </ion-tab-button>
 
     <ion-tab-button tab="comisiones">
-      <ion-icon name="people-circle-outline"></ion-icon>
+      <ion-icon name="people-outline"></ion-icon>
       <ion-label>Comisiones</ion-label>
     </ion-tab-button>
+
+    @if (esPresidente) {
+      <ion-tab-button tab="presidencia">
+        <ion-icon name="ribbon-outline"></ion-icon>
+        <ion-label>Presidencia</ion-label>
+      </ion-tab-button>
+    }
 
   </ion-tab-bar>
 

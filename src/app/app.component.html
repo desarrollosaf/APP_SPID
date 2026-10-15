@@ -3,31 +3,14 @@
   <!-- ══ SPLASH SCREEN ══ -->
   @if (!splashDone) {
     <div class="splash" [class.splash--exit]="splashExiting">
+      <div class="sp-blob sp-blob--1"></div>
+      <div class="sp-blob sp-blob--2"></div>
 
-      <!-- Anillos de pulso -->
-      <div class="sp-ring sp-ring--1"></div>
-      <div class="sp-ring sp-ring--2"></div>
-      <div class="sp-ring sp-ring--3"></div>
-
-      <!-- Partículas doradas -->
-      <span class="sp-p sp-p--1"></span>
-      <span class="sp-p sp-p--2"></span>
-      <span class="sp-p sp-p--3"></span>
-      <span class="sp-p sp-p--4"></span>
-      <span class="sp-p sp-p--5"></span>
-      <span class="sp-p sp-p--6"></span>
-
-      <!-- Contenido central -->
       <div class="sp-body">
-        <div class="sp-seal">
-          <div class="sp-seal-glow"></div>
-          <ion-icon name="business-outline" class="sp-icon"></ion-icon>
-        </div>
-        <div class="sp-title">Congreso del Estado de México</div>
-        <div class="sp-divider"><span></span></div>
+        <img src="assets/congreso_logo.png" alt="Congreso del Estado de México" class="sp-logo" />
         <div class="sp-subtitle">Sistema de Votación Digital</div>
+        <div class="sp-progress"><span></span></div>
       </div>
-
     </div>
   }
 
@@ -47,38 +30,39 @@
   <ion-split-pane contentId="main-content" when="false">
     <ion-menu contentId="main-content" type="overlay" [disabled]="!isAuthenticated">
       <ion-content>
-        <ion-list id="inbox-list">
-          <ion-list-header>Inicio</ion-list-header>
-          <ion-note>Congreso del Estado de Mexico </ion-note>
+        <div class="menu-wrap">
 
-          @for (p of appPages; track p; let i = $index) {
-            <ion-menu-toggle auto-hide="false">
-              @if (p.action === 'logout') {
-                <ion-item lines="none" detail="false" (click)="logout()">
-                  <ion-icon slot="start" ios="log-out-outline" md="log-out-sharp"></ion-icon>
-                  <ion-label>{{ p.title }}</ion-label>
-                </ion-item>
-              } @else {
-                <ion-item routerDirection="root" [routerLink]="[p.url]" lines="none" detail="false" routerLinkActive="selected">
-                  <ion-icon slot="start" [ios]="p.icon + '-outline'" [md]="p.icon + '-sharp'"></ion-icon>
-                  <ion-label>{{ p.title }}</ion-label>
-                </ion-item>
+          <div class="menu-brand">
+            <img src="assets/congreso_logo.png" alt="Congreso del Estado de México" />
+            <span class="menu-brand-sub">Sistema de Votación Digital</span>
+          </div>
+
+          <nav class="menu-nav">
+            @for (p of appPages; track p) {
+              @if (p.action !== 'logout' && (!p.soloPresidente || esPresidente)) {
+                <ion-menu-toggle auto-hide="false">
+                  <a class="menu-item" routerDirection="root" [routerLink]="[p.url]" routerLinkActive="selected">
+                    <span class="menu-ico"><ion-icon [name]="p.icon + '-outline'"></ion-icon></span>
+                    <span class="menu-label">{{ p.title }}</span>
+                    <ion-icon name="chevron-forward" class="menu-chev"></ion-icon>
+                  </a>
+                </ion-menu-toggle>
               }
-            </ion-menu-toggle>
-          }
-          
-        </ion-list>
+            }
+          </nav>
 
-        <!-- <ion-list id="labels-list">
-          <ion-list-header>Labels</ion-list-header>
-
-          @for (label of labels; track label) {
-            <ion-item lines="none">
-              <ion-icon aria-hidden="true" slot="start" ios="bookmark-outline" md="bookmark-sharp"></ion-icon>
-              <ion-label>{{ label }}</ion-label>
-            </ion-item>
+          @for (p of appPages; track p) {
+            @if (p.action === 'logout') {
+              <ion-menu-toggle auto-hide="false">
+                <button class="menu-logout" type="button" (click)="logout()">
+                  <ion-icon name="log-out-outline"></ion-icon>
+                  <span>{{ p.title }}</span>
+                </button>
+              </ion-menu-toggle>
+            }
           }
-        </ion-list> -->
+
+        </div>
       </ion-content>
     </ion-menu>
     <ion-router-outlet id="main-content"></ion-router-outlet>

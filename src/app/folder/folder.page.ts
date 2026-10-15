@@ -10,6 +10,7 @@ import { User } from '../service/user';
 })
 export class FolderPage implements OnInit, ViewWillEnter {
   nombreDiputado: string = '';
+  fechaHoy: string = '';
 
   constructor(private userService: User) {}
 
@@ -17,5 +18,7 @@ export class FolderPage implements OnInit, ViewWillEnter {
 
   ionViewWillEnter(): void {
     this.nombreDiputado = this.userService.nombreCompleto;
+    const fecha = new Date().toLocaleDateString('es-MX', { weekday: 'long', day: 'numeric', month: 'long' });
+    this.fechaHoy = fecha.charAt(0).toUpperCase() + fecha.slice(1);
   }
 }

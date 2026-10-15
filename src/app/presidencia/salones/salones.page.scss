@@ -1,0 +1,381 @@
+@use '../../../theme/ui';
+@use '../pres';
+
+// ── Indicadores en vivo ───────────────────────────────────────────────
+.live-stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
+.ls {
+  --c: var(--brand);
+  --c-rgb: var(--brand-rgb);
+
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 14px 12px;
+  border-radius: var(--r-lg);
+  background: var(--surface);
+  box-shadow: var(--shadow-sm);
+  border: none;
+  border-top: 3px solid var(--c);
+  font-family: var(--font);
+  text-align: left;
+  cursor: pointer;
+  transition: transform 0.15s ease, background 0.2s ease, box-shadow 0.2s ease;
+
+  &:active { transform: scale(0.97); }
+
+  &--on {
+    background: rgba(var(--c-rgb), 0.10);
+    box-shadow: 0 0 0 2px var(--c) inset, var(--shadow-sm);
+  }
+
+  &--bad    { --c: var(--bad); --c-rgb: var(--bad-rgb); }
+  &--accent { --c: #A9823F;    --c-rgb: var(--accent-rgb); }
+  &--ok     { --c: var(--ok);  --c-rgb: var(--ok-rgb); }
+}
+
+.ls-num {
+  font-size: 28px;
+  font-weight: 800;
+  letter-spacing: -0.8px;
+  line-height: 1;
+  color: var(--c);
+}
+
+.ls-lbl {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-2);
+
+  .live-dot { width: 6px; height: 6px; }
+}
+
+// ── Navegación por día ────────────────────────────────────────────────
+.day-nav {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
+
+  > button {
+    width: 46px;
+    height: 46px;
+    flex-shrink: 0;
+    border: none;
+    border-radius: var(--r-md);
+    background: var(--surface);
+    box-shadow: var(--shadow-sm);
+    color: var(--text);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+
+    ion-icon { font-size: 18px; }
+    &:active { transform: scale(0.95); }
+  }
+}
+
+.day-label {
+  position: relative;
+  flex: 1;
+  height: 46px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border-radius: var(--r-md);
+  background: var(--surface);
+  box-shadow: var(--shadow-sm);
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text);
+  cursor: pointer;
+
+  ion-icon { font-size: 17px; color: var(--brand); }
+
+  // El selector nativo queda encima, invisible, para abrir el calendario del sistema
+  input {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    width: 100%;
+    cursor: pointer;
+  }
+}
+
+// ── Tarjeta de salón ──────────────────────────────────────────────────
+.salones {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.salon {
+  padding: 16px;
+  border-radius: var(--r-lg);
+  background: var(--surface);
+  box-shadow: var(--shadow-sm);
+}
+
+.salon-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
+.salon-dot {
+  width: 10px;
+  height: 10px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  background: var(--sc, var(--brand));
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--sc, var(--brand)) 20%, transparent);
+}
+
+.salon-name {
+  flex: 1;
+  min-width: 0;
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text);
+  line-height: 1.3;
+}
+
+.salon-state {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  flex-shrink: 0;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 700;
+  background: var(--surface-2);
+  color: var(--text-2);
+
+  .live-dot { width: 6px; height: 6px; }
+
+  &[data-state='en-evento']    { background: rgba(var(--bad-rgb), 0.10); color: var(--bad); }
+  &[data-state='proximamente'] { background: rgba(var(--accent-rgb), 0.18); color: #8A6A32; }
+  &[data-state='disponible']   { background: rgba(var(--ok-rgb), 0.10); color: var(--ok); }
+}
+
+// Línea de tiempo 08:00 – 20:00
+.track {
+  position: relative;
+  height: 14px;
+  border-radius: 7px;
+  background: var(--surface-2);
+  overflow: hidden;
+}
+
+.track-bar {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  padding: 0;
+  border: none;
+  border-radius: 7px;
+  background: var(--sc, var(--brand));
+  opacity: 0.85;
+  cursor: pointer;
+}
+
+.track-now {
+  position: absolute;
+  top: -2px;
+  bottom: -2px;
+  width: 2px;
+  margin-left: -1px;
+  background: var(--bad);
+  box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.9);
+}
+
+.track-scale {
+  display: flex;
+  justify-content: space-between;
+  margin: 6px 0 4px;
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--text-3);
+  font-variant-numeric: tabular-nums;
+}
+
+.salon-events {
+  display: flex;
+  flex-direction: column;
+  margin-top: 8px;
+  border-top: 1px solid var(--border);
+}
+
+.se {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 0;
+  border: none;
+  border-bottom: 1px solid var(--border);
+  background: transparent;
+  font-family: var(--font);
+  text-align: left;
+  cursor: pointer;
+
+  &:last-child { border-bottom: none; padding-bottom: 0; }
+
+  ion-icon { font-size: 15px; color: var(--text-3); flex-shrink: 0; }
+}
+
+.se-time {
+  flex-shrink: 0;
+  min-width: 92px;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text-2);
+  font-variant-numeric: tabular-nums;
+}
+
+.se-title {
+  flex: 1;
+  min-width: 0;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text);
+  line-height: 1.35;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.salon-free {
+  margin-top: 10px;
+  font-size: 13px;
+  color: var(--text-3);
+}
+
+// ── Lista semana / mes ────────────────────────────────────────────────
+.ev--btn {
+  width: 100%;
+  border: none;
+  font-family: var(--font);
+  text-align: left;
+  cursor: pointer;
+  &:active { transform: scale(0.99); }
+}
+
+.mini-dot {
+  width: 8px;
+  height: 8px;
+  margin-top: 3px;
+  flex-shrink: 0;
+  border-radius: 50%;
+}
+
+// ── Detalle ───────────────────────────────────────────────────────────
+.det-salon {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 10px;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-2);
+}
+
+.det-rows {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 6px 14px;
+  border-radius: var(--r-md);
+  background: var(--surface-2);
+}
+
+.det-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 0;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text);
+
+  & + & { border-top: 1px solid var(--border); }
+
+  ion-icon { font-size: 18px; color: var(--brand); }
+}
+
+// ── Filtro activo ─────────────────────────────────────────────────────
+.filter-on {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 10px 12px 10px 14px;
+  margin-bottom: 12px;
+  border-radius: var(--r-md);
+  background: var(--text);
+  color: #fff;
+  font-size: 13px;
+  font-weight: 700;
+
+  span { display: inline-flex; align-items: center; gap: 6px; }
+  ion-icon { font-size: 14px; }
+
+  button {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 5px 10px;
+    border: none;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.16);
+    color: #fff;
+    font-family: var(--font);
+    font-size: 12px;
+    font-weight: 700;
+    cursor: pointer;
+  }
+}
+
+// ── Estado de cada evento del salón ───────────────────────────────────
+.se[data-estado='pasado'] {
+  .se-time, .se-title { color: var(--text-3); }
+}
+
+.se[data-estado='en-curso'] {
+  margin: 0 -10px;
+  padding-left: 10px;
+  padding-right: 10px;
+  border-radius: var(--r-md);
+  background: rgba(var(--bad-rgb), 0.06);
+  border-bottom-color: transparent;
+
+  .se-time { color: var(--bad); }
+}
+
+.se-now {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  margin-right: 6px;
+  padding: 1px 8px;
+  border-radius: 999px;
+  background: rgba(var(--bad-rgb), 0.12);
+  color: var(--bad);
+  font-size: 11px;
+  font-weight: 800;
+  vertical-align: 1px;
+
+  .live-dot { width: 6px; height: 6px; }
+}
