@@ -3,6 +3,7 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { AlertController, ToastController, ViewWillEnter, ViewWillLeave } from '@ionic/angular';
 import { User } from '../../service/user';
 import { HapticsService } from '../../service/haptics.service';
+import { SocketService } from '../../service/socket.service';
 import {
   EstadoEvento, EventoAgenda, PresidenciaService, ResumenAgenda,
   aFechaLocal, aIso, avanceEvento, estadoEvento, faltaPara, sumarDias,
@@ -37,7 +38,11 @@ export class PanelPresidenciaPage implements ViewWillEnter, ViewWillLeave, OnDes
   enviando = false;
   p6: 'consultando' | 'conectado' | 'desconectado' | 'sin-conexion' = 'consultando';
 
+  /** Sesión del Pleno en curso (llega por el socket); resalta el acceso "Sesión del Pleno". */
+  sesionPleno: { titulo: string; idAgenda: string } | null = null;
+
   private reloj?: ReturnType<typeof setInterval>;
+  private dejarDeEscuchar?: () => void;
 
   constructor(
     private userService: User,
@@ -45,6 +50,7 @@ export class PanelPresidenciaPage implements ViewWillEnter, ViewWillLeave, OnDes
     private haptics: HapticsService,
     private alertCtrl: AlertController,
     private toastCtrl: ToastController,
+    private socketService: SocketService,
   ) {}
 
   ionViewWillEnter(): void {
@@ -53,14 +59,21 @@ export class PanelPresidenciaPage implements ViewWillEnter, ViewWillLeave, OnDes
     this.reloj = setInterval(() => (this.ahora = new Date()), 1000);
     if (!this.resumen) this.cargar();
     if (this.esPresidente) this.consultarP6();
+
+    this.socketService.conectarComoDiputado(this.userService.integranteLegislaturaId);
+    this.dejarDeEscuchar?.();
+    this.dejarDeEscuchar = this.socketService.escucharSesionPlenaria(s => (this.sesionPleno = s));
   }
 
   ionViewWillLeave(): void {
     clearInterval(this.reloj);
+    this.dejarDeEscuchar?.();
+    this.dejarDeEscuchar = undefined;
   }
 
   ngOnDestroy(): void {
     clearInterval(this.reloj);
+    this.dejarDeEscuchar?.();
   }
 
   cargar(refrescar = false, refresher?: { complete: () => void }): void {

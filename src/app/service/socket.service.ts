@@ -155,34 +155,67 @@ export class SocketService {
     else socket.once('connect', emit);
   }
 
+  // Se guarda el callback de la pestaña Sesión para quitar solo ese al salir;
+  // así no se borran otros oyentes de los mismos eventos (p. ej. el de Inicio).
+  private sesionesActivasCb?: (lista: any[]) => void;
+  private sesionIniciadaCb?: (data: any) => void;
+  private sesionTerminadaCb?: (data: any) => void;
+
   onSesionesActivas(cb: (lista: any[]) => void): void {
     const s = this.ensureConnected();
-    s.off('sesiones-activas');
+    if (this.sesionesActivasCb) s.off('sesiones-activas', this.sesionesActivasCb);
+    this.sesionesActivasCb = cb;
     s.on('sesiones-activas', cb);
   }
 
   offSesionesActivas(): void {
-    this.socket?.off('sesiones-activas');
+    if (this.sesionesActivasCb) this.socket?.off('sesiones-activas', this.sesionesActivasCb);
+    this.sesionesActivasCb = undefined;
   }
 
   onSesionIniciada(cb: (data: any) => void): void {
     const s = this.ensureConnected();
-    s.off('sesion-iniciada');
+    if (this.sesionIniciadaCb) s.off('sesion-iniciada', this.sesionIniciadaCb);
+    this.sesionIniciadaCb = cb;
     s.on('sesion-iniciada', cb);
   }
 
   offSesionIniciada(): void {
-    this.socket?.off('sesion-iniciada');
+    if (this.sesionIniciadaCb) this.socket?.off('sesion-iniciada', this.sesionIniciadaCb);
+    this.sesionIniciadaCb = undefined;
   }
 
   onSesionTerminada(cb: (data: { clave: string; idAgenda: string; esComision?: boolean; idComision?: string; idComisiones?: string[] }) => void): void {
     const s = this.ensureConnected();
-    s.off('sesion-terminada');
+    if (this.sesionTerminadaCb) s.off('sesion-terminada', this.sesionTerminadaCb);
+    this.sesionTerminadaCb = cb;
     s.on('sesion-terminada', cb);
   }
 
   offSesionTerminada(): void {
-    this.socket?.off('sesion-terminada');
+    if (this.sesionTerminadaCb) this.socket?.off('sesion-terminada', this.sesionTerminadaCb);
+    this.sesionTerminadaCb = undefined;
+  }
+
+  /** Avisa si hay sesión del Pleno en curso (para Inicio). Regresa la función para dejar de escuchar;
+   *  usa sus propios oyentes, así que no interfiere con los de la pestaña Sesión. */
+  escucharSesionPlenaria(cb: (sesion: { titulo: string; idAgenda: string } | null) => void): () => void {
+    const s = this.ensureConnected();
+    const alListar = (lista: any[]) => {
+      const p = (lista ?? []).find((x: any) => !x.esComision);
+      cb(p ? { titulo: p.titulo ?? '', idAgenda: p.idAgenda ?? '' } : null);
+    };
+    const alIniciar = (d: any) => { if (!d?.esComision) cb({ titulo: d.titulo ?? '', idAgenda: d.idAgenda ?? '' }); };
+    const alTerminar = (d: any) => { if (!d?.esComision) cb(null); };
+    s.on('sesiones-activas', alListar);
+    s.on('sesion-iniciada', alIniciar);
+    s.on('sesion-terminada', alTerminar);
+    this.emitGetSesionesActivas();
+    return () => {
+      s.off('sesiones-activas', alListar);
+      s.off('sesion-iniciada', alIniciar);
+      s.off('sesion-terminada', alTerminar);
+    };
   }
 
   // ── Actualizaciones desde el admin ───────────────────────────────────────

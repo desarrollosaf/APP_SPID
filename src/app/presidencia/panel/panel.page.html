@@ -36,29 +36,25 @@
 
     <!-- ══ Notificar al congreso (solo Presidencia) ══ -->
     @if (esPresidente) {
-    <div class="notify-wrap">
-      <button class="notify" type="button" [class.notify--sending]="enviando" [disabled]="enviando" (click)="notificar()">
-        <span class="notify-ico">
+    <div class="pq">
+      <!-- Notificar al congreso -->
+      <button class="pq-tile pq-tile--notify" type="button" [class.notify--sending]="enviando" [disabled]="enviando" (click)="notificar()">
+        <span class="pq-ico notify-ico">
           <span class="notify-wave"></span>
-          <ion-icon name="volume-high"></ion-icon>
+          @if (enviando) { <ion-spinner name="crescent"></ion-spinner> } @else { <ion-icon name="volume-high"></ion-icon> }
         </span>
-        <span class="notify-text">
-          <span class="notify-title">{{ enviando ? 'Enviando aviso…' : 'Notificar al congreso' }}</span>
-          <span class="notify-sub">
-            @if (!enviando) { <span class="p6-dot" [attr.data-p6]="p6"></span> }
-            {{ subtituloNotificar }}
-          </span>
-        </span>
-        <span class="notify-go">
-          @if (enviando) { <ion-spinner name="crescent"></ion-spinner> }
-          @else { <ion-icon name="arrow-forward"></ion-icon> }
-        </span>
+        <span class="pq-title">{{ enviando ? 'Enviando…' : 'Notificar al congreso' }}</span>
+        <span class="pq-sub"><span class="p6-dot" [attr.data-p6]="p6"></span>{{ p6 === 'conectado' ? 'En línea' : p6 === 'consultando' ? 'Revisando…' : 'Sin conexión' }}</span>
       </button>
-      @if (!enviando) {
-        <div class="notify-foot">
-          <button type="button" (click)="consultarP6()"><ion-icon name="refresh"></ion-icon> Revisar estado del P-6</button>
-        </div>
-      }
+
+      <!-- Sesión del Pleno -->
+      <a class="pq-tile" [class.quick-card--live]="sesionPleno" routerLink="/tabs/sesiones">
+        @if (sesionPleno) { <span class="pq-live"><span class="live-dot"></span></span> }
+        <span class="pq-ico qc-ico--brand"><ion-icon name="library"></ion-icon></span>
+        <span class="pq-title">Sesión del Pleno</span>
+        <span class="pq-sub">{{ sesionPleno ? 'En vivo' : 'Asistencia y votaciones' }}</span>
+      </a>
+
     </div>
 
     }
@@ -69,10 +65,16 @@
     <div class="section-title">Accesos rápidos</div>
 
     <div class="quick-grid">
-      <a class="quick-card" routerLink="/tabs/sesiones">
+      <a class="quick-card" [class.quick-card--live]="sesionPleno" routerLink="/tabs/sesiones">
+        @if (sesionPleno) {
+          <span class="qc-live"><span class="live-dot"></span>En vivo</span>
+        }
         <span class="qc-ico qc-ico--brand"><ion-icon name="library"></ion-icon></span>
         <span class="qc-title">Sesión del Pleno</span>
-        <span class="qc-sub">Asistencia y votaciones</span>
+        <span class="qc-sub">{{ sesionPleno ? (sesionPleno.titulo || 'Sesión en curso') : 'Asistencia y votaciones' }}</span>
+        @if (sesionPleno) {
+          <span class="qc-go">Entrar <ion-icon name="arrow-forward"></ion-icon></span>
+        }
       </a>
 
       <a class="quick-card" routerLink="/tabs/comisiones">
@@ -81,15 +83,6 @@
         <span class="qc-sub">Eventos e integrantes</span>
       </a>
     </div>
-
-    <a class="list-card" routerLink="/cambiar-password">
-      <span class="qc-ico qc-ico--neutral"><ion-icon name="key"></ion-icon></span>
-      <span class="lc-text">
-        <span class="qc-title">Seguridad</span>
-        <span class="qc-sub">Cambiar contraseña</span>
-      </span>
-      <ion-icon name="chevron-forward" class="lc-chev"></ion-icon>
-    </a>
 
     }
 

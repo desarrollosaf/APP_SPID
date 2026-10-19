@@ -4,6 +4,10 @@ export const environment = {
   socketUrl: 'https://parlamentario.congresoedomex.gob.mx',
   socketPath: '/socket.io',
 
+  // Transmisión que se muestra en la pestaña Sesión mientras hay sesión en curso.
+  // Acepta cualquier enlace de YouTube (watch?v=, youtu.be/, /live/). Vacío = sin video.
+  sesionVideoUrl: 'https://www.youtube.com/watch?v=XaqTPouuyE4',
+
   // Módulo de Presidencia (portado de SIPresidencia)
   presidencia: {
     // Usuarios con acceso, por correo o nombre completo (sin importar acentos ni mayúsculas).

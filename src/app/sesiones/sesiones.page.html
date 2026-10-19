@@ -14,8 +14,9 @@
 
   <div class="page-pad">
 
-    <!-- ══ BANNER EN VIVO — siempre visible cuando hay sesión activa ══ -->
-    @if (sesionActiva) {
+    <!-- ══ BANNER EN VIVO ══
+         Sin evento abierto y con video, el banner va integrado debajo del video (ver "live-card"). -->
+    @if (sesionActiva && !(videoUrl && evento != 2 && evento != 3)) {
       <div class="session-banner">
         <div class="banner-left">
           <span class="pulse-dot"></span>
@@ -34,6 +35,15 @@
         </div>
       </div>
     }
+
+    <!-- Reproductor de la transmisión (se reutiliza en los dos acomodos) -->
+    <ng-template #reproductor>
+      <div class="lv-frame">
+        <iframe [src]="videoUrl" title="Transmisión de la sesión"
+                allow="autoplay; encrypted-media; picture-in-picture; fullscreen"
+                allowfullscreen referrerpolicy="strict-origin-when-cross-origin"></iframe>
+      </div>
+    </ng-template>
 
     <!-- ══════════════════════════════════════════
          ESTADO 2 — REGISTRO DE ASISTENCIA
@@ -144,11 +154,38 @@
       </div>
     }
 
+    @if (sesionActiva && videoUrl && (evento == 2 || evento == 3)) {
+      <div class="lv-section">
+        <div class="lv-label"><span class="live-dot"></span>Transmisión en vivo</div>
+        <div class="lv-solo">
+          <ng-container *ngTemplateOutlet="reproductor"></ng-container>
+        </div>
+      </div>
+    }
+
     <!-- ══════════════════════════════════════════
          DEFAULT — SIN EVENTO ACTIVO
     ══════════════════════════════════════════ -->
     @else {
       @if (sesionActiva) {
+
+        @if (videoUrl) {
+          <div class="live-card">
+            <ng-container *ngTemplateOutlet="reproductor"></ng-container>
+            <div class="lc-info">
+              <div class="lc-text">
+                <span class="lc-live"><span class="live-dot"></span>En vivo</span>
+                <span class="lc-title">{{ sesionNombre || 'Sesión del Pleno' }}</span>
+              </div>
+              @if (asistenciaRegistrada) {
+                <div class="lc-badge">
+                  <ion-icon name="checkmark-circle"></ion-icon>
+                  <span>Asistencia</span>
+                </div>
+              }
+            </div>
+          </div>
+        }
 
         <!-- Botones de consulta -->
         <div class="detalle-btns">
@@ -163,7 +200,7 @@
         </div>
 
         <!-- Estado de espera -->
-        @if (!vistaDetalle || vistaDetalle === 'none') {
+        @if (!videoUrl && (!vistaDetalle || vistaDetalle === 'none')) {
           <div class="no-event-wrap">
             <div class="no-event-seal">
               <ion-icon name="hourglass-outline"></ion-icon>

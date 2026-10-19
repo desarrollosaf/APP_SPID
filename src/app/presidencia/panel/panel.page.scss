@@ -892,7 +892,7 @@
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 12px;
-  margin-bottom: 12px;
+  margin-bottom: 20px;
 }
 
 .quick-card,
@@ -979,3 +979,142 @@
     filter: grayscale(0.2);
   }
 }
+
+// ── "Sesión del Pleno" resaltado cuando hay sesión en curso ──────────
+@keyframes qc-live-glow {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(var(--bad-rgb), 0.28), var(--shadow-sm); }
+  50%      { box-shadow: 0 0 0 6px rgba(var(--bad-rgb), 0), var(--shadow-md); }
+}
+
+.quick-card { position: relative; }
+
+.quick-card--live {
+  outline: 2px solid rgba(var(--bad-rgb), 0.55);
+  outline-offset: -2px;
+  animation: qc-live-glow 2s ease-in-out infinite;
+
+  .qc-ico { background: rgba(var(--bad-rgb), 0.10); color: var(--bad); }
+
+  .qc-sub {
+    color: var(--text-2);
+    font-weight: 600;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+}
+
+.qc-live {
+  position: absolute;
+  top: 14px;
+  right: 12px;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 9px;
+  border-radius: 999px;
+  background: rgba(var(--bad-rgb), 0.10);
+  color: var(--bad);
+  font-size: 11px;
+  font-weight: 800;
+
+  .live-dot { width: 6px; height: 6px; }
+}
+
+.qc-go {
+  display: inline-flex;
+  align-items: center;
+  align-self: flex-start;
+  gap: 4px;
+  margin-top: 10px;
+  padding: 6px 12px;
+  border-radius: 999px;
+  background: var(--bad);
+  color: #fff;
+  font-size: 12px;
+  font-weight: 800;
+
+  ion-icon { font-size: 14px; }
+}
+
+// ── Accesos de Presidencia (Notificar + Sesión + Comisiones) ─────────
+.pq {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
+.pq-tile {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+  padding: 14px 12px;
+  border: none;
+  border-radius: var(--r-lg);
+  background: var(--surface);
+  box-shadow: var(--shadow-sm);
+  font-family: var(--font);
+  text-align: left;
+  text-decoration: none;
+  cursor: pointer;
+  transition: transform 0.14s ease;
+
+  &:active:not(:disabled) { transform: scale(0.96); }
+  &:disabled { cursor: default; }
+}
+
+.pq-ico {
+  position: relative;
+  width: 42px;
+  height: 42px;
+  margin-bottom: 10px;
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  ion-icon { position: relative; font-size: 21px; }
+  ion-spinner { width: 20px; height: 20px; color: #fff; }
+}
+
+.pq-tile--notify .pq-ico {
+  background: linear-gradient(135deg, #D9B26F, #A9823F);
+  color: #fff;
+  box-shadow: 0 8px 18px -8px rgba(169, 130, 63, 0.9);
+}
+
+.pq-title {
+  font-size: 14px;
+  font-weight: 800;
+  color: var(--text);
+  letter-spacing: -0.2px;
+}
+
+.pq-sub {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-3);
+  line-height: 1.2;
+
+  white-space: nowrap;
+
+  .p6-dot { width: 6px; height: 6px; flex-shrink: 0; }
+}
+
+.pq-tile.quick-card--live .pq-ico { background: rgba(var(--bad-rgb), 0.10); color: var(--bad); }
+
+.pq-live {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  .live-dot { display: block; width: 9px; height: 9px; }
+}
+
+.pq-tile.quick-card--live .pq-sub { color: var(--bad); }

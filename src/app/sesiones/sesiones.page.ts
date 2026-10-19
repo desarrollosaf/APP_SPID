@@ -1,12 +1,20 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
+import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { ViewWillEnter, ViewWillLeave, AlertController } from '@ionic/angular';
 import { Eventos } from '../service/eventos';
 import { SocketService } from '../service/socket.service';
 import { User } from '../service/user';
 import { HapticsService } from '../service/haptics.service';
 import { EstadoPanel } from '../interface/user';
+import { environment } from '../../environments/environment';
 
 const SENTIDO: Record<string, number> = { FAVOR: 1, ABSTENCION: 2, CONTRA: 3, 'SIN REGISTRO': 0 };
+
+/** Saca el id de un enlace de YouTube: watch?v=ID, youtu.be/ID, /live/ID, /embed/ID o el id solo. */
+function idDeYoutube(url: string): string | null {
+  const m = url.trim().match(/(?:v=|youtu\.be\/|\/live\/|\/embed\/|\/shorts\/)([\w-]{11})/) ?? url.trim().match(/^([\w-]{11})$/);
+  return m ? m[1] : null;
+}
 
 @Component({
   selector: 'app-sesiones',
@@ -29,6 +37,8 @@ export class SesionesPage implements OnInit, OnDestroy, ViewWillEnter, ViewWillL
 
   // Sesión plenaria activa
   sesionActiva: boolean = false;
+  /** Transmisión de la sesión (se arma una sola vez para que el iframe no se recargue). */
+  readonly videoUrl: SafeResourceUrl | null;
   sesionNombre: string = '';
 
   // Vista de detalle (orden del día / votos)
@@ -50,8 +60,14 @@ export class SesionesPage implements OnInit, OnDestroy, ViewWillEnter, ViewWillL
     private socketService: SocketService,
     private userService: User,
     private alertCtrl: AlertController,
-    private hapticsService: HapticsService
-  ) {}
+    private hapticsService: HapticsService,
+    sanitizer: DomSanitizer
+  ) {
+    const id = idDeYoutube(environment.sesionVideoUrl ?? '');
+    this.videoUrl = id
+      ? sanitizer.bypassSecurityTrustResourceUrl(`https://www.youtube-nocookie.com/embed/${id}?playsinline=1&rel=0&modestbranding=1`)
+      : null;
+  }
 
   ngOnInit() {}
 
