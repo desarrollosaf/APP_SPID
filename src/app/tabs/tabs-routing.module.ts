@@ -1,7 +1,6 @@
 import { NgModule } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
 import { TabsPage } from './tabs.page';
-import { presidenteGuard } from '../guards/presidente.guard';
 
 const routes: Routes = [
   {
@@ -10,7 +9,7 @@ const routes: Routes = [
     children: [
       {
         path: 'inicio',
-        loadChildren: () => import('../folder/folder.module').then(m => m.FolderPageModule)
+        loadChildren: () => import('../presidencia/presidencia.module').then(m => m.PresidenciaPageModule)
       },
       {
         path: 'sesiones',
@@ -20,11 +19,8 @@ const routes: Routes = [
         path: 'comisiones',
         loadChildren: () => import('../comisiones/comisiones.module').then(m => m.ComisionesPageModule)
       },
-      {
-        path: 'presidencia',
-        canActivate: [presidenteGuard],
-        loadChildren: () => import('../presidencia/presidencia.module').then(m => m.PresidenciaPageModule)
-      },
+      // La antigua pestaña de Presidencia ahora vive en Inicio
+      { path: 'presidencia', redirectTo: 'inicio', pathMatch: 'prefix' },
       { path: '', redirectTo: 'inicio', pathMatch: 'full' }
     ]
   }

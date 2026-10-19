@@ -20,11 +20,10 @@ export class AppComponent implements OnInit, OnDestroy {
   splashExiting = false;
   isAuthenticated = false;
 
-  public appPages: { title: string; url?: string; icon: string; action?: string; soloPresidente?: boolean }[] = [
+  public appPages = [
     { title: 'Inicio',        url: '/tabs/inicio',      icon: 'home'          },
     { title: 'Sesión',        url: '/tabs/sesiones',     icon: 'library'       },
     { title: 'Comisiones',    url: '/tabs/comisiones',   icon: 'people' },
-    { title: 'Presidencia',   url: '/tabs/presidencia',  icon: 'ribbon', soloPresidente: true },
     { title: 'Cambiar contraseña', url: '/cambiar-password', icon: 'key'      },
     { title: 'Cerrar sesión', action: 'logout',          icon: 'log-out'       },
   ];
@@ -81,10 +80,6 @@ export class AppComponent implements OnInit, OnDestroy {
     StatusBar.setStyle({ style: Style.Light }).catch(() => {});
     // Oculta la barra de accesorios del teclado en iOS para una UI más limpia
     Keyboard.setAccessoryBarVisible({ isVisible: false }).catch(() => {});
-  }
-
-  get esPresidente(): boolean {
-    return this.userService.esPresidente;
   }
 
   ngOnDestroy() {

@@ -13,7 +13,7 @@ const DIAS_TIRA = 14;
 interface DiaTira { iso: string; letra: string; dia: number; eventos: number; hoy: boolean }
 
 @Component({
-  selector: 'app-panel-presidencia',
+  selector: 'app-inicio',
   templateUrl: './panel.page.html',
   styleUrls: ['./panel.page.scss'],
   standalone: false,
@@ -52,7 +52,7 @@ export class PanelPresidenciaPage implements ViewWillEnter, ViewWillLeave, OnDes
     this.ahora = new Date();
     this.reloj = setInterval(() => (this.ahora = new Date()), 1000);
     if (!this.resumen) this.cargar();
-    this.consultarP6();
+    if (this.esPresidente) this.consultarP6();
   }
 
   ionViewWillLeave(): void {
@@ -74,6 +74,11 @@ export class PanelPresidenciaPage implements ViewWillEnter, ViewWillLeave, OnDes
 
   refrescar(ev: Event): void {
     this.cargar(true, ev.target as unknown as { complete: () => void });
+  }
+
+  /** Inicio es el mismo para todos; Presidencia ve además Notificar, indicadores, sesiones, salones y agenda. */
+  get esPresidente(): boolean {
+    return this.userService.esPresidente;
   }
 
   // ── Encabezado ──

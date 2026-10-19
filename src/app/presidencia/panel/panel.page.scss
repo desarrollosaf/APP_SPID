@@ -1,6 +1,15 @@
 @use '../../../theme/ui';
 @use '../pres';
 
+.toolbar-logo {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  padding-left: 12px;
+
+  img { height: 34px; width: auto; }
+}
+
 // ── Hero con reloj ────────────────────────────────────────────────────
 @keyframes hero-glow {
   0%, 100% { opacity: 0.55; transform: scale(1); }
@@ -43,6 +52,7 @@
 
 .hero-top {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   justify-content: space-between;
   gap: 8px;
@@ -866,5 +876,106 @@
   .tl-dot {
     border-color: var(--bad);
     box-shadow: 0 0 0 4px rgba(var(--bad-rgb), 0.18);
+  }
+}
+
+// ── Accesos del diputado ───────────────────────────────────────────────────────────
+.section-title {
+  font-size: 17px;
+  font-weight: 800;
+  color: var(--text);
+  letter-spacing: -0.3px;
+  margin: 6px 4px 14px;
+}
+
+.quick-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.quick-card,
+.list-card {
+  background: var(--surface);
+  border-radius: var(--r-lg);
+  box-shadow: var(--shadow-sm);
+  text-decoration: none;
+  color: inherit;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+
+  &:active { transform: scale(0.97); }
+}
+
+.quick-card {
+  display: flex;
+  flex-direction: column;
+  padding: 18px 16px;
+  min-height: 150px;
+
+  .qc-ico { margin-bottom: auto; }
+  .qc-title { margin-top: 18px; }
+}
+
+.list-card {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 16px;
+  margin-bottom: 20px;
+}
+
+.lc-text {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.lc-chev {
+  font-size: 18px;
+  color: var(--text-3);
+}
+
+.qc-ico {
+  width: 46px;
+  height: 46px;
+  border-radius: 15px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+
+  ion-icon { font-size: 22px; }
+
+  &--brand   { background: var(--brand-100); color: var(--brand); }
+  &--info    { background: rgba(var(--info-rgb), 0.12); color: var(--info); }
+  &--neutral { background: var(--surface-2); color: var(--text-2); }
+}
+
+.qc-title {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text);
+  letter-spacing: -0.2px;
+  line-height: 1.25;
+}
+
+.qc-sub {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-3);
+  margin-top: 3px;
+}
+
+// ── Pie ───────────────────────────────────────────────────────────────
+.home-foot {
+  display: flex;
+  justify-content: center;
+  padding: 36px 0 8px;
+
+  img {
+    width: 150px;
+    opacity: 0.55;
+    filter: grayscale(0.2);
   }
 }

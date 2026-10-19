@@ -8,7 +8,7 @@
 
       <div class="sp-body">
         <img src="assets/congreso_logo.png" alt="Congreso del Estado de México" class="sp-logo" />
-        <div class="sp-subtitle">Sistema de Votación Digital</div>
+        <div class="sp-subtitle">Sistema Parlamentario de Información Documental</div>
         <div class="sp-progress"><span></span></div>
       </div>
     </div>
@@ -34,12 +34,12 @@
 
           <div class="menu-brand">
             <img src="assets/congreso_logo.png" alt="Congreso del Estado de México" />
-            <span class="menu-brand-sub">Sistema de Votación Digital</span>
+            <span class="menu-brand-sub">Sistema Parlamentario de Información Documental</span>
           </div>
 
           <nav class="menu-nav">
             @for (p of appPages; track p) {
-              @if (p.action !== 'logout' && (!p.soloPresidente || esPresidente)) {
+              @if (p.action !== 'logout') {
                 <ion-menu-toggle auto-hide="false">
                   <a class="menu-item" routerDirection="root" [routerLink]="[p.url]" routerLinkActive="selected">
                     <span class="menu-ico"><ion-icon [name]="p.icon + '-outline'"></ion-icon></span>

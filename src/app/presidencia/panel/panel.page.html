@@ -3,9 +3,9 @@
     <ion-buttons slot="start">
       <ion-menu-button></ion-menu-button>
     </ion-buttons>
-    <div class="toolbar-name-block">
-      <span class="tnb-greeting">Presidencia</span>
-      <span class="tnb-name">{{ nombre }}</span>
+    <!-- El nombre ya aparece en el cuadro de bienvenida; aquí va solo el logo -->
+    <div class="toolbar-logo">
+      <img src="assets/congreso_logo.png" alt="Congreso del Estado de México" />
     </div>
   </ion-toolbar>
 </ion-header>
@@ -20,7 +20,11 @@
     <!-- ══ Hero con reloj ══ -->
     <section class="hero">
       <div class="hero-top">
-        <span class="hero-chip"><ion-icon name="ribbon"></ion-icon> Presidencia</span>
+        @if (esPresidente) {
+          <span class="hero-chip"><ion-icon name="ribbon"></ion-icon> Presidencia</span>
+        } @else {
+          <span class="hero-chip"><ion-icon name="document-text"></ion-icon> Sistema Parlamentario de Información Documental</span>
+        }
         <span class="hero-fecha">{{ fechaLarga }}</span>
       </div>
       <div class="hero-saludo">{{ saludo }},</div>
@@ -30,7 +34,8 @@
       </div>
     </section>
 
-    <!-- ══ Notificar al congreso ══ -->
+    <!-- ══ Notificar al congreso (solo Presidencia) ══ -->
+    @if (esPresidente) {
     <div class="notify-wrap">
       <button class="notify" type="button" [class.notify--sending]="enviando" [disabled]="enviando" (click)="notificar()">
         <span class="notify-ico">
@@ -55,6 +60,38 @@
         </div>
       }
     </div>
+
+    }
+
+    @if (!esPresidente) {
+
+    <!-- ══ Accesos del diputado ══ -->
+    <div class="section-title">Accesos rápidos</div>
+
+    <div class="quick-grid">
+      <a class="quick-card" routerLink="/tabs/sesiones">
+        <span class="qc-ico qc-ico--brand"><ion-icon name="library"></ion-icon></span>
+        <span class="qc-title">Sesión del Pleno</span>
+        <span class="qc-sub">Asistencia y votaciones</span>
+      </a>
+
+      <a class="quick-card" routerLink="/tabs/comisiones">
+        <span class="qc-ico qc-ico--info"><ion-icon name="people"></ion-icon></span>
+        <span class="qc-title">Mis comisiones</span>
+        <span class="qc-sub">Eventos e integrantes</span>
+      </a>
+    </div>
+
+    <a class="list-card" routerLink="/cambiar-password">
+      <span class="qc-ico qc-ico--neutral"><ion-icon name="key"></ion-icon></span>
+      <span class="lc-text">
+        <span class="qc-title">Seguridad</span>
+        <span class="qc-sub">Cambiar contraseña</span>
+      </span>
+      <ion-icon name="chevron-forward" class="lc-chev"></ion-icon>
+    </a>
+
+    }
 
     <!-- ══ Ahora en el Congreso ══ -->
     @if (!cargando && !errorAgenda) {
@@ -94,6 +131,8 @@
         }
       </section>
     }
+
+    @if (esPresidente) {
 
     <!-- ══ Indicadores ══ -->
     <div class="stats">
@@ -244,6 +283,13 @@
           </div>
         }
       </div>
+    }
+
+    } @else {
+
+    <div class="home-foot">
+      <img src="assets/congreso_logo.png" alt="Congreso del Estado de México" />
+    </div>
     }
 
   </div>

@@ -4,12 +4,15 @@ import { PanelPresidenciaPage } from './panel/panel.page';
 import { SalonesPage } from './salones/salones.page';
 import { SesionesPresidenciaPage } from './sesiones/sesiones.page';
 import { SesionDetallePage } from './sesion-detalle/sesion-detalle.page';
+import { presidenteGuard } from '../guards/presidente.guard';
 
 const routes: Routes = [
+  // Inicio: el mismo panel para todos; muestra más secciones si es Presidencia.
   { path: '', component: PanelPresidenciaPage },
-  { path: 'salones', component: SalonesPage },
-  { path: 'sesiones', component: SesionesPresidenciaPage },
-  { path: 'sesiones/:id', component: SesionDetallePage },
+  // Subpáginas solo para Presidencia
+  { path: 'salones', component: SalonesPage, canActivate: [presidenteGuard] },
+  { path: 'sesiones', component: SesionesPresidenciaPage, canActivate: [presidenteGuard] },
+  { path: 'sesiones/:id', component: SesionDetallePage, canActivate: [presidenteGuard] },
 ];
 
 @NgModule({
