@@ -44,7 +44,7 @@
           @if (enviando) { <ion-spinner name="crescent"></ion-spinner> } @else { <ion-icon name="volume-high"></ion-icon> }
         </span>
         <span class="pq-title">{{ enviando ? 'Enviando…' : 'Notificar al congreso' }}</span>
-        <span class="pq-sub"><span class="p6-dot" [attr.data-p6]="p6"></span>{{ p6 === 'conectado' ? 'En línea' : p6 === 'consultando' ? 'Revisando…' : 'Sin conexión' }}</span>
+        <span class="pq-sub"><span class="p6-dot" [attr.data-p6]="p6"></span>{{ p6 === 'conectado' ? 'P-6 en línea' : p6 === 'consultando' ? 'Revisando…' : p6 === 'desconectado' ? 'P-6 desconectado' : 'Sin conexión' }}</span>
       </button>
 
       <!-- Sesión del Pleno -->
