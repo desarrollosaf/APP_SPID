@@ -14,11 +14,11 @@ export const environment = {
 
   // Módulo de Presidencia (portado de SIPresidencia)
   presidencia: {
-    // Usuarios con acceso, por correo o nombre completo (sin importar acentos ni mayúsculas).
-    usuarios: ['paco.vazquez@legislativoedomex.gob.mx'],
+    // La vista de Presidencia la ve quien preside la Junta de Coordinación Política (se detecta solo).
     agendaApiUrl: 'https://administracionyfinanzasplem.gob.mx/Documentacion/api/agenda',
-    // Pad del Roland P-6 que toca el botón "Notificar al congreso".
-    p6Pad: { bank: 'A', pad: 1 },
+    // Backend de SIPresidencia para el botón "Notificar al congreso" (Roland P-6).
+    // En producción va con el /api de su nginx, p. ej. https://<servidor-sipresidencia>/api
+    sipApiUrl: 'http://localhost:3050',
   },
 };
 

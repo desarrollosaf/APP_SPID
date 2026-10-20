@@ -1,12 +1,12 @@
 import { Injectable, inject } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable, forkJoin, map, shareReplay, tap } from 'rxjs';
 import { environment } from '../../environments/environment';
 
 // Módulo de Presidencia, portado de SIPresidencia (angular/SIPresidencia).
 // - Agenda y salones: API pública de agenda del Congreso.
 // - Sesiones, orden del día, votos y videos: API pública de Registro Parlamentario (misma API que SPID).
-// - Botón "Notificar al congreso": backend de SPID (/api/presidencia/p6), con la misma sesión.
+// - Botón "Notificar al congreso": backend de SIPresidencia (/spid/p6), con la sesión de SPID.
 
 // ── Agenda ────────────────────────────────────────────────────────────
 
@@ -291,16 +291,24 @@ export class PresidenciaService {
   }
 
   // ── Notificar al congreso (Roland P-6) ──
-  // El backend de SPID reenvía la orden por Socket.IO al puente (Raspberry Pi) que tiene el P-6 por USB.
-  // Usa la misma sesión de SPID; el backend solo lo permite a los usuarios de Presidencia.
+  // Lo atiende el backend de SIPresidencia (/spid/p6/*). Se manda el token de SPID del usuario;
+  // SIPresidencia lo valida con SPID y solo deja pasar a los usuarios de Presidencia.
+  // El pad que suena lo decide el servidor.
+
+  get p6Configurado(): boolean {
+    return !!this.cfg.sipApiUrl;
+  }
+
+  private get headersSpid(): HttpHeaders {
+    return new HttpHeaders({ Authorization: `Bearer ${localStorage.getItem('authToken') ?? ''}` });
+  }
 
   /** Solo consulta si el puente del P-6 está en línea; no toca ningún sonido. */
   estadoP6(): Observable<{ conectado: boolean; puentes: number }> {
-    return this.http.get<{ conectado: boolean; puentes: number }>(`${environment.apiUrl}/presidencia/p6/estado`);
+    return this.http.get<{ conectado: boolean; puentes: number }>(`${this.cfg.sipApiUrl}/spid/p6/estado`, { headers: this.headersSpid });
   }
 
   notificarCongreso(): Observable<{ ok: boolean; puentes: number }> {
-    const { bank, pad } = this.cfg.p6Pad;
-    return this.http.post<{ ok: boolean; puentes: number }>(`${environment.apiUrl}/presidencia/p6/pad`, { bank, pad, velocity: 100 });
+    return this.http.post<{ ok: boolean; puentes: number }>(`${this.cfg.sipApiUrl}/spid/p6/notificar`, {}, { headers: this.headersSpid });
   }
 }

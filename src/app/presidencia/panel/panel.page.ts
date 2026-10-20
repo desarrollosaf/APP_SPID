@@ -58,7 +58,7 @@ export class PanelPresidenciaPage implements ViewWillEnter, ViewWillLeave, OnDes
     this.ahora = new Date();
     this.reloj = setInterval(() => (this.ahora = new Date()), 1000);
     if (!this.resumen) this.cargar();
-    if (this.esPresidente) this.consultarP6();
+    this.userService.verificarPresidencia().subscribe(es => { if (es) this.consultarP6(); });
 
     this.socketService.conectarComoDiputado(this.userService.integranteLegislaturaId);
     this.dejarDeEscuchar?.();
@@ -225,6 +225,7 @@ export class PanelPresidenciaPage implements ViewWillEnter, ViewWillLeave, OnDes
 
   /** Lee si el puente del P-6 está en línea (no toca ningún sonido). */
   consultarP6(): void {
+    if (!this.presidencia.p6Configurado) { this.p6 = 'sin-conexion'; return; }
     this.p6 = 'consultando';
     this.presidencia.estadoP6().subscribe({
       next: e => (this.p6 = e.conectado ? 'conectado' : 'desconectado'),
@@ -250,6 +251,10 @@ export class PanelPresidenciaPage implements ViewWillEnter, ViewWillLeave, OnDes
 
   async notificar(): Promise<void> {
     if (this.enviando) return;
+    if (!this.presidencia.p6Configurado) {
+      this.toast('Falta configurar la conexión con SIPresidencia.', 'warning');
+      return;
+    }
 
     const alerta = await this.alertCtrl.create({
       header: 'Notificar al congreso',

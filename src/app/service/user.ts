@@ -1,5 +1,5 @@
-import { Observable } from 'rxjs';
-import { tap } from 'rxjs/operators';
+import { Observable, of } from 'rxjs';
+import { catchError, map, tap } from 'rxjs/operators';
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { BehaviorSubject } from 'rxjs';
@@ -15,6 +15,10 @@ export class User {
   private currentUserSubject = new BehaviorSubject<Users | null>(null);
   public currentUser$ = this.currentUserSubject.asObservable();
 
+  /** Presidencia = quien preside la Junta de Coordinación Política (se recalcula con sus comisiones). */
+  private presidenteSubject = new BehaviorSubject<boolean>(localStorage.getItem('esPresidente') === '1');
+  public esPresidente$ = this.presidenteSubject.asObservable();
+
   constructor() {
     this.limpiarTokenInvalido();
     const storedUser = localStorage.getItem('currentUser');
@@ -25,6 +29,7 @@ export class User {
         if (user?.token && user.token !== 'undefined' && user.token.length > 20) {
           localStorage.setItem('authToken', user.token);
           this.currentUserSubject.next(user);
+          this.verificarPresidencia().subscribe();
         } else {
           // Sesión guardada sin token válido — forzar nuevo login
           this.clearSession();
@@ -46,6 +51,8 @@ export class User {
     localStorage.removeItem('authToken');
     localStorage.removeItem('currentUser');
     localStorage.removeItem('isLoggedin');
+    localStorage.removeItem('esPresidente');
+    this.presidenteSubject.next(false);
     this.currentUserSubject.next(null);
   }
 
@@ -54,6 +61,7 @@ export class User {
       tap((response: Users) => {
         localStorage.setItem('authToken', response.token);
         this.setCurrentUser(response);
+        this.verificarPresidencia().subscribe();
       })
     );
   }
@@ -85,18 +93,35 @@ export class User {
     return u?.nombreCompleto ?? u?.name ?? '';
   }
 
-  /** Acceso al módulo de Presidencia: el usuario está en environment.presidencia.usuarios (correo o nombre). */
+  /** Vista de Presidencia: preside la Junta de Coordinación Política. */
   get esPresidente(): boolean {
-    const u = this.currentUserValue?.user;
-    if (!u) return false;
-    const propios = [u.email, u.name, u.nombreCompleto].filter(Boolean).map(t => normalizar(t!));
-    return environment.presidencia.usuarios.some(p => propios.includes(normalizar(p)));
+    return this.presidenteSubject.value;
+  }
+
+  /** Consulta las comisiones del diputado y actualiza si preside la JUCOPO.
+   *  Si la consulta falla se conserva el último valor conocido. */
+  verificarPresidencia(): Observable<boolean> {
+    if (!this.currentUserValue) return of(false);
+    return this.http.get<{ comisiones: { nombre: string; cargo: string }[] }>(`${environment.apiUrl}/diputado/mis-comisiones`).pipe(
+      map(r => (r.comisiones ?? []).some(esPresidenciaJucopo)),
+      tap(es => {
+        localStorage.setItem('esPresidente', es ? '1' : '0');
+        this.presidenteSubject.next(es);
+      }),
+      catchError(() => of(this.presidenteSubject.value)),
+    );
   }
 
   setCurrentUser(user: Users) {
     this.currentUserSubject.next(user);
     localStorage.setItem('currentUser', JSON.stringify(user));
   }
+}
+
+/** Preside la JUCOPO. El cargo debe EMPEZAR con "presiden" para no contar "Vicepresidencia". */
+function esPresidenciaJucopo(c: { nombre: string; cargo: string }): boolean {
+  const nombre = normalizar(c.nombre ?? '');
+  return nombre.includes('junta de coordinacion politica') && normalizar(c.cargo ?? '').startsWith('presiden');
 }
 
 /** Minúsculas, sin acentos y con espacios simples, para comparar nombres y correos. */
