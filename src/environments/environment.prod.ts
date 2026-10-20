@@ -14,6 +14,6 @@ export const environment = {
     agendaApiUrl: 'https://administracionyfinanzasplem.gob.mx/Documentacion/api/agenda',
     // Backend de SIPresidencia para el botón "Notificar al congreso" (Roland P-6).
     // En producción va con el /api de su nginx, p. ej. https://<servidor-sipresidencia>/api
-    sipApiUrl: '', // Pendiente: URL pública de SIPresidencia
+    sipApiUrl: 'https://presidencia.congresoedomex.gob.mx/api',
   },
 };
