@@ -27,44 +27,5 @@
     </div>
   </div>
 
-  <ion-split-pane contentId="main-content" when="false">
-    <ion-menu contentId="main-content" type="overlay" [disabled]="!isAuthenticated">
-      <ion-content>
-        <div class="menu-wrap">
-
-          <div class="menu-brand">
-            <img src="assets/congreso_logo.png" alt="Congreso del Estado de México" />
-            <span class="menu-brand-sub">Sistema Parlamentario de Información Documental</span>
-          </div>
-
-          <nav class="menu-nav">
-            @for (p of appPages; track p) {
-              @if (p.action !== 'logout') {
-                <ion-menu-toggle auto-hide="false">
-                  <a class="menu-item" routerDirection="root" [routerLink]="[p.url]" routerLinkActive="selected">
-                    <span class="menu-ico"><ion-icon [name]="p.icon + '-outline'"></ion-icon></span>
-                    <span class="menu-label">{{ p.title }}</span>
-                    <ion-icon name="chevron-forward" class="menu-chev"></ion-icon>
-                  </a>
-                </ion-menu-toggle>
-              }
-            }
-          </nav>
-
-          @for (p of appPages; track p) {
-            @if (p.action === 'logout') {
-              <ion-menu-toggle auto-hide="false">
-                <button class="menu-logout" type="button" (click)="logout()">
-                  <ion-icon name="log-out-outline"></ion-icon>
-                  <span>{{ p.title }}</span>
-                </button>
-              </ion-menu-toggle>
-            }
-          }
-
-        </div>
-      </ion-content>
-    </ion-menu>
-    <ion-router-outlet id="main-content"></ion-router-outlet>
-  </ion-split-pane>
+  <ion-router-outlet id="main-content"></ion-router-outlet>
 </ion-app>

@@ -15,13 +15,13 @@
       </ion-buttons>
       <ion-title class="toolbar-title-sm">Comisión en vivo</ion-title>
     } @else {
-      <ion-buttons slot="start">
-        <ion-menu-button></ion-menu-button>
-      </ion-buttons>
       <div class="toolbar-name-block">
         <span class="tnb-greeting">Hola,</span>
         <span class="tnb-name">{{ nombreDiputado }}</span>
       </div>
+      <ion-buttons slot="end">
+        <app-avatar-btn></app-avatar-btn>
+      </ion-buttons>
     }
   </ion-toolbar>
 </ion-header>

@@ -1,0 +1,214 @@
+@use '../../theme/ui';
+
+.perfil { padding-bottom: 32px; }
+
+// ── Encabezado ────────────────────────────────────────────────────────
+.pf-hero {
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 28px 20px 24px;
+  margin-bottom: 24px;
+  border-radius: var(--r-xl);
+  background: var(--brand-grad);
+  box-shadow: var(--shadow-brand);
+  color: #fff;
+
+  &::before {
+    content: '';
+    position: absolute;
+    width: 240px; height: 240px;
+    top: -130px; right: -80px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.10);
+  }
+
+  > * { position: relative; }
+}
+
+.pf-avatar {
+  width: 96px;
+  height: 96px;
+  margin-bottom: 14px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.18);
+  border: 3px solid rgba(255, 255, 255, 0.55);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+
+  ion-icon { font-size: 66px; margin-top: 22px; color: rgba(255, 255, 255, 0.92); }
+
+  &--pres { border-color: #E9C98C; box-shadow: 0 0 0 4px rgba(233, 201, 140, 0.35); }
+}
+
+.pf-nombre {
+  margin: 0 0 10px;
+  font-size: 22px;
+  font-weight: 800;
+  letter-spacing: -0.4px;
+  line-height: 1.2;
+}
+
+.pf-rol {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.16);
+  font-size: 13px;
+  font-weight: 700;
+
+  ion-icon { font-size: 15px; }
+}
+
+// ── Secciones ─────────────────────────────────────────────────────────
+.pf-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 4px 10px;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: var(--text-3);
+}
+
+.pf-count {
+  padding: 1px 8px;
+  border-radius: 999px;
+  background: var(--brand-50);
+  color: var(--brand);
+  letter-spacing: 0;
+}
+
+.pf-card {
+  margin-bottom: 22px;
+  border-radius: var(--r-lg);
+  background: var(--surface);
+  box-shadow: var(--shadow-sm);
+  overflow: hidden;
+}
+
+.pf-row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 16px;
+  text-decoration: none;
+  color: inherit;
+
+  & + & { border-top: 1px solid var(--border); }
+
+  &--link:active { background: var(--surface-2); }
+}
+
+.pf-ico {
+  width: 42px;
+  height: 42px;
+  flex-shrink: 0;
+  border-radius: 14px;
+  background: var(--brand-50);
+  color: var(--brand);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  ion-icon { font-size: 20px; }
+
+  &--ok   { background: rgba(var(--ok-rgb), 0.10); color: var(--ok); }
+  &--gold { background: rgba(var(--accent-rgb), 0.18); color: #8A6A32; }
+  &--partido { background: var(--surface-2); background: color-mix(in srgb, var(--pc) 14%, white); color: var(--pc); }
+}
+
+.pf-text {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.pf-k {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-3);
+}
+
+.pf-v {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+
+  &--wrap { white-space: normal; line-height: 1.3; }
+  &--ok { color: var(--ok); }
+}
+
+.pf-coord {
+  display: inline-block;
+  margin-left: 6px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: rgba(var(--accent-rgb), 0.18);
+  color: #8A6A32;
+  font-size: 11px;
+  font-weight: 800;
+  vertical-align: 2px;
+}
+
+.pf-chev { font-size: 16px; color: var(--text-3); }
+
+.pf-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  padding: 22px 16px;
+  font-size: 14px;
+  color: var(--text-2);
+  text-align: center;
+}
+
+// ── Cerrar sesión ─────────────────────────────────────────────────────
+.pf-logout {
+  width: 100%;
+  height: 52px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border: none;
+  border-radius: var(--r-md);
+  background: rgba(var(--bad-rgb), 0.08);
+  color: var(--bad);
+  font-family: var(--font);
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+
+  ion-icon { font-size: 20px; }
+  &:active { transform: scale(0.98); }
+}
+
+.pf-foot {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 28px 0 4px;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-3);
+  text-align: center;
+
+  img { width: 130px; opacity: 0.55; }
+}

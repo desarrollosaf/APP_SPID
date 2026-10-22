@@ -1,0 +1,84 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/tabs/inicio" text="" icon="arrow-back-outline"></ion-back-button>
+    </ion-buttons>
+    <ion-title>Mi perfil</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <div class="page-pad perfil">
+
+    <!-- ══ Encabezado ══ -->
+    <section class="pf-hero">
+      <div class="pf-avatar" [class.pf-avatar--pres]="esPresidente"><ion-icon name="person"></ion-icon></div>
+      <h1 class="pf-nombre">{{ nombre }}</h1>
+      <span class="pf-rol">
+        @if (esPresidente) { <ion-icon name="ribbon"></ion-icon> } @else { <ion-icon name="person"></ion-icon> }
+        {{ rol }}
+      </span>
+    </section>
+
+    <!-- ══ Cuenta ══ -->
+    <div class="pf-label">Mi cuenta</div>
+    <div class="pf-card">
+      <div class="pf-row">
+        <span class="pf-ico"><ion-icon name="mail"></ion-icon></span>
+        <span class="pf-text">
+          <span class="pf-k">Usuario</span>
+          <span class="pf-v">{{ usuario }}</span>
+        </span>
+      </div>
+      @if (grupo) {
+        <div class="pf-row">
+          <span class="pf-ico pf-ico--partido" [style.--pc]="grupo.color"><ion-icon name="flag"></ion-icon></span>
+          <span class="pf-text">
+            <span class="pf-k">Grupo parlamentario</span>
+            <span class="pf-v pf-v--wrap">
+              {{ grupo.siglas }}
+              @if (grupo.coordinador) { <span class="pf-coord">Coordinación</span> }
+            </span>
+            @if (grupo.nombre && grupo.nombre.toLowerCase() !== ('partido ' + grupo.siglas).toLowerCase()) {
+              <span class="pf-k">{{ grupo.nombre }}</span>
+            }
+          </span>
+        </div>
+      }
+      @if (enFuncionesDesde) {
+        <div class="pf-row">
+          <span class="pf-ico"><ion-icon name="calendar"></ion-icon></span>
+          <span class="pf-text">
+            <span class="pf-k">En funciones desde</span>
+            <span class="pf-v">{{ enFuncionesDesde }}</span>
+          </span>
+        </div>
+      }
+      <div class="pf-row">
+        <span class="pf-ico pf-ico--ok"><ion-icon name="shield-checkmark"></ion-icon></span>
+        <span class="pf-text">
+          <span class="pf-k">Estatus</span>
+          <span class="pf-v pf-v--ok">Activo</span>
+        </span>
+      </div>
+      <a class="pf-row pf-row--link" routerLink="/cambiar-password">
+        <span class="pf-ico"><ion-icon name="key"></ion-icon></span>
+        <span class="pf-text">
+          <span class="pf-k">Seguridad</span>
+          <span class="pf-v">Cambiar contraseña</span>
+        </span>
+        <ion-icon name="chevron-forward" class="pf-chev"></ion-icon>
+      </a>
+    </div>
+
+    <button class="pf-logout" type="button" (click)="cerrarSesion()">
+      <ion-icon name="log-out-outline"></ion-icon>
+      Cerrar sesión
+    </button>
+
+    <div class="pf-foot">
+      <img src="assets/congreso_logo.png" alt="Congreso del Estado de México" />
+      <span>Sistema Parlamentario de Información Documental</span>
+    </div>
+  </div>
+</ion-content>

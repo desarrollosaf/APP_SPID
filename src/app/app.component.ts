@@ -7,6 +7,7 @@ import { SocketService } from './service/socket.service';
 import { User } from './service/user';
 import { Eventos } from './service/eventos';
 import { HapticsService } from './service/haptics.service';
+import { LogoutService } from './service/logout.service';
 
 @Component({
   selector: 'app-root',
@@ -20,14 +21,6 @@ export class AppComponent implements OnInit, OnDestroy {
   splashExiting = false;
   isAuthenticated = false;
 
-  public appPages = [
-    { title: 'Inicio',        url: '/tabs/inicio',      icon: 'home'          },
-    { title: 'Sesión',        url: '/tabs/sesiones',     icon: 'library'       },
-    { title: 'Comisiones',    url: '/tabs/comisiones',   icon: 'people' },
-    { title: 'Cambiar contraseña', url: '/cambiar-password', icon: 'key'      },
-    { title: 'Cerrar sesión', action: 'logout',          icon: 'log-out'       },
-  ];
-
   // Keep-alive: llama cada 20 min para que el backend renueve el token (si usa sliding window)
   // y para detectar expiración antes de que ocurra en medio de una sesión parlamentaria
   private keepAliveInterval: ReturnType<typeof setInterval> | null = null;
@@ -38,8 +31,12 @@ export class AppComponent implements OnInit, OnDestroy {
     private socketService: SocketService,
     private userService: User,
     private eventosService: Eventos,
-    private hapticsService: HapticsService
+    private hapticsService: HapticsService,
+    logoutService: LogoutService
   ) {
+    // "Cerrar sesión" vive en Mi perfil; aquí se muestra la animación de salida.
+    logoutService.solicitud$.subscribe(() => this.logout());
+
     this.userService.currentUser$.subscribe(user => {
       this.isAuthenticated = !!user;
       if (user) {

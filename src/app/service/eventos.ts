@@ -25,6 +25,15 @@ export class Eventos {
     return this.http.post<any>(`${environment.apiUrl}/diputado/registrar-voto`, data);
   }
 
+  getMiPerfil(): Observable<{ integrante: { fecha_inicio: string | null; diputado: { nombres: string; apaterno: string; amaterno: string; alias: string | null } | null } }> {
+    return this.http.get<any>(`${environment.apiUrl}/diputado/mi-perfil`);
+  }
+
+  /** Grupos parlamentarios vigentes con sus integrantes (id = integrante_legislatura). */
+  getGruposParlamentarios(): Observable<{ grupos: { id: string; nombre: string | null; siglas: string; integrantes: { id: string; coordinador: boolean }[] }[] }> {
+    return this.http.get<any>(`${environment.apiUrl}/inteligencia/todos/integrantes/`);
+  }
+
   getMisComisiones(): Observable<{ comisiones: MiComision[] }> {
     return this.http.get<{ comisiones: MiComision[] }>(`${environment.apiUrl}/diputado/mis-comisiones`);
   }
