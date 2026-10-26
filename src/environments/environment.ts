@@ -15,7 +15,7 @@ export const environment = {
   // Módulo de Presidencia (portado de SIPresidencia)
   presidencia: {
     // La vista de Presidencia la ve quien preside la Junta de Coordinación Política (se detecta solo).
-    agendaApiUrl: 'https://administracionyfinanzasplem.gob.mx/Documentacion/api/agenda',
+    agendaApiUrl: 'https://administracionyfinanzasplem.gob.mx/Documentacion/backend/api/agenda',
     // Backend de SIPresidencia para el botón "Notificar al congreso" (Roland P-6).
     // En producción va con el /api de su nginx, p. ej. https://<servidor-sipresidencia>/api
     sipApiUrl: 'https://presidencia.congresoedomex.gob.mx/api', // SIPresidencia local: http://localhost:3050
