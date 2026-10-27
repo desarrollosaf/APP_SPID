@@ -54,6 +54,10 @@ export class SesionesPage implements OnInit, OnDestroy, ViewWillEnter, ViewWillL
   private idAgendaActual: string = '';
   private idVotoPuntoActual: string = '';
   private idComisionActual: string = '';
+  // Lo que identifica la votación abierta (llega en el mismo socket). Se manda
+  // con el voto para que el backend lo encuentre aunque haya fallado la
+  // petición que trae id_voto_punto (si no, el voto da 404 hasta salir de la pestaña).
+  private votacionActual: { idPunto?: any; idReserva?: string | null; idIniciativa?: string | null } = {};
 
   constructor(
     private eventosService: Eventos,
@@ -210,6 +214,7 @@ export class SesionesPage implements OnInit, OnDestroy, ViewWillEnter, ViewWillL
       this.idComisionActual = data.idComision ?? '';
       const idRes = (data as any).idReserva;
       const idIni = (data as any).idIniciativa;
+      this.votacionActual = { idPunto: data.idPunto ?? null, idReserva: idRes ?? null, idIniciativa: idIni ?? null };
       this.temaVotacion = this.extraerTextoVotacion(data.punto, idRes, idIni);
       this.noPuntoVotacion = (data.punto as any)?.nopunto ?? null;
       this.tipoPuntoVotacion = idRes ? 'Reserva' : idIni ? 'Iniciativa' : '';
@@ -258,6 +263,7 @@ export class SesionesPage implements OnInit, OnDestroy, ViewWillEnter, ViewWillL
     this.idAgendaActual = '';
     this.idVotoPuntoActual = '';
     this.idComisionActual = '';
+    this.votacionActual = {};
   }
 
   private perteneceAComision(obj: { idComision?: string | null; idComisiones?: string[] }): boolean {
@@ -281,6 +287,11 @@ export class SesionesPage implements OnInit, OnDestroy, ViewWillEnter, ViewWillL
       this.idAgendaActual = estado.votacion.idAgenda;
       this.idVotoPuntoActual = estado.votacion.id_voto_punto;
       this.idComisionActual = estado.votacion.idComision ?? '';
+      this.votacionActual = {
+        idPunto: estado.votacion.idPunto ?? null,
+        idReserva: estado.votacion.idReserva ?? null,
+        idIniciativa: estado.votacion.idIniciativa ?? null,
+      };
       this.temaVotacion = this.extraerTextoVotacion(estado.votacion.punto, estado.votacion.idReserva, estado.votacion.idIniciativa);
       this.noPuntoVotacion = estado.votacion.punto?.nopunto ?? null;
       this.tipoPuntoVotacion = estado.votacion.idReserva ? 'Reserva' : estado.votacion.idIniciativa ? 'Iniciativa' : '';
@@ -310,6 +321,7 @@ export class SesionesPage implements OnInit, OnDestroy, ViewWillEnter, ViewWillL
     this.eventosService.registrarVoto({
       sentido_voto: SENTIDO[tipo] ?? 1,
       id_voto_punto: this.idVotoPuntoActual,
+      ...this.votacionActual,
     }).subscribe({
       next: (r: any) => console.log('Votación registrada:', r),
       error: (err: any) => {

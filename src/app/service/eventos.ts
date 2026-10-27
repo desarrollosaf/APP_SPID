@@ -21,7 +21,14 @@ export class Eventos {
     return this.http.post<any>(`${environment.apiUrl}/diputado/registrar-asistencia`, data);
   }
 
-  registrarVoto(data: { sentido_voto: number; id_voto_punto: string; id_comision?: string }): Observable<any> {
+  registrarVoto(data: {
+    sentido_voto: number;
+    id_voto_punto: string;
+    id_comision?: string;
+    idPunto?: any;
+    idReserva?: string | null;
+    idIniciativa?: string | null;
+  }): Observable<any> {
     return this.http.post<any>(`${environment.apiUrl}/diputado/registrar-voto`, data);
   }
 
